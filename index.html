@@ -1522,54 +1522,66 @@
         box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
       }
 
+      /* HIDE the roof header on desktop - marquee IS the header! */
+      .stage-roof {
+        display: none !important;
+      }
+
       /* OG Marquee sign - The SOULFUL one with chase lights! */
       .marquee-sign {
-        top: 70px; /* Below the roof */
+        top: 8px; /* Flush to top */
         transform: translateX(-50%);
       }
 
       .marquee-frame {
         border-radius: 16px;
-        padding: 10px 20px;
+        padding: 12px 24px;
       }
 
       .marquee-content {
-        padding: 10px 20px;
-        gap: 20px;
+        padding: 12px 24px;
+        gap: 24px;
       }
 
       .marquee-center {
-        min-width: 280px;
+        min-width: 320px;
       }
 
+      /* BIGGER text on marquee! */
       .marquee-question {
-        font-size: 16px;
+        font-size: 20px;
+        letter-spacing: 1px;
       }
 
-      /* Marquee bars - larger to match sidebar style */
+      .marquee-vote-icon {
+        font-size: 32px;
+      }
+
+      /* Marquee bars - match sidebar style exactly */
       .marquee-bars {
-        margin-top: 10px;
-        gap: 6px;
+        margin-top: 12px;
+        gap: 8px;
       }
 
       .marquee-bar-row {
-        gap: 10px;
+        gap: 12px;
       }
 
       .marquee-bar-label {
-        font-size: 9px;
-        width: 44px;
+        font-size: 10px;
+        width: 50px;
+        font-weight: 700;
       }
 
       .marquee-bar-container {
-        height: 12px;
-        border-radius: 6px;
+        height: 14px;
+        border-radius: 7px;
       }
 
       .marquee-bar-pct {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 800;
-        width: 36px;
+        width: 40px;
       }
 
       /* HIDE the sterile Jumbotron - we want the OG marquee! */
@@ -1579,7 +1591,7 @@
 
       /* DJ Booth — Below the marquee sign */
       .dj-booth-visual {
-        top: 240px; /* Below the soulful marquee */
+        top: 180px; /* Closer to marquee */
       }
 
       /* Nightclub takes full space */
@@ -1587,14 +1599,14 @@
         flex: 1;
       }
 
-      /* Dance floor (Crowd) - Bottom 40% of screen */
+      /* Dance floor (Crowd) - RIGHT UP TO THE DJ! Real club vibe */
       .dance-floor {
-        top: auto;
+        top: 280px; /* Directly below DJ booth */
         bottom: 20px;
         left: 20px;
         right: 20px;
-        height: 40%;
-        max-height: 400px;
+        height: auto;
+        max-height: none;
         border-radius: 24px;
         padding: 16px;
       }
@@ -2405,19 +2417,28 @@
       transition: width 0.5s ease;
     }
 
+    /* Party YES bar - Cyan/Blue (matches sidebar) */
+    .marquee-bar.yes {
+      background: linear-gradient(90deg, var(--neon-cyan), #00d4ff);
+      box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    /* Party NO bar - Pink (matches sidebar) */
     .marquee-bar.no {
-      background: linear-gradient(90deg, var(--neon-pink), #ff6090);
+      background: linear-gradient(90deg, #ff6090, var(--neon-pink));
       box-shadow: 0 0 6px var(--neon-pink);
     }
 
-    .marquee-bar.yes {
-      background: linear-gradient(90deg, #00d4ff, var(--neon-cyan));
-      box-shadow: 0 0 6px var(--neon-cyan);
+    /* Kalshi YES bar - Gold (matches sidebar) */
+    .marquee-bar.yes.kalshi {
+      background: linear-gradient(90deg, var(--neon-gold), #ffcc00);
+      box-shadow: 0 0 8px var(--neon-gold);
     }
 
-    .marquee-bar.yes.kalshi {
-      background: linear-gradient(90deg, #c9a227, var(--neon-gold));
-      box-shadow: 0 0 6px var(--neon-gold);
+    /* Kalshi NO bar - Neutral gray (matches sidebar background) */
+    .marquee-bar.kalshi-no {
+      background: rgba(80, 80, 100, 0.6);
+      box-shadow: none;
     }
 
     .marquee-bar-pct {
@@ -3396,7 +3417,7 @@
       height: 38%; /* Bottom ~40% for the crowd */
       max-height: 350px; /* Cap on mobile */
       display: flex;
-      flex-direction: row; /* LEFT/RIGHT SPLIT: NO on left, YES on right */
+      flex-direction: row-reverse; /* LEFT/RIGHT SPLIT: YES (blue) on LEFT, NO (pink) on RIGHT — matches sidebar! */
       gap: 6px;
       z-index: 5;
       padding: 12px;
@@ -6856,14 +6877,14 @@
                 </div>
                 <!-- Market Question -->
                 <div class="marquee-question" id="marquee-question">Will BTC hit $100k by Dec 31?</div>
-                <!-- Stacked Progress Bars: Kalshi + Party -->
+                <!-- Stacked Progress Bars: Kalshi + Party — YES (blue) on LEFT like sidebar! -->
                 <div class="marquee-bars">
                   <!-- Kalshi Bar -->
                   <div class="marquee-bar-row kalshi">
                     <span class="marquee-bar-label">KALSHI</span>
                     <div class="marquee-bar-container">
-                      <div class="marquee-bar no" id="marquee-kalshi-no" style="width: 35%"></div>
                       <div class="marquee-bar yes kalshi" id="marquee-kalshi-yes" style="width: 65%"></div>
+                      <div class="marquee-bar no kalshi-no" id="marquee-kalshi-no" style="width: 35%"></div>
                     </div>
                     <span class="marquee-bar-pct" id="marquee-kalshi-pct">65%</span>
                   </div>
@@ -6871,8 +6892,8 @@
                   <div class="marquee-bar-row party">
                     <span class="marquee-bar-label">PARTY</span>
                     <div class="marquee-bar-container">
-                      <div class="marquee-bar no" id="marquee-bar-no" style="width: 28%"></div>
                       <div class="marquee-bar yes" id="marquee-bar-yes" style="width: 72%"></div>
+                      <div class="marquee-bar no" id="marquee-bar-no" style="width: 28%"></div>
                     </div>
                     <span class="marquee-bar-pct" id="marquee-yes-pct">72%</span>
                   </div>
