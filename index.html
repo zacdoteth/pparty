@@ -1736,16 +1736,15 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NINTENDO-STYLE HEADER — Clean, Tactile, Premium
+       HABBO 2026: MAXIMUM MA — No nav, all room
+       "The Roof is the Room. The Room is the World." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
     .arena-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: calc(var(--safe-top) + 8px) 12px 12px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
-      position: relative;
-      z-index: 100;
+      display: none !important; /* GONE. Maximum Ma. */
+    }
+
+    .scores-container {
+      display: none !important; /* Data lives on the wall screens now */
     }
 
     .nav-btn {
@@ -3413,20 +3412,20 @@
        "A User is a Resident. A Page is a Room." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
 
-    /* THE ROOM CONTAINER — Perspective viewport */
+    /* THE ROOM CONTAINER — Maximum Ma: 100% width, bottom 70% of screen */
     .iso-room {
       position: absolute;
-      top: 60px;
+      top: 30%; /* Room fills bottom 70% */
       bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 95%;
-      max-width: 500px;
+      left: 0;
+      right: 0;
+      width: 100%;
       z-index: 5;
-      /* 3D Perspective — Camera looking down at the room */
-      perspective: 800px;
-      perspective-origin: 50% 35%;
+      /* 3D Perspective — Camera looking down at the corner */
+      perspective: 1000px;
+      perspective-origin: 50% 20%;
       transform-style: preserve-3d;
+      overflow: visible;
     }
 
     /* THE ROOM WORLD — Everything rotates together */
@@ -3440,25 +3439,39 @@
       transform-origin: center center;
     }
 
-    /* ═══ THE FLOOR — Diamond Grid with YES/NO Zones ═══ */
+    /* ═══════════════════════════════════════════════════════════════
+       THE FLOOR — Dynamic Territory Based on Market Probability
+       "The floor tells the story. 70% NO = 70% Pink territory." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
     .iso-floor {
       position: absolute;
-      width: 280px;
+      width: 320px;
       height: 280px;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
       transform-style: preserve-3d;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 4px;
+      /* Dynamic columns set by JS via CSS custom property */
+      --yes-ratio: 0.5;
+      --no-ratio: 0.5;
     }
 
-    /* Floor Zone Containers */
+    /* Floor Zone Containers — Width driven by market ratio */
     .floor-zone {
       position: relative;
       transform-style: preserve-3d;
-      transition: all 0.3s var(--smooth);
+      transition: flex 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .floor-zone.yes {
+      flex: var(--yes-ratio);
+    }
+
+    .floor-zone.no {
+      flex: var(--no-ratio);
     }
 
     /* The Tile Grid within each zone */
@@ -3548,61 +3561,147 @@
       border-color: #FF0055;
     }
 
-    /* ═══ THE WALLS — Vertical planes for depth ═══ */
+    /* ═══════════════════════════════════════════════════════════════
+       THE CORNER WALLS — Two massive SCREENS meeting at 120° angle
+       Left Wall = Pink (NO) Screen | Right Wall = Cyan (YES) Screen
+       "These walls are not walls. They are JUMBOTRONS." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
     .iso-wall {
       position: absolute;
       transform-style: preserve-3d;
-      background: linear-gradient(180deg,
-        #0a0a12 0%,
-        #080810 50%,
-        #050508 100%
-      );
     }
 
-    /* Back Wall (LEFT in iso view — behind YES zone) */
+    /* BACK-LEFT WALL — The NO Screen (Pink) */
     .iso-wall.back-left {
-      width: 140px;
-      height: 120px;
-      left: calc(50% - 142px);
-      top: calc(50% - 140px);
+      width: 180px;
+      height: 160px;
+      left: calc(50% - 180px);
+      top: calc(50% - 200px);
       transform: rotateX(-90deg) translateZ(0px);
       transform-origin: bottom center;
-      border-left: 2px solid rgba(0, 240, 255, 0.3);
-      box-shadow: inset 0 0 60px rgba(0, 240, 255, 0.1);
+      background: linear-gradient(180deg, #1a0515 0%, #0f030a 100%);
+      border: 2px solid rgba(255, 0, 85, 0.4);
+      box-shadow:
+        inset 0 0 80px rgba(255, 0, 85, 0.15),
+        0 0 40px rgba(255, 0, 85, 0.2);
+      overflow: hidden;
     }
 
-    /* Back Wall (RIGHT in iso view — behind NO zone) */
+    /* Pixel grid texture on wall screens */
+    .iso-wall::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 8px 8px;
+      pointer-events: none;
+    }
+
+    /* Screen glow emission */
+    .iso-wall::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: linear-gradient(0deg, currentColor, transparent);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .iso-wall.back-left::after { color: #FF0055; }
+    .iso-wall.back-right::after { color: #00F0FF; }
+
+    /* BACK-RIGHT WALL — The YES Screen (Cyan) */
     .iso-wall.back-right {
-      width: 140px;
-      height: 120px;
-      right: calc(50% - 142px);
-      top: calc(50% - 140px);
+      width: 180px;
+      height: 160px;
+      right: calc(50% - 180px);
+      top: calc(50% - 200px);
       transform: rotateX(-90deg) translateZ(0px);
       transform-origin: bottom center;
-      border-right: 2px solid rgba(255, 0, 85, 0.3);
-      box-shadow: inset 0 0 60px rgba(255, 0, 85, 0.1);
+      background: linear-gradient(180deg, #051520 0%, #030a0f 100%);
+      border: 2px solid rgba(0, 240, 255, 0.4);
+      box-shadow:
+        inset 0 0 80px rgba(0, 240, 255, 0.15),
+        0 0 40px rgba(0, 240, 255, 0.2);
+      overflow: hidden;
     }
 
-    /* Side Wall Left */
-    .iso-wall.side-left {
-      width: 120px;
-      height: 140px;
-      left: calc(50% - 260px);
-      top: calc(50% - 70px);
-      transform: rotateY(90deg) rotateZ(0deg);
-      transform-origin: right center;
-      background: linear-gradient(90deg, #050508, #0a0a12);
+    /* Wall Screen Content Container */
+    .wall-screen-content {
+      position: absolute;
+      inset: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      z-index: 2;
     }
 
-    /* Side Wall Right */
-    .iso-wall.side-right {
-      width: 120px;
-      height: 140px;
-      right: calc(50% - 260px);
-      top: calc(50% - 70px);
-      transform: rotateY(-90deg);
-      transform-origin: left center;
-      background: linear-gradient(-90deg, #050508, #0a0a12);
+    /* Wall Screen Label */
+    .wall-screen-label {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+    }
+
+    .iso-wall.back-left .wall-screen-label { color: #FF0055; }
+    .iso-wall.back-right .wall-screen-label { color: #00F0FF; }
+
+    /* Wall Screen Stats */
+    .wall-screen-stat {
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0.8;
+      letter-spacing: 1px;
+    }
+
+    .wall-screen-odds {
+      font-size: 48px;
+      font-weight: 900;
+      text-shadow: 0 0 30px currentColor;
+      line-height: 1;
+    }
+
+    /* Scanlines overlay */
+    .wall-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Floor light bloom from wall screens */
+    .wall-floor-bloom {
+      position: absolute;
+      width: 200px;
+      height: 150px;
+      bottom: -150px;
+      left: 50%;
+      transform: translateX(-50%) rotateX(90deg);
+      transform-origin: top center;
+      pointer-events: none;
+    }
+
+    .iso-wall.back-left .wall-floor-bloom {
+      background: radial-gradient(ellipse at 50% 0%, rgba(255, 0, 85, 0.25) 0%, transparent 70%);
+    }
+
+    .iso-wall.back-right .wall-floor-bloom {
+      background: radial-gradient(ellipse at 50% 0%, rgba(0, 240, 255, 0.25) 0%, transparent 70%);
     }
 
     /* ═══ THE JUMBOTRON — Wall-Mounted Screen ═══ */
@@ -3724,67 +3823,119 @@
       pointer-events: none;
     }
 
-    /* ═══ THE DJ BOOTH — 3D Block Structure ═══ */
+    /* ═══════════════════════════════════════════════════════════════
+       THE DJ BOOTH — Physical 3D Block Structure
+       "Not a sprite. A BLOCK. Top, Front-Left, Front-Right faces." — Toshiro
+       Sits ON the floor tiles, against the central corner seam.
+    ═══════════════════════════════════════════════════════════════ */
     .iso-dj-booth {
       position: absolute;
       left: 50%;
-      top: calc(50% - 80px);
+      top: calc(50% - 100px);
       transform: translateX(-50%);
       transform-style: preserve-3d;
       z-index: 60;
     }
 
-    /* DJ Booth Base — The console block */
+    /* DJ Booth Base — The 3D console block */
     .dj-booth-block {
       position: relative;
-      width: 80px;
-      height: 25px;
-      background: linear-gradient(180deg, #2a2a35 0%, #1a1a22 100%);
+      width: 100px;
+      height: 40px;
       transform-style: preserve-3d;
     }
 
-    /* Front face of booth */
-    .dj-booth-block::before {
-      content: '';
+    /* TOP FACE — The console surface */
+    .dj-booth-top {
       position: absolute;
       width: 100%;
-      height: 30px;
+      height: 100%;
+      background: linear-gradient(135deg, #2a2a35 0%, #1f1f28 50%, #18181f 100%);
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      box-shadow:
+        inset 0 0 20px rgba(255, 215, 0, 0.1),
+        0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    /* FRONT-LEFT FACE — Visible in isometric view */
+    .dj-booth-front-left {
+      position: absolute;
+      width: 100%;
+      height: 35px;
       bottom: 0;
-      background: linear-gradient(180deg, #1a1a22, #0f0f15);
+      background: linear-gradient(180deg, #1a1a22 0%, #0f0f15 100%);
       transform: rotateX(-90deg);
       transform-origin: bottom;
-      border-top: 2px solid rgba(255, 215, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 0, 85, 0.4);
+      box-shadow: inset 0 -10px 30px rgba(255, 0, 85, 0.1);
     }
 
-    /* Right face of booth */
-    .dj-booth-block::after {
+    /* LED strip on front face */
+    .dj-booth-front-left::before {
       content: '';
       position: absolute;
-      width: 30px;
-      height: 100%;
-      right: 0;
-      background: linear-gradient(90deg, #151520, #0a0a10);
-      transform: rotateY(90deg);
-      transform-origin: right;
+      top: 8px;
+      left: 10px;
+      right: 10px;
+      height: 4px;
+      background: linear-gradient(90deg, #FF0055, #FFD700, #00F0FF);
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      animation: led-pulse 1s ease-in-out infinite alternate;
     }
 
-    /* DJ Turntables */
+    @keyframes led-pulse {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    /* FRONT-RIGHT FACE — Side panel */
+    .dj-booth-front-right {
+      position: absolute;
+      width: 35px;
+      height: 100%;
+      right: 0;
+      background: linear-gradient(90deg, #151520 0%, #0a0a10 100%);
+      transform: rotateY(90deg);
+      transform-origin: right;
+      border-right: 2px solid rgba(0, 240, 255, 0.4);
+      box-shadow: inset 10px 0 30px rgba(0, 240, 255, 0.1);
+    }
+
+    /* DJ Turntables on top face */
     .dj-turntables {
       position: absolute;
-      top: -2px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
       display: flex;
-      gap: 20px;
+      gap: 24px;
+      z-index: 2;
     }
 
     .dj-turntable {
-      width: 18px;
-      height: 18px;
-      background: radial-gradient(circle, #222 0%, #111 70%, #333 100%);
+      width: 22px;
+      height: 22px;
+      background: radial-gradient(circle, #333 0%, #111 60%, #222 100%);
       border-radius: 50%;
       border: 2px solid #444;
-      animation: spin-record 3s linear infinite;
+      box-shadow:
+        inset 0 0 8px rgba(0, 0, 0, 0.8),
+        0 2px 4px rgba(0, 0, 0, 0.5);
+      animation: spin-record 2.5s linear infinite;
+    }
+
+    /* Record label */
+    .dj-turntable::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, #FFD700, #FF8800);
+      border-radius: 50%;
     }
 
     @keyframes spin-record {
@@ -3792,21 +3943,57 @@
       to { transform: rotate(360deg); }
     }
 
-    /* DJ Avatar (standing on booth) */
+    /* Mixer in center */
+    .dj-mixer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 30px;
+      background: linear-gradient(180deg, #222, #111);
+      border-radius: 2px;
+      border: 1px solid #444;
+      z-index: 1;
+    }
+
+    .dj-mixer-slider {
+      position: absolute;
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(180deg, #00F0FF, #FF0055);
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+      animation: mixer-slide 0.5s ease-in-out infinite alternate;
+    }
+
+    .dj-mixer-slider:first-child { top: 4px; }
+    .dj-mixer-slider:last-child { bottom: 4px; animation-delay: 0.25s; }
+
+    @keyframes mixer-slide {
+      0% { transform: translateX(-50%) translateY(-2px); }
+      100% { transform: translateX(-50%) translateY(2px); }
+    }
+
+    /* DJ Avatar (billboard sprite standing ON booth) */
     .dj-avatar {
       position: absolute;
       left: 50%;
       bottom: 100%;
-      transform: translateX(-50%) translateZ(20px);
+      /* Billboard counter-rotation + translateZ to stand on top of booth */
+      transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg) translateZ(30px);
       transform-style: preserve-3d;
     }
 
-    /* DJ Head */
+    /* DJ Head with photo */
     .dj-avatar-head {
-      width: 24px;
-      height: 24px;
-      background: radial-gradient(circle at 30% 30%, #222, #111);
+      width: 28px;
+      height: 28px;
+      background: url('/tg/bandit.jpg') center/cover;
       border-radius: 50%;
+      border: 2px solid #FFD700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.5);
       position: relative;
       margin: 0 auto;
     }
@@ -3815,39 +4002,40 @@
     .dj-avatar-head::after {
       content: '';
       position: absolute;
-      top: 4px;
-      left: -4px;
-      right: -4px;
-      height: 6px;
-      background: linear-gradient(90deg, #FF0055, transparent 20%, transparent 80%, #00F0FF);
+      top: 2px;
+      left: -6px;
+      right: -6px;
+      height: 8px;
+      background: linear-gradient(90deg, #FF0055, #333 20%, #333 80%, #00F0FF);
       border-radius: 10px 10px 0 0;
     }
 
     /* DJ Body */
     .dj-avatar-body {
-      width: 20px;
-      height: 28px;
+      width: 22px;
+      height: 30px;
       background: linear-gradient(180deg, #1a1a25, #0f0f15);
-      margin: 2px auto 0;
+      margin: -4px auto 0;
       border-radius: 4px 4px 0 0;
+      border: 1px solid rgba(255, 215, 0, 0.3);
     }
 
-    /* DJ Arms */
+    /* DJ Arms scratching */
     .dj-avatar-arms {
       position: absolute;
-      top: 28px;
+      top: 32px;
       left: 50%;
       transform: translateX(-50%);
-      width: 44px;
+      width: 50px;
       display: flex;
       justify-content: space-between;
     }
 
     .dj-arm {
-      width: 4px;
-      height: 16px;
-      background: #1a1a25;
-      border-radius: 2px;
+      width: 5px;
+      height: 18px;
+      background: linear-gradient(180deg, #1a1a25, #0f0f15);
+      border-radius: 3px;
       transform-origin: top center;
       animation: dj-scratch 0.5s ease-in-out infinite alternate;
     }
@@ -3860,7 +4048,10 @@
       100% { transform: rotate(15deg); }
     }
 
-    /* ═══ BILLBOARD AVATARS — Always face the camera ═══ */
+    /* ═══════════════════════════════════════════════════════════════
+       BILLBOARD AVATARS — Social Signaling + Habbo Floor Shadows
+       "Clothes match your bet. Shadow locks you to the floor." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
     .crowd-area {
       position: absolute;
       inset: 0;
@@ -3879,12 +4070,27 @@
       cursor: pointer;
     }
 
+    /* HABBO "J" FLOOR SHADOW — Dark squircle locked to floor tile */
+    .iso-avatar::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 10px;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%) rotateX(60deg) rotateZ(-45deg);
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
     .iso-avatar-sprite {
       width: 32px;
       height: 48px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
     }
 
     /* Avatar Head with photo */
@@ -3896,6 +4102,7 @@
       border: 2px solid rgba(255, 255, 255, 0.3);
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      z-index: 2;
     }
 
     .iso-avatar-photo {
@@ -3905,13 +4112,39 @@
       background-position: center;
     }
 
-    /* Avatar Body */
+    /* Avatar Body — Default neutral */
     .iso-avatar-body {
       width: 16px;
       height: 20px;
       background: linear-gradient(180deg, #2a2a35 0%, #1a1a22 100%);
       border-radius: 4px 4px 0 0;
       margin-top: -4px;
+      z-index: 1;
+      transition: background 0.3s ease;
+    }
+
+    /* ═══ BETSIDE OUTFIT COLORS — "Your clothes tell your story" ═══ */
+
+    /* YES Team Outfit — Cyan */
+    .iso-avatar.bet-yes .iso-avatar-body {
+      background: linear-gradient(180deg, #00D0DD 0%, #008899 100%);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    }
+
+    .iso-avatar.bet-yes .iso-avatar-head {
+      border-color: #00F0FF;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* NO Team Outfit — Pink */
+    .iso-avatar.bet-no .iso-avatar-body {
+      background: linear-gradient(180deg, #DD0055 0%, #990033 100%);
+      box-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
+    }
+
+    .iso-avatar.bet-no .iso-avatar-head {
+      border-color: #FF0055;
+      box-shadow: 0 0 12px rgba(255, 0, 85, 0.5), 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
     /* Party Hat / Aura — The "Drip" */
@@ -3922,6 +4155,7 @@
       transform: translateX(-50%);
       font-size: 14px;
       filter: drop-shadow(0 0 4px currentColor);
+      z-index: 3;
     }
 
     .iso-avatar-aura.yes { color: #00F0FF; }
@@ -7701,9 +7935,27 @@
           <!-- THE 3D WORLD — Everything rotates together -->
           <div class="iso-world" id="iso-world">
 
-            <!-- THE WALLS — Vertical planes for depth -->
-            <div class="iso-wall back-left"></div>
-            <div class="iso-wall back-right"></div>
+            <!-- THE CORNER WALLS — Two massive SCREENS meeting at 120° angle -->
+            <!-- BACK-LEFT WALL: The NO Screen (Pink) -->
+            <div class="iso-wall back-left">
+              <div class="wall-screen-content">
+                <div class="wall-screen-label">NO</div>
+                <div class="wall-screen-odds" id="wall-no-odds">35%</div>
+                <div class="wall-screen-stat">Kalshi: <span id="wall-no-kalshi">35¢</span></div>
+              </div>
+              <div class="wall-scanlines"></div>
+              <div class="wall-floor-bloom"></div>
+            </div>
+            <!-- BACK-RIGHT WALL: The YES Screen (Cyan) -->
+            <div class="iso-wall back-right">
+              <div class="wall-screen-content">
+                <div class="wall-screen-label">YES</div>
+                <div class="wall-screen-odds" id="wall-yes-odds">65%</div>
+                <div class="wall-screen-stat">Kalshi: <span id="wall-yes-kalshi">65¢</span></div>
+              </div>
+              <div class="wall-scanlines"></div>
+              <div class="wall-floor-bloom"></div>
+            </div>
 
             <!-- THE JUMBOTRON — Wall-mounted screen -->
             <div class="iso-jumbotron" id="iso-jumbotron">
@@ -7718,14 +7970,24 @@
               <div class="iso-jumbotron-light"></div>
             </div>
 
-            <!-- THE DJ BOOTH — 3D block structure -->
+            <!-- THE DJ BOOTH — Physical 3D Block Structure -->
             <div class="iso-dj-booth">
               <div class="dj-booth-block">
-                <div class="dj-turntables">
-                  <div class="dj-turntable"></div>
-                  <div class="dj-turntable"></div>
+                <!-- 3D Faces -->
+                <div class="dj-booth-top">
+                  <div class="dj-turntables">
+                    <div class="dj-turntable"></div>
+                    <div class="dj-turntable"></div>
+                  </div>
+                  <div class="dj-mixer">
+                    <div class="dj-mixer-slider"></div>
+                    <div class="dj-mixer-slider"></div>
+                  </div>
                 </div>
+                <div class="dj-booth-front-left"></div>
+                <div class="dj-booth-front-right"></div>
               </div>
+              <!-- DJ Avatar standing ON the booth -->
               <div class="dj-avatar">
                 <div class="dj-avatar-head"></div>
                 <div class="dj-avatar-body"></div>
@@ -8216,6 +8478,42 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // HABBO 2026 — DYNAMIC FLOOR TERRITORY
+    // "The floor tells the story. 70% NO = 70% Pink territory." — Toshiro
+    // ═══════════════════════════════════════════════════════════════
+    function setMarketRatio(yesPercentage) {
+      const floor = document.getElementById('iso-floor');
+      if (!floor) return;
+
+      // Clamp between 10-90% to always show both zones
+      const yesRatio = Math.max(0.1, Math.min(0.9, yesPercentage / 100));
+      const noRatio = 1 - yesRatio;
+
+      // Update CSS custom properties for dynamic flex sizing
+      floor.style.setProperty('--yes-ratio', yesRatio);
+      floor.style.setProperty('--no-ratio', noRatio);
+
+      // Update wall screen stats
+      const wallYesOdds = document.getElementById('wall-yes-odds');
+      const wallNoOdds = document.getElementById('wall-no-odds');
+      const wallYesKalshi = document.getElementById('wall-yes-kalshi');
+      const wallNoKalshi = document.getElementById('wall-no-kalshi');
+
+      if (wallYesOdds) wallYesOdds.textContent = `${yesPercentage}%`;
+      if (wallNoOdds) wallNoOdds.textContent = `${100 - yesPercentage}%`;
+      if (wallYesKalshi) wallYesKalshi.textContent = `${yesPercentage}¢`;
+      if (wallNoKalshi) wallNoKalshi.textContent = `${100 - yesPercentage}¢`;
+
+      // Update floor zone score labels
+      const yesScore = document.getElementById('yes-score');
+      const noScore = document.getElementById('no-score');
+      if (yesScore) yesScore.textContent = `${yesPercentage}%`;
+      if (noScore) noScore.textContent = `${100 - yesPercentage}%`;
+
+      console.log(`[HABBO 2026] Floor territory: YES ${Math.round(yesRatio * 100)}% | NO ${Math.round(noRatio * 100)}%`);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // OPEN MARKET (ARENA)
     // ═══════════════════════════════════════════════════════════════
     function openMarket(index) {
@@ -8281,9 +8579,8 @@
       document.getElementById('party-no').textContent = `${100 - currentMarket.partyYes}%`;
       document.getElementById('party-bar-yes').style.width = `${currentMarket.partyYes}%`;
 
-      // Update floor score labels to match market data
-      document.getElementById('yes-score').textContent = `${yesPercent}%`;
-      document.getElementById('no-score').textContent = `${100 - yesPercent}%`;
+      // ═══ HABBO 2026 — Dynamic floor territory based on market probability ═══
+      setMarketRatio(yesPercent);
 
       // Start countdown timer
       startCountdown();
@@ -8380,10 +8677,15 @@
       });
     }
 
-    // ═══ HABBO 2026 — Billboard Avatar Creation ═══
+    // ═══════════════════════════════════════════════════════════════
+    // HABBO 2026 — Billboard Avatar Creation with BetSide Outfits
+    // "Your clothes tell your story." — Toshiro
+    // ═══════════════════════════════════════════════════════════════
     function createVillager(member, index, team, position) {
       const avatar = document.createElement('div');
-      avatar.className = 'iso-avatar dancing';
+      // Add bet-yes or bet-no class for outfit coloring
+      const betClass = team === 'yes' ? 'bet-yes' : 'bet-no';
+      avatar.className = `iso-avatar dancing ${betClass}`;
 
       // Random animation delay for organic crowd
       const delay = Math.random() * 2;
@@ -8403,13 +8705,11 @@
       const auras = ['👑', '🔥', '⭐', '💎', '🎮', '🎯', '🚀', '💫'];
       const aura = auras[Math.floor(Math.random() * auras.length)];
 
-      const borderColor = team === 'yes' ? '#00F0FF' : '#FF0055';
-
-      // HABBO 2026 Billboard Avatar
+      // HABBO 2026 Billboard Avatar with team-colored outfit
       avatar.innerHTML = `
         <div class="iso-avatar-sprite">
           <div class="iso-avatar-aura ${team}">${aura}</div>
-          <div class="iso-avatar-head" style="border-color: ${borderColor};">
+          <div class="iso-avatar-head">
             <div class="iso-avatar-photo" style="background-image: url('${member.photo}')"></div>
           </div>
           <div class="iso-avatar-body"></div>
