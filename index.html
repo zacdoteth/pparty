@@ -3452,7 +3452,9 @@
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-touch-callout: none;
       will-change: transform, left, bottom;
+      pointer-events: auto !important;
     }
 
     .player-container:active {
@@ -3807,9 +3809,14 @@
       padding: 15px 16px calc(15px + var(--safe-bottom));
       background: linear-gradient(180deg, transparent, rgba(0,0,0,0.4) 60%);
       display: flex;
-      z-index: 100;
+      z-index: 90; /* Below player-container */
       align-items: center;
       justify-content: center;
+      pointer-events: none; /* Let clicks pass through to player */
+    }
+
+    .control-deck > * {
+      pointer-events: auto; /* But dock can still receive events */
     }
 
     /* Player Home Base — Dock circle that surrounds the player */
@@ -3826,6 +3833,7 @@
       padding-bottom: 8px;
       animation: dock-breathe 2s ease-in-out infinite;
       box-shadow: 0 0 30px rgba(255,215,0,0.1), inset 0 0 20px rgba(255,215,0,0.05);
+      pointer-events: none; /* Don't block player dragging */
     }
 
     @keyframes dock-breathe {
@@ -4976,7 +4984,7 @@
           </div>
         </div>
 
-        <!-- Player (You) — Photo head with stick figure body like villagers -->
+        <!-- Player (You) — OUTSIDE dance-floor so it can be dragged freely! -->
         <div class="player-container at-door" id="player-container">
           <div class="player at-door" id="player">
             <div class="player-speech" id="player-speech"></div>
@@ -4993,13 +5001,13 @@
           </div>
           <div class="player-label">You</div>
         </div>
-      </div>
 
-      <!-- Vote Buttons -->
-      <div class="control-deck">
-        <!-- Player Dock - visual home base (drag-only mode) -->
-        <div class="player-dock" id="player-dock">
-          <div class="drag-hint">← NO &nbsp;|&nbsp; YES →</div>
+        <!-- Vote Buttons -->
+        <div class="control-deck">
+          <!-- Player Dock - visual home base (drag-only mode) -->
+          <div class="player-dock" id="player-dock">
+            <div class="drag-hint">← NO &nbsp;|&nbsp; YES →</div>
+          </div>
         </div>
       </div>
     </div>
