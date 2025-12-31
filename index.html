@@ -3453,7 +3453,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      will-change: transform, left, bottom;
+      will-change: transform;
       pointer-events: auto !important;
     }
 
@@ -3461,13 +3461,12 @@
       cursor: grabbing;
     }
 
-    /* At door - INSIDE the dock circle, BELOW dance floor */
+    /* At door - INSIDE the dock circle */
     .player-container.at-door {
       left: 50%;
       bottom: 30px;
       transform: translateX(-50%);
-      z-index: 101;
-      transition: none;
+      z-index: 200;
     }
 
     .player-container.on-stage {
@@ -4684,6 +4683,8 @@
       50% { opacity: 1; transform: scale(1.5); }
     }
   </style>
+  <!-- interact.js for bulletproof drag & drop -->
+  <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.27/dist/interact.min.js"></script>
 </head>
 <body>
   <!-- GLOBAL PARTY LIGHTS — Always visible, never resets! -->
@@ -5859,39 +5860,17 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // DRAGGING — Nintendo-Quality Doll Physics
-    // Feel the weight. Feel the swing. Feel the JUICE!
+    // DRAGGING — interact.js Powered Nintendo Physics
+    // Battle-tested library + our juice = MAGIC!
     // ═══════════════════════════════════════════════════════════════
     function setupDragging() {
-      // State
-      let isDragging = false;
-      let hasMoved = false;
       let pendingVote = null;
+      let lastVelocityX = 0;
+      let dragStartX = 0;
+      let dragStartY = 0;
 
-      // Position tracking
-      let startPointerX = 0;
-      let startPointerY = 0;
-      let startElementX = 0;
-      let startElementY = 0;
-      let currentX = 0;
-      let currentY = 0;
-
-      // Velocity for doll physics
-      let velocityX = 0;
-      let velocityY = 0;
-      let lastX = 0;
-      let lastY = 0;
-      let lastTime = 0;
-
-      // Constants
-      const TAP_THRESHOLD = 8;
-      const ZONE_THRESHOLD = 0.3; // 30% from center
-      const VELOCITY_DECAY = 0.92;
-      const MAX_ROTATION = 15; // degrees
-
-      // Get screen dimensions
-      const getScreenWidth = () => window.innerWidth;
-      const getScreenCenter = () => getScreenWidth() / 2;
+      const ZONE_THRESHOLD = 0.3;
+      const MAX_ROTATION = 15;
 
       // Confirmation popup elements
       const dropConfirm = document.getElementById('drop-confirm');
@@ -5900,216 +5879,186 @@
       const dropConfirmCancel = document.getElementById('drop-confirm-cancel');
       const dropConfirmYes = document.getElementById('drop-confirm-yes');
 
-      // ═══ PICKUP ═══
-      function handlePointerDown(e) {
-        if (isDragging) return;
-        e.preventDefault();
-        e.stopPropagation();
-
-        isDragging = true;
-        hasMoved = false;
-
-        // Capture pointer for reliable tracking
-        playerContainer.setPointerCapture(e.pointerId);
-
-        // Record start positions
+      // Get the starting position
+      function getStartPosition() {
         const rect = playerContainer.getBoundingClientRect();
-        startPointerX = e.clientX;
-        startPointerY = e.clientY;
-        startElementX = rect.left + rect.width / 2;
-        startElementY = rect.top + rect.height / 2;
-        currentX = startElementX;
-        currentY = startElementY;
-        lastX = startElementX;
-        lastY = startElementY;
-        lastTime = performance.now();
-        velocityX = 0;
-        velocityY = 0;
-
-        // Add dragging classes
-        playerContainer.classList.add('dragging');
-        player.classList.add('lifted');
-        player.classList.add('dragging-active');
-
-        // Hide dock
-        document.getElementById('player-dock').classList.add('hidden');
-
-        // Nintendo "lift" effect - scale up with shadow
-        player.style.transform = 'scale(1.15)';
-        player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
-
-        // Haptic lift
-        if (navigator.vibrate) navigator.vibrate(8);
-
-        console.log('🎮 Pickup! Starting drag...');
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
       }
 
-      // ═══ MOVE ═══
-      function handlePointerMove(e) {
-        if (!isDragging) return;
-        e.preventDefault();
+      // ═══ INTERACT.JS SETUP ═══
+      interact('#player-container').draggable({
+        // Enable inertial throwing
+        inertia: {
+          resistance: 12,
+          minSpeed: 200,
+          endSpeed: 50
+        },
 
-        const now = performance.now();
-        const dt = Math.max(now - lastTime, 1);
+        // Keep within the arena
+        modifiers: [
+          interact.modifiers.restrict({
+            restriction: '#screen-arena',
+            endOnly: false
+          })
+        ],
 
-        // Calculate delta from start
-        const dx = e.clientX - startPointerX;
-        const dy = e.clientY - startPointerY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Unified touch + mouse
+        autoScroll: false,
 
-        // Check if we've moved past threshold
-        if (!hasMoved && dist > TAP_THRESHOLD) {
-          hasMoved = true;
-          player.classList.remove('lifted');
+        listeners: {
+          start(event) {
+            const startPos = getStartPosition();
+            dragStartX = startPos.x;
+            dragStartY = startPos.y;
+
+            // Reset data attributes
+            event.target.setAttribute('data-x', 0);
+            event.target.setAttribute('data-y', 0);
+
+            // Nintendo "lift" effect
+            playerContainer.classList.add('dragging');
+            player.classList.add('lifted');
+            player.style.transform = 'scale(1.15)';
+            player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
+
+            // Hide dock
+            document.getElementById('player-dock').classList.add('hidden');
+
+            // Haptic
+            if (navigator.vibrate) navigator.vibrate(10);
+
+            console.log('🎮 interact.js: Drag started!');
+          },
+
+          move(event) {
+            const target = event.target;
+
+            // Get cumulative position
+            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            // Store velocity for doll swing
+            lastVelocityX = event.velocity.x;
+
+            // Calculate rotation based on velocity (doll swing!)
+            const rotation = Math.max(-MAX_ROTATION, Math.min(MAX_ROTATION, event.velocity.x * 0.15));
+
+            // Apply the transform
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            player.style.transform = `scale(1.15) rotate(${rotation}deg)`;
+
+            // Store position
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+
+            // Calculate current screen position for zone detection
+            const currentX = dragStartX + x;
+            const screenCenter = window.innerWidth / 2;
+            const normalizedX = (currentX - screenCenter) / screenCenter;
+
+            // Zone feedback
+            if (normalizedX < -ZONE_THRESHOLD) {
+              zoneNo.classList.add('hovering');
+              zoneYes.classList.remove('hovering');
+              const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
+              zoneNo.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
+              zoneYes.style.setProperty('--spotlight-intensity', '0.25');
+              player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255, 0, 128, ${intensity * 0.6}))`;
+            } else if (normalizedX > ZONE_THRESHOLD) {
+              zoneYes.classList.add('hovering');
+              zoneNo.classList.remove('hovering');
+              const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
+              zoneYes.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
+              zoneNo.style.setProperty('--spotlight-intensity', '0.25');
+              player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(0, 245, 255, ${intensity * 0.6}))`;
+            } else {
+              zoneNo.classList.remove('hovering');
+              zoneYes.classList.remove('hovering');
+              zoneNo.style.setProperty('--spotlight-intensity', '0.4');
+              zoneYes.style.setProperty('--spotlight-intensity', '0.4');
+              player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
+            }
+          },
+
+          end(event) {
+            const target = event.target;
+            const x = parseFloat(target.getAttribute('data-x')) || 0;
+
+            // Remove dragging classes
+            playerContainer.classList.remove('dragging');
+            player.classList.remove('lifted');
+
+            // Clear zone states
+            zoneNo.classList.remove('hovering');
+            zoneYes.classList.remove('hovering');
+            zoneNo.style.setProperty('--spotlight-intensity', '0.4');
+            zoneYes.style.setProperty('--spotlight-intensity', '0.4');
+
+            // Calculate final position
+            const currentX = dragStartX + x;
+            const screenCenter = window.innerWidth / 2;
+            const normalizedX = (currentX - screenCenter) / screenCenter;
+
+            console.log(`🎮 interact.js: Release at normalized X: ${normalizedX.toFixed(2)}`);
+
+            // Determine vote based on position
+            let targetVote = null;
+            if (normalizedX < -ZONE_THRESHOLD) {
+              targetVote = 'no';
+            } else if (normalizedX > ZONE_THRESHOLD) {
+              targetVote = 'yes';
+            }
+
+            if (targetVote) {
+              // Landed on a side!
+              pendingVote = targetVote;
+
+              // Reset transform and use CSS class positioning
+              target.style.transform = '';
+              target.setAttribute('data-x', 0);
+              target.setAttribute('data-y', 0);
+
+              // Move to team position
+              playerContainer.classList.add('landing');
+              playerContainer.classList.remove('at-door');
+              playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+
+              // Landing squash
+              player.classList.add('landing-squash');
+              player.style.transform = '';
+              player.style.filter = '';
+
+              setTimeout(() => {
+                player.classList.remove('landing-squash');
+                playerContainer.classList.remove('landing');
+              }, 300);
+
+              // Show confirmation popup
+              showDropConfirm(targetVote);
+
+              if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
+            } else {
+              // Snap back to dock
+              snapBackToDock(target);
+            }
+          }
         }
-
-        if (!hasMoved) return;
-
-        // Update position (finger follows directly)
-        currentX = startElementX + dx;
-        currentY = startElementY + dy;
-
-        // Calculate velocity for doll swing effect
-        velocityX = (currentX - lastX) / dt * 16; // normalize to ~60fps
-        velocityY = (currentY - lastY) / dt * 16;
-        lastX = currentX;
-        lastY = currentY;
-        lastTime = now;
-
-        // Apply damping
-        velocityX *= VELOCITY_DECAY;
-        velocityY *= VELOCITY_DECAY;
-
-        // Calculate rotation based on horizontal velocity (doll swing)
-        const rotation = Math.max(-MAX_ROTATION, Math.min(MAX_ROTATION, velocityX * 0.8));
-
-        // Convert to bottom-based positioning
-        const newBottom = window.innerHeight - currentY;
-
-        // Apply position directly (no transition during drag)
-        playerContainer.style.left = `${currentX}px`;
-        playerContainer.style.bottom = `${newBottom}px`;
-        playerContainer.style.transform = 'translate(-50%, 50%)';
-
-        // Doll swing rotation
-        player.style.transform = `scale(1.15) rotate(${rotation}deg)`;
-
-        // Zone feedback
-        const screenCenter = getScreenCenter();
-        const normalizedX = (currentX - screenCenter) / screenCenter; // -1 to 1
-
-        if (normalizedX < -ZONE_THRESHOLD) {
-          // NO zone (left)
-          zoneNo.classList.add('hovering');
-          zoneYes.classList.remove('hovering');
-          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
-          zoneNo.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
-          zoneYes.style.setProperty('--spotlight-intensity', '0.25');
-          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255, 0, 128, ${intensity * 0.6}))`;
-        } else if (normalizedX > ZONE_THRESHOLD) {
-          // YES zone (right)
-          zoneYes.classList.add('hovering');
-          zoneNo.classList.remove('hovering');
-          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
-          zoneYes.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
-          zoneNo.style.setProperty('--spotlight-intensity', '0.25');
-          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(0, 245, 255, ${intensity * 0.6}))`;
-        } else {
-          // Center - neutral
-          zoneNo.classList.remove('hovering');
-          zoneYes.classList.remove('hovering');
-          zoneNo.style.setProperty('--spotlight-intensity', '0.4');
-          zoneYes.style.setProperty('--spotlight-intensity', '0.4');
-          player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
-        }
-      }
-
-      // ═══ RELEASE ═══
-      function handlePointerUp(e) {
-        if (!isDragging) return;
-        isDragging = false;
-
-        // Release pointer capture
-        try {
-          playerContainer.releasePointerCapture(e.pointerId);
-        } catch (err) {}
-
-        // Remove dragging classes
-        playerContainer.classList.remove('dragging');
-        player.classList.remove('lifted', 'dragging-active');
-
-        // Clear zone hover states
-        zoneNo.classList.remove('hovering');
-        zoneYes.classList.remove('hovering');
-        zoneNo.style.setProperty('--spotlight-intensity', '0.4');
-        zoneYes.style.setProperty('--spotlight-intensity', '0.4');
-
-        // Tap (no significant movement) - just bounce
-        if (!hasMoved) {
-          player.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease';
-          player.style.transform = 'scale(1.2)';
-          setTimeout(() => {
-            player.style.transform = '';
-            player.style.filter = '';
-            player.style.transition = '';
-          }, 150);
-          document.getElementById('player-dock').classList.remove('hidden');
-          if (navigator.vibrate) navigator.vibrate([5, 30, 5]);
-          console.log('🎮 Tap detected, bouncing back');
-          return;
-        }
-
-        // Calculate final position
-        const screenCenter = getScreenCenter();
-        const normalizedX = (currentX - screenCenter) / screenCenter;
-
-        // Determine target
-        let targetVote = null;
-        if (normalizedX < -ZONE_THRESHOLD) {
-          targetVote = 'no';
-        } else if (normalizedX > ZONE_THRESHOLD) {
-          targetVote = 'yes';
-        }
-
-        console.log(`🎮 Release at normalized X: ${normalizedX.toFixed(2)}, target: ${targetVote}`);
-
-        if (targetVote) {
-          // Landed on a side - show confirmation popup
-          pendingVote = targetVote;
-          showDropConfirm(targetVote);
-
-          // Move player to holding position on that side
-          playerContainer.classList.add('landing');
-          playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
-          playerContainer.style.left = '';
-          playerContainer.style.bottom = '';
-          playerContainer.style.transform = '';
-
-          // Landing squash animation
-          player.classList.add('landing-squash');
-          player.style.filter = '';
-          player.style.transform = '';
-
-          setTimeout(() => {
-            player.classList.remove('landing-squash');
-            playerContainer.classList.remove('landing');
-          }, 300);
-
-          if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
-        } else {
-          // Snap back to dock with bounce
-          snapBackToDock();
-        }
-      }
+      });
 
       // ═══ SNAP BACK TO DOCK ═══
-      function snapBackToDock() {
+      function snapBackToDock(target) {
+        // Animate back
+        target.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        target.style.transform = '';
+        target.setAttribute('data-x', 0);
+        target.setAttribute('data-y', 0);
+
         playerContainer.classList.add('returning');
         playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
         playerContainer.classList.add('at-door');
-        playerContainer.style.left = '';
-        playerContainer.style.bottom = '';
-        playerContainer.style.transform = '';
 
         player.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease';
         player.style.transform = '';
@@ -6123,6 +6072,7 @@
 
         setTimeout(() => {
           playerContainer.classList.remove('returning');
+          target.style.transition = '';
           player.style.transition = '';
         }, 500);
 
@@ -6151,7 +6101,7 @@
       dropConfirmCancel.addEventListener('click', () => {
         hideDropConfirm();
         pendingVote = null;
-        snapBackToDock();
+        snapBackToDock(playerContainer);
         if (navigator.vibrate) navigator.vibrate(8);
       });
 
@@ -6172,7 +6122,6 @@
         // Show speech bubble
         showPlayerSpeech(side);
 
-        // Start the James Brown funk!
         console.log(`🎮 CONFIRMED! ${side.toUpperCase()} - Get on down! 🕺`);
 
         // Epic haptic
@@ -6182,18 +6131,7 @@
         showCelebration();
       }
 
-      // ═══ EVENT LISTENERS ═══
-      playerContainer.addEventListener('pointerdown', handlePointerDown, { passive: false });
-      document.addEventListener('pointermove', handlePointerMove, { passive: false });
-      document.addEventListener('pointerup', handlePointerUp);
-      document.addEventListener('pointercancel', handlePointerUp);
-
-      // Prevent scroll on touch
-      playerContainer.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) e.preventDefault();
-      }, { passive: false });
-
-      console.log('🎮 Nintendo drag system initialized!');
+      console.log('🎮 interact.js drag system initialized!');
     }
 
     // Zone interaction is handled inline in drag handler
