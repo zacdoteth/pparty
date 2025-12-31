@@ -3569,12 +3569,12 @@
 
     /* ═══════════════════════════════════════════════════════════════
        LAYER 2: THE 3D WORLD (The Stage)
-       "120px margin-top clearance for the HUD sign." — Toshiro
+       "140px margin-top clearance for the God Sign." — Toshiro V11
     ═══════════════════════════════════════════════════════════════ */
     .iso-room {
       position: absolute;
-      /* STRICT LAYERING: 120px clearance for the fixed HUD sign */
-      top: 120px;
+      /* STRICT LAYERING: 140px clearance for the fixed HUD sign */
+      top: 140px;
       bottom: 40px;
       left: 0;
       right: 0;
@@ -3936,93 +3936,10 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       HOLOGRAM ZONES — Diegetic UI that exists IN the game world
-       "Vertical Energy Curtains rising from the back edge." — Toshiro
-
-       The labels float in 3D space ABOVE the crowd — never blocked.
+       HOLOGRAM ZONES — DELETED (Redundant with HUD sign)
+       "One Sign. Clean Architecture." — Toshiro V11
     ═══════════════════════════════════════════════════════════════ */
-
-    /* Energy Curtain — Semi-transparent gradient rising from zone edge */
-    .energy-curtain {
-      position: absolute;
-      bottom: 100%;
-      left: 0;
-      right: 0;
-      height: 200px;
-      pointer-events: none;
-      transform: rotateX(-90deg);
-      transform-origin: bottom center;
-      opacity: 0.6;
-    }
-
-    .energy-curtain.no {
-      background: linear-gradient(
-        0deg,
-        rgba(255, 0, 85, 0.4) 0%,
-        rgba(255, 0, 85, 0.2) 30%,
-        rgba(255, 0, 85, 0.05) 70%,
-        transparent 100%
-      );
-    }
-
-    .energy-curtain.yes {
-      background: linear-gradient(
-        0deg,
-        rgba(0, 240, 255, 0.4) 0%,
-        rgba(0, 240, 255, 0.2) 30%,
-        rgba(0, 240, 255, 0.05) 70%,
-        transparent 100%
-      );
-    }
-
-    /* Floating Hologram Label — Glows like a hologram above the crowd */
-    .hologram-label {
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translateX(-50%) rotateX(-55deg);
-      font-size: clamp(24px, 6vw, 40px);
-      font-weight: 900;
-      letter-spacing: 3px;
-      text-align: center;
-      pointer-events: none;
-      z-index: 100;
-      /* Billboard counter-rotation to face camera */
-      transform-style: preserve-3d;
-    }
-
-    .hologram-label.no {
-      color: #FF0055;
-      text-shadow:
-        0 0 20px #FF0055,
-        0 0 40px rgba(255, 0, 85, 0.6),
-        0 0 80px rgba(255, 0, 85, 0.3);
-      animation: hologram-flicker 3s ease-in-out infinite;
-    }
-
-    .hologram-label.yes {
-      color: #00F0FF;
-      text-shadow:
-        0 0 20px #00F0FF,
-        0 0 40px rgba(0, 240, 255, 0.6),
-        0 0 80px rgba(0, 240, 255, 0.3);
-      animation: hologram-flicker 3s ease-in-out infinite;
-      animation-delay: -1.5s;
-    }
-
-    @keyframes hologram-flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.85; }
-      52% { opacity: 0.95; }
-      54% { opacity: 0.8; }
-    }
-
-    .hologram-percent {
-      display: block;
-      font-size: 0.6em;
-      opacity: 0.9;
-      margin-top: 4px;
-    }
+    .energy-curtain, .hologram-label, .hologram-percent { display: none; }
 
     /* ═══════════════════════════════════════════════════════════════
        THE CORNER WALLS — Two massive SCREENS meeting at 120° angle
@@ -4740,152 +4657,193 @@
       border-radius: 50%;
     }
 
-    /* TG NAME TAG — Member's name displayed below the avatar */
+    /* ═══════════════════════════════════════════════════════════════
+       USERNAME TAG — Floating ABOVE the head (Z-Sort Fix!)
+       "Clean label. 20px above head. Dark pill. pointer-events: none." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
     .avatar-name {
       position: absolute;
-      bottom: -22px;
+      top: -28px; /* ABOVE the head, not below! */
       left: 50%;
       transform: translateX(-50%);
-      font-size: 10px;
-      font-weight: 800;
+      font-size: 9px;
+      font-weight: 700;
       color: #fff;
-      text-shadow:
-        0 0 6px rgba(0, 0, 0, 1),
-        0 1px 3px rgba(0, 0, 0, 1),
-        0 0 12px currentColor,
-        0 0 20px currentColor;
       white-space: nowrap;
       letter-spacing: 0.5px;
-      z-index: 100;
-      pointer-events: none;
-      /* Make sure name is always visible */
-      background: rgba(0, 0, 0, 0.5);
-      padding: 2px 6px;
-      border-radius: 4px;
+      z-index: 200;
+      pointer-events: none; /* Never blocks clicks! */
+      /* Clean dark pill background */
+      background: rgba(0, 0, 0, 0.85);
+      padding: 3px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     /* YES team names glow cyan */
     .iso-avatar.bet-yes .avatar-name {
       color: #00F0FF;
-      border: 1px solid rgba(0, 240, 255, 0.4);
+      border-color: rgba(0, 240, 255, 0.5);
+      text-shadow: 0 0 8px #00F0FF;
     }
 
     /* NO team names glow pink */
     .iso-avatar.bet-no .avatar-name {
       color: #FF4B9B;
-      border: 1px solid rgba(255, 75, 155, 0.4);
+      border-color: rgba(255, 75, 155, 0.5);
+      text-shadow: 0 0 8px #FF4B9B;
     }
 
-    /* STICK FIGURE BODY — The Torso Line */
+    /* ═══════════════════════════════════════════════════════════════
+       XIAO XIAO STYLE — Thin 2px Line Bodies (Newgrounds Classic!)
+       "Pure lines. High energy. Flash animation polish." — Toshiro V11
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* STICK FIGURE BODY — Thin 2px Torso Line */
     .stick-body {
-      width: 4px;
-      height: 16px;
-      background: #111;
-      margin-top: -2px;
+      width: 2px;
+      height: 18px;
+      background: #fff;
+      margin-top: -1px;
       position: relative;
       z-index: 2;
+      border-radius: 1px;
     }
 
-    /* Stick figure shirt color overlay — fills when betting */
-    .stick-body::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: transparent;
-      transition: background 0.3s ease;
-    }
-
-    /* STICK ARMS — Thick lines */
+    /* STICK ARMS — Thin 2px Line (spread like fighting stance) */
     .stick-arms {
       position: absolute;
-      top: 20px;
+      top: 22px;
       left: 50%;
       transform: translateX(-50%);
-      width: 32px;
-      height: 4px;
-      background: #111;
+      width: 36px;
+      height: 2px;
+      background: #fff;
       z-index: 1;
+      border-radius: 1px;
     }
 
-    /* STICK LEGS — Two lines */
+    /* STICK LEGS — Thin 2px Lines (slightly bent for fighting stance) */
     .stick-legs {
       position: absolute;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 22px;
     }
 
     .stick-legs::before,
     .stick-legs::after {
       content: '';
       position: absolute;
-      width: 4px;
-      height: 20px;
-      background: #111;
+      width: 2px;
+      height: 22px;
+      background: #fff;
       top: 0;
+      border-radius: 1px;
     }
 
     .stick-legs::before {
-      left: 2px;
-      transform: rotate(-10deg);
+      left: 4px;
+      transform: rotate(-12deg);
+      transform-origin: top center;
     }
 
     .stick-legs::after {
-      right: 2px;
-      transform: rotate(10deg);
+      right: 4px;
+      transform: rotate(12deg);
+      transform-origin: top center;
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       STICK FIGURE STATES — Neutral vs Betting
+       STICK FIGURE STATES — Neon Glow Lines (Xiao Xiao Style)
+       "Neutral = White. YES = Cyan. NO = Pink. Pure neon energy." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
 
-    /* NEUTRAL STATE — White/Black, just observing */
-    .iso-avatar.neutral .stick-head {
+    /* NEUTRAL STATE — White lines, just observing */
+    .iso-avatar.neutral .stick-head { border-color: #fff; }
+    .iso-avatar.neutral .stick-body,
+    .iso-avatar.neutral .stick-arms,
+    .iso-avatar.neutral .stick-legs::before,
+    .iso-avatar.neutral .stick-legs::after {
       background: #fff;
-      border-color: #111;
     }
 
-    /* YES BET STATE — Cyan Aura + Shirt Fill */
+    /* YES BET STATE — Cyan Neon Glow */
     .iso-avatar.bet-yes .stick-head {
-      background: #fff;
       border-color: #00F0FF;
-      box-shadow: 0 0 12px #00F0FF, 0 0 24px rgba(0, 240, 255, 0.5);
+      box-shadow: 0 0 15px #00F0FF, 0 0 30px rgba(0, 240, 255, 0.6);
     }
-
-    .iso-avatar.bet-yes .stick-body {
+    .iso-avatar.bet-yes .stick-body,
+    .iso-avatar.bet-yes .stick-arms,
+    .iso-avatar.bet-yes .stick-legs::before,
+    .iso-avatar.bet-yes .stick-legs::after {
       background: #00F0FF;
-      box-shadow: 0 0 8px #00F0FF;
+      box-shadow: 0 0 10px #00F0FF, 0 0 20px rgba(0, 240, 255, 0.5);
     }
 
-    .iso-avatar.bet-yes .stick-arms {
-      background: #00F0FF;
-      box-shadow: 0 0 8px #00F0FF;
-    }
-
-    /* NO BET STATE — Pink Aura + Shirt Fill */
+    /* NO BET STATE — Pink Neon Glow */
     .iso-avatar.bet-no .stick-head {
-      background: #fff;
       border-color: #FF0055;
-      box-shadow: 0 0 12px #FF0055, 0 0 24px rgba(255, 0, 85, 0.5);
+      box-shadow: 0 0 15px #FF0055, 0 0 30px rgba(255, 0, 85, 0.6);
+    }
+    .iso-avatar.bet-no .stick-body,
+    .iso-avatar.bet-no .stick-arms,
+    .iso-avatar.bet-no .stick-legs::before,
+    .iso-avatar.bet-no .stick-legs::after {
+      background: #FF0055;
+      box-shadow: 0 0 10px #FF0055, 0 0 20px rgba(255, 0, 85, 0.5);
     }
 
-    .iso-avatar.bet-no .stick-body {
-      background: #FF0055;
-      box-shadow: 0 0 8px #FF0055;
+    /* ═══════════════════════════════════════════════════════════════
+       🥋 FIGHTING STANCE — Default High-Energy Idle (Xiao Xiao Style!)
+       "Knees bent. Arms ready. Stick Figure ATTITUDE." — Toshiro V11
+
+       This is the BASE stance — all dancers have this energy even when idle.
+       Reference: Newgrounds stick fights. Ready for action!
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Fighting Stance Base — Subtle ready-to-fight sway */
+    .iso-avatar .stick-body {
+      animation: stance-body 1.5s ease-in-out infinite;
+    }
+    @keyframes stance-body {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-1px); }
     }
 
-    .iso-avatar.bet-no .stick-arms {
-      background: #FF0055;
-      box-shadow: 0 0 8px #FF0055;
+    /* Arms ready — subtle tension sway */
+    .iso-avatar .stick-arms {
+      animation: stance-arms 1.2s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes stance-arms {
+      0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+      50% { transform: translateX(-50%) rotate(5deg); }
+    }
+
+    /* Legs in fighting stance — knees slightly bent, ready to spring */
+    .iso-avatar .stick-legs::before {
+      animation: stance-leg-l 1.3s ease-in-out infinite;
+    }
+    .iso-avatar .stick-legs::after {
+      animation: stance-leg-r 1.3s ease-in-out infinite;
+    }
+    @keyframes stance-leg-l {
+      0%, 100% { transform: rotate(-15deg) translateY(0); }
+      50% { transform: rotate(-10deg) translateY(-1px); }
+    }
+    @keyframes stance-leg-r {
+      0%, 100% { transform: rotate(15deg) translateY(0); }
+      50% { transform: rotate(10deg) translateY(-1px); }
     }
 
     /* ═══════════════════════════════════════════════════════════════
        🕺 FORTNITE-LEVEL EPIC DANCE ANIMATIONS — 10 Unique Moves! 🕺
        "Make them SMILE like Miyamoto-san taught us." — Toshiro
 
-       Each dance has body, arms, and legs animations for full expression!
+       Each dance OVERRIDES the fighting stance with full expression!
     ═══════════════════════════════════════════════════════════════ */
 
     /* ═══ DANCE 1: THE BOUNCE — Classic Jump! ═══ */
