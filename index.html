@@ -4608,13 +4608,13 @@
     /* SQUIRCLE SHADOW — Separate element, stays FLAT on floor */
     .iso-avatar-shadow {
       position: absolute;
-      width: 28px;
-      height: 12px;
-      bottom: 0;
+      width: 32px;
+      height: 14px;
+      bottom: -8px; /* Shadow at ground level where feet land */
       left: 50%;
       /* Shadow lies flat on the tilted floor — DO NOT counter-rotate */
       transform: translateX(-50%) translateZ(-15px);
-      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
       border-radius: 50%;
       pointer-events: none;
       z-index: -1;
@@ -4626,11 +4626,13 @@
     ═══════════════════════════════════════════════════════════════ */
     .iso-avatar-sprite {
       width: 40px;
-      height: 60px;
+      height: 70px; /* Taller to fit full body + legs */
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
+      /* Push sprite UP so feet touch the ground plane */
+      margin-top: -10px;
     }
 
     /* STICK FIGURE HEAD — Larger for TG photos to be visible! */
@@ -4658,40 +4660,77 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       USERNAME TAG — Floating ABOVE the head (Z-Sort Fix!)
-       "Clean label. 20px above head. Dark pill. pointer-events: none." — Toshiro
+       SPEECH BUBBLE — Shows their VOTE! (YES! / NO!)
+       "Way cooler than names. They're SHOUTING their votes!" — User Feedback
     ═══════════════════════════════════════════════════════════════ */
-    .avatar-name {
+    .vote-bubble {
       position: absolute;
-      top: -28px; /* ABOVE the head, not below! */
+      top: -32px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 9px;
-      font-weight: 700;
-      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
       white-space: nowrap;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
       z-index: 200;
-      pointer-events: none; /* Never blocks clicks! */
-      /* Clean dark pill background */
-      background: rgba(0, 0, 0, 0.85);
-      padding: 3px 8px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+      padding: 4px 10px;
+      border-radius: 12px;
+      animation: bubble-bounce 2s ease-in-out infinite;
     }
 
-    /* YES team names glow cyan */
-    .iso-avatar.bet-yes .avatar-name {
-      color: #00F0FF;
-      border-color: rgba(0, 240, 255, 0.5);
-      text-shadow: 0 0 8px #00F0FF;
+    /* Speech bubble tail pointing down */
+    .vote-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
     }
 
-    /* NO team names glow pink */
-    .iso-avatar.bet-no .avatar-name {
-      color: #FF4B9B;
-      border-color: rgba(255, 75, 155, 0.5);
-      text-shadow: 0 0 8px #FF4B9B;
+    @keyframes bubble-bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-3px); }
+    }
+
+    /* YES BUBBLE — Cyan with glow */
+    .iso-avatar.bet-yes .vote-bubble {
+      background: linear-gradient(135deg, #00F0FF, #00C8FF);
+      color: #000;
+      text-shadow: none;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .iso-avatar.bet-yes .vote-bubble::after {
+      border-top: 8px solid #00F0FF;
+    }
+
+    /* NO BUBBLE — Pink with glow */
+    .iso-avatar.bet-no .vote-bubble {
+      background: linear-gradient(135deg, #FF0055, #FF4B9B);
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      box-shadow: 0 0 15px rgba(255, 0, 85, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .iso-avatar.bet-no .vote-bubble::after {
+      border-top: 8px solid #FF0055;
+    }
+
+    /* Small name under the bubble */
+    .vote-name {
+      position: absolute;
+      top: -44px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      white-space: nowrap;
+      z-index: 199;
+      pointer-events: none;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -5082,6 +5121,76 @@
     @keyframes twist-legs {
       0%, 100% { transform: rotate(0deg); }
       50% { transform: rotate(20deg); }
+    }
+
+    /* ═══ DANCE 11: THE SHUFFLE — Melbourne Shuffle! ═══ */
+    .iso-avatar.dance-shuffle {
+      animation: dance-shuffle 0.6s ease-in-out infinite;
+    }
+    @keyframes dance-shuffle {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateX(0); }
+      25% { transform: rotateX(-55deg) translateZ(18px) translateX(-8px) translateY(-3px); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateX(0); }
+      75% { transform: rotateX(-55deg) translateZ(18px) translateX(8px) translateY(-3px); }
+    }
+    .iso-avatar.dance-shuffle .stick-legs::before {
+      animation: shuffle-leg-l 0.3s ease-in-out infinite;
+    }
+    .iso-avatar.dance-shuffle .stick-legs::after {
+      animation: shuffle-leg-r 0.3s ease-in-out infinite;
+    }
+    @keyframes shuffle-leg-l {
+      0%, 100% { transform: rotate(-30deg) translateY(0); }
+      50% { transform: rotate(15deg) translateY(-8px); }
+    }
+    @keyframes shuffle-leg-r {
+      0%, 100% { transform: rotate(15deg) translateY(-8px); }
+      50% { transform: rotate(-30deg) translateY(0); }
+    }
+    .iso-avatar.dance-shuffle .stick-arms {
+      animation: shuffle-arms 0.6s ease-in-out infinite;
+    }
+    @keyframes shuffle-arms {
+      0%, 50%, 100% { transform: translateX(-50%) rotate(0deg); }
+      25% { transform: translateX(-50%) rotate(20deg) translateY(-3px); }
+      75% { transform: translateX(-50%) rotate(-20deg) translateY(-3px); }
+    }
+
+    /* ═══ DANCE 12: ORANGE JUSTICE — The Fortnite Classic! ═══ */
+    .iso-avatar.dance-orange {
+      animation: dance-orange 0.5s ease-in-out infinite;
+    }
+    @keyframes dance-orange {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(-5deg); }
+      50% { transform: rotateX(-55deg) translateZ(20px) rotate(5deg) translateY(-8px); }
+    }
+    .iso-avatar.dance-orange .stick-body {
+      animation: orange-body 0.25s ease-in-out infinite;
+    }
+    @keyframes orange-body {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
+    }
+    .iso-avatar.dance-orange .stick-arms {
+      animation: orange-arms 0.25s ease-in-out infinite;
+    }
+    @keyframes orange-arms {
+      0%, 100% { transform: translateX(-30%) rotate(-45deg) scaleX(1.2); }
+      50% { transform: translateX(-70%) rotate(45deg) scaleX(1.2); }
+    }
+    .iso-avatar.dance-orange .stick-legs::before {
+      animation: orange-leg-l 0.25s ease-in-out infinite;
+    }
+    .iso-avatar.dance-orange .stick-legs::after {
+      animation: orange-leg-r 0.25s ease-in-out infinite;
+    }
+    @keyframes orange-leg-l {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(30deg) translateY(-5px); }
+    }
+    @keyframes orange-leg-r {
+      0%, 100% { transform: rotate(30deg) translateY(-5px); }
+      50% { transform: rotate(-20deg); }
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -9734,7 +9843,7 @@
     function createVillager(member, index, team, position) {
       const avatar = document.createElement('div');
 
-      // 🕺 FORTNITE-LEVEL EPIC DANCES: 10 unique moves for party vibes!
+      // 🕺 EPIC DANCES: 12 unique moves including shuffle & orange justice!
       const danceTypes = [
         'dance-bounce',    // Classic jump
         'dance-floss',     // Fortnite classic
@@ -9745,7 +9854,9 @@
         'dance-disco',     // Saturday Night Fever
         'dance-runman',    // Classic hip hop
         'dance-dab',       // Iconic move
-        'dance-twist'      // Classic 60s
+        'dance-twist',     // Classic 60s
+        'dance-shuffle',   // Melbourne Shuffle!
+        'dance-orange'     // Orange Justice - Fortnite!
       ];
       const randomDance = danceTypes[Math.floor(Math.random() * danceTypes.length)];
 
@@ -9776,10 +9887,26 @@
       const memberName = member?.name || `User ${index + 1}`;
       const memberPhoto = member?.photo || `/tg/user_${index + 1}.jpg`;
 
-      // TG PARTY: Real photos with names displayed!
+      // SPEECH BUBBLES: Funny vote messages! Way more personality!
+      const yesPhrases = [
+        'YES!', 'YAAAS!', 'LFG!', '🚀', 'WAGMI!', 'BET!',
+        'SEND IT!', '100%!', 'MOON!', 'BULLISH!', 'LETS GO!',
+        'FOR SURE!', 'OBVIOUSLY!', 'EASY!', 'LOCK IT!', 'BASED!'
+      ];
+      const noPhrases = [
+        'NO!', 'NOPE!', 'NAH!', '💀', 'NGMI!', 'CAP!',
+        'DOUBT!', 'BEARISH!', 'RIP!', 'FADE!', 'NO WAY!',
+        'NEVER!', 'NOOOO!', 'PASS!', 'SELL!', 'REKT!'
+      ];
+      const phrases = team === 'yes' ? yesPhrases : noPhrases;
+      const voteText = phrases[Math.floor(Math.random() * phrases.length)];
+
       avatar.innerHTML = `
         <div class="iso-avatar-sprite">
           <div class="iso-avatar-shadow"></div>
+          <!-- SPEECH BUBBLE — Shows their vote! -->
+          <div class="vote-name">${memberName}</div>
+          <div class="vote-bubble">${voteText}</div>
           <div class="stick-head">
             <!-- TG Avatar Photo with onerror fallback -->
             <img
@@ -9794,8 +9921,6 @@
           <div class="stick-body"></div>
           <div class="stick-arms"></div>
           <div class="stick-legs"></div>
-          <!-- TG NAME TAG — Shows the member's name! -->
-          <div class="avatar-name">${memberName}</div>
         </div>
       `;
 
