@@ -3418,111 +3418,166 @@
     ═══════════════════════════════════════════════════════════════ */
 
     /* ═══════════════════════════════════════════════════════════════
-       THE MAIN SIGN — Question Display ABOVE the floor zones
-       "The question hovers above the battlefield. Pure 2D. No warping." — Toshiro
+       THE CEILING SIGN — Hanging Jumbotron (Paper Mario Style)
+       "It HANGS from the ceiling via chains. It floats ABOVE the DJ." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
-    .hud-question {
+    .ceiling-sign {
       position: absolute;
-      /* PICTO-PARTY: Sits ABOVE the dance floor, directly in view */
-      top: 8%;
+      top: 0;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 100;
+      z-index: 200;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
       pointer-events: none;
     }
 
-    .hud-question-text {
-      font-size: clamp(20px, 6vw, 36px);
+    /* The Chains — Hanging cables from ceiling */
+    .ceiling-chains {
+      display: flex;
+      justify-content: space-between;
+      width: 180px;
+      height: 30px;
+    }
+
+    .chain {
+      width: 3px;
+      height: 100%;
+      background: repeating-linear-gradient(
+        180deg,
+        #666 0px,
+        #666 3px,
+        #444 3px,
+        #444 6px
+      );
+      border-radius: 2px;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    /* The Sign Board — Neon bordered */
+    .sign-board {
+      position: relative;
+      background: linear-gradient(180deg,
+        #1a1a2a 0%,
+        #0f0f1a 100%
+      );
+      border: 3px solid transparent;
+      border-radius: 8px;
+      padding: 12px 20px;
+      text-align: center;
+      box-shadow:
+        0 0 20px rgba(255, 0, 85, 0.4),
+        0 0 20px rgba(0, 240, 255, 0.4),
+        0 8px 30px rgba(0, 0, 0, 0.6);
+      animation: sign-sway 5s ease-in-out infinite;
+    }
+
+    /* Neon border effect */
+    .sign-board::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #FF0055, #FFD700, #00F0FF);
+      z-index: -1;
+    }
+
+    .sign-board::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      background: linear-gradient(180deg, #1a1a2a 0%, #0f0f1a 100%);
+      z-index: -1;
+    }
+
+    @keyframes sign-sway {
+      0%, 100% { transform: rotate(-0.5deg); }
+      50% { transform: rotate(0.5deg); }
+    }
+
+    .sign-question {
+      font-size: clamp(16px, 4vw, 24px);
       font-weight: 900;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: #fff;
       text-shadow:
-        0 0 30px rgba(255, 255, 255, 0.9),
-        0 0 60px rgba(255, 255, 255, 0.5),
-        0 4px 8px rgba(0, 0, 0, 0.9);
-      text-align: center;
-      padding: 16px 32px;
-      background: linear-gradient(180deg,
-        rgba(20, 20, 35, 0.95) 0%,
-        rgba(10, 10, 20, 0.9) 100%
-      );
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      box-shadow:
-        0 0 40px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 0 15px rgba(255, 255, 255, 0.8),
+        0 0 30px rgba(255, 255, 255, 0.4);
+      margin-bottom: 10px;
     }
 
     /* Progress bar under the question */
-    .hud-progress-bar {
+    .sign-progress-bar {
       display: flex;
       width: 100%;
-      max-width: 400px;
       height: 8px;
       border-radius: 4px;
       overflow: hidden;
-      background: rgba(0, 0, 0, 0.5);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.6);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
-    .hud-progress-no {
+    .sign-progress-no {
       height: 100%;
       background: linear-gradient(90deg, #FF0055, #FF3377);
       transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 10px #FF0055;
+      box-shadow: 0 0 8px #FF0055;
     }
 
-    .hud-progress-yes {
+    .sign-progress-yes {
       height: 100%;
       background: linear-gradient(90deg, #00CCFF, #00F0FF);
       transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 10px #00F0FF;
+      box-shadow: 0 0 8px #00F0FF;
     }
 
-    .hud-live {
+    .sign-live {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 14px;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
       font-weight: 700;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: #FF3366;
-      text-shadow: 0 0 15px #FF3366;
+      text-shadow: 0 0 10px #FF3366;
+      margin-top: 8px;
     }
 
-    .hud-live-dot {
-      width: 10px;
-      height: 10px;
+    .sign-live-dot {
+      width: 6px;
+      height: 6px;
       background: #FF3366;
       border-radius: 50%;
-      box-shadow: 0 0 10px #FF3366, 0 0 20px #FF3366;
-      animation: hud-pulse 1s ease-in-out infinite;
+      box-shadow: 0 0 6px #FF3366;
+      animation: live-pulse 1s ease-in-out infinite;
     }
 
-    @keyframes hud-pulse {
+    @keyframes live-pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+      50% { opacity: 0.3; transform: scale(0.6); }
     }
 
-    /* THE SCENE CONTAINER — Push perspective back to reduce warping */
+    /* Legacy HUD - hidden */
+    .hud-question { display: none; }
+    .hud-progress-bar { display: none; }
+    .hud-live { display: none; }
+
+    /* THE SCENE CONTAINER — Paper Mario Style Stage */
     .iso-room {
       position: absolute;
-      /* PICTO-PARTY: Fill more of the screen! */
-      top: 15%;
-      bottom: 60px;
+      /* PAPER MARIO: Dance floor takes 60% of vertical space */
+      top: 100px; /* Leave room for hanging sign */
+      bottom: 40px;
       left: 0;
       right: 0;
       width: 100%;
       z-index: 5;
       /* CRITICAL: 1200px perspective reduces sprite warping */
       perspective: 1200px;
-      perspective-origin: 50% 40%;
+      perspective-origin: 50% 50%;
       transform-style: preserve-3d;
       overflow: visible;
     }
@@ -3837,8 +3892,23 @@
     .floor-zone.no .iso-tile::after { background: #180812; }
 
     /* Zone hover glow */
+    /* HOVER FEEDBACK — Entire zone glows WHITE when player hovers */
+    .floor-zone.hovering {
+      filter: brightness(1.4);
+    }
+
     .floor-zone.hovering .iso-tile {
-      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
+      box-shadow:
+        inset 0 0 30px rgba(255, 255, 255, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .floor-zone.hovering .zone-wall {
+      filter: brightness(1.3);
+      box-shadow:
+        inset 0 0 80px rgba(255, 255, 255, 0.2),
+        0 0 40px rgba(255, 255, 255, 0.3) !important;
     }
 
     /* "BILLIE JEAN" EFFECT — Tile Flash States */
@@ -4132,11 +4202,12 @@
     .iso-dj-booth {
       position: absolute;
       left: 50%;
-      /* PICTO-PARTY: Move DJ higher, behind the floor */
-      top: calc(50% - 140px);
+      /* PAPER MARIO: DJ sits at back corner, ON the floor, behind dancers */
+      top: 20%;
       transform: translateX(-50%);
       transform-style: preserve-3d;
-      z-index: 60;
+      /* Z-index below dancers (50) but above floor tiles */
+      z-index: 30;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -4665,54 +4736,101 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       STICK FIGURE DANCE ANIMATION — Xiao Xiao / Newgrounds Style!
-       "They don't just stand there. They DANCE." — Toshiro
+       RHYTHM HEAVEN DANCE ANIMATIONS — 3 Types for Variety!
+       "Not synchronized robots. ORGANIC crowd." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
-    .iso-avatar.dancing .stick-arms {
-      animation: stick-dance-arms 0.4s ease-in-out infinite alternate;
+
+    /* DANCE TYPE 1: BOUNCE (Up/Down) — The Classic */
+    .iso-avatar.dance-bounce {
+      animation: dance-bounce 0.5s ease-in-out infinite;
     }
 
-    .iso-avatar.dancing .stick-legs::before {
-      animation: stick-dance-leg-left 0.4s ease-in-out infinite alternate;
-    }
-
-    .iso-avatar.dancing .stick-legs::after {
-      animation: stick-dance-leg-right 0.4s ease-in-out infinite alternate-reverse;
-    }
-
-    .iso-avatar.dancing .stick-body {
-      animation: stick-dance-body 0.2s ease-in-out infinite alternate;
-    }
-
-    @keyframes stick-dance-arms {
-      0% { transform: translateX(-50%) rotate(-15deg); }
-      100% { transform: translateX(-50%) rotate(15deg); }
-    }
-
-    @keyframes stick-dance-leg-left {
-      0% { transform: rotate(-20deg); }
-      100% { transform: rotate(5deg); }
-    }
-
-    @keyframes stick-dance-leg-right {
-      0% { transform: rotate(20deg); }
-      100% { transform: rotate(-5deg); }
-    }
-
-    @keyframes stick-dance-body {
-      0% { transform: scaleY(0.95); }
-      100% { transform: scaleY(1.05); }
-    }
-
-    /* BOUNCING IDLE — When not dancing, gentle bounce */
-    .iso-avatar.bouncing {
-      animation: stick-bounce 0.5s ease-in-out infinite;
-    }
-
-    @keyframes stick-bounce {
+    @keyframes dance-bounce {
       0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0); }
-      50% { transform: rotateX(-55deg) translateZ(15px) translateY(-8px); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateY(-12px); }
     }
+
+    .iso-avatar.dance-bounce .stick-arms {
+      animation: arms-pump 0.5s ease-in-out infinite;
+    }
+
+    @keyframes arms-pump {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); }
+      50% { transform: translateX(-50%) rotate(-20deg) scaleY(0.9); }
+    }
+
+    /* DANCE TYPE 2: WIGGLE (Rotate Left/Right) — The Groovy */
+    .iso-avatar.dance-wiggle {
+      animation: dance-wiggle 0.6s ease-in-out infinite;
+    }
+
+    @keyframes dance-wiggle {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(-8deg); }
+      50% { transform: rotateX(-55deg) translateZ(15px) rotate(8deg); }
+    }
+
+    .iso-avatar.dance-wiggle .stick-arms {
+      animation: arms-wave 0.6s ease-in-out infinite;
+    }
+
+    @keyframes arms-wave {
+      0%, 100% { transform: translateX(-50%) rotate(-25deg); }
+      50% { transform: translateX(-50%) rotate(25deg); }
+    }
+
+    .iso-avatar.dance-wiggle .stick-legs::before,
+    .iso-avatar.dance-wiggle .stick-legs::after {
+      animation: legs-shuffle 0.3s ease-in-out infinite alternate;
+    }
+
+    @keyframes legs-shuffle {
+      0% { transform: rotate(-15deg); }
+      100% { transform: rotate(15deg); }
+    }
+
+    /* DANCE TYPE 3: SPIN (Full 360 flip) — The Showoff */
+    .iso-avatar.dance-spin {
+      animation: dance-spin 1.5s ease-in-out infinite;
+    }
+
+    @keyframes dance-spin {
+      0%, 80%, 100% { transform: rotateX(-55deg) translateZ(15px) rotateY(0deg); }
+      40% { transform: rotateX(-55deg) translateZ(25px) rotateY(360deg); }
+    }
+
+    .iso-avatar.dance-spin .stick-arms {
+      animation: arms-spin-pose 1.5s ease-in-out infinite;
+    }
+
+    @keyframes arms-spin-pose {
+      0%, 80%, 100% { transform: translateX(-50%) rotate(0deg); }
+      20%, 60% { transform: translateX(-50%) rotate(45deg) scaleX(1.3); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       STICK FIGURE FACES — Punctuation Expressions!
+       "Use simple punctuation faces: :) B) >:|" — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
+    .stick-face {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      font-weight: 900;
+      color: #111;
+      font-family: monospace;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    /* Different face expressions */
+    .stick-face.happy::before { content: ':)'; }
+    .stick-face.cool::before { content: 'B)'; }
+    .stick-face.angry::before { content: '>:|'; }
+    .stick-face.surprised::before { content: ':O'; }
+    .stick-face.wink::before { content: ';)'; }
+    .stick-face.smirk::before { content: ':>'; }
 
     /* Avatar Head with photo */
     .iso-avatar-head {
@@ -8525,24 +8643,30 @@
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════
-             HABBO 2026 — THE ISOMETRIC ROOM
-             "A User is a Resident. A Page is a Room." — Toshiro
+             PAPER MARIO — THE CEILING SIGN (Hanging Jumbotron)
+             "It HANGS from the ceiling. It floats ABOVE the DJ." — Toshiro
         ═══════════════════════════════════════════════════════════════ -->
-        <!-- 2D HUD — Question Overlay (Outside 3D space) -->
-        <!-- ═══════════════════════════════════════════════════════════════
-             THE MAIN SIGN — Question + Progress ABOVE the Floor
-             "The question hovers above the battlefield." — Toshiro
-        ═══════════════════════════════════════════════════════════════ -->
-        <div class="hud-question" id="hud-question">
-          <div class="hud-live">
-            <span class="hud-live-dot"></span>
-            <span>LIVE</span>
+        <div class="ceiling-sign" id="ceiling-sign">
+          <div class="ceiling-chains">
+            <div class="chain"></div>
+            <div class="chain"></div>
           </div>
+          <div class="sign-board">
+            <div class="sign-question" id="sign-question">WILL BTC HIT $100K?</div>
+            <div class="sign-progress-bar">
+              <div class="sign-progress-no" id="sign-progress-no" style="width: 35%"></div>
+              <div class="sign-progress-yes" id="sign-progress-yes" style="width: 65%"></div>
+            </div>
+            <div class="sign-live">
+              <span class="sign-live-dot"></span>
+              <span>LIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legacy HUD (hidden by CSS) -->
+        <div class="hud-question" id="hud-question" style="display:none;">
           <div class="hud-question-text" id="hud-question-text">WILL BTC HIT $100K?</div>
-          <div class="hud-progress-bar">
-            <div class="hud-progress-no" id="hud-progress-no" style="width: 35%"></div>
-            <div class="hud-progress-yes" id="hud-progress-yes" style="width: 65%"></div>
-          </div>
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════
@@ -9133,6 +9257,12 @@
       if (hudProgressYes) hudProgressYes.style.width = `${yesPercentage}%`;
       if (hudProgressNo) hudProgressNo.style.width = `${100 - yesPercentage}%`;
 
+      // PAPER MARIO: Update ceiling sign progress bar
+      const signProgressYes = document.getElementById('sign-progress-yes');
+      const signProgressNo = document.getElementById('sign-progress-no');
+      if (signProgressYes) signProgressYes.style.width = `${yesPercentage}%`;
+      if (signProgressNo) signProgressNo.style.width = `${100 - yesPercentage}%`;
+
       console.log(`[PICTO-PARTY] Market: ${yesPercentage}% YES → Floor: ${Math.round(yesRatio * 100)}% YES / ${Math.round(noRatio * 100)}% NO`);
     }
 
@@ -9306,13 +9436,19 @@
     // ═══════════════════════════════════════════════════════════════
     function createVillager(member, index, team, position) {
       const avatar = document.createElement('div');
-      // Add bet-yes or bet-no class for outfit coloring, sky-drop for entrance, dancing for fun!
-      const betClass = team === 'yes' ? 'bet-yes' : 'bet-no';
-      avatar.className = `iso-avatar sky-drop dancing ${betClass}`;
 
-      // Random animation delay for staggered sky drops (0-1s) and dancing (0-2s)
-      const dropDelay = index * 0.1 + Math.random() * 0.3;
-      avatar.style.animationDelay = `${dropDelay.toFixed(2)}s`;
+      // RHYTHM HEAVEN: Random dance type for organic crowd
+      const danceTypes = ['dance-bounce', 'dance-wiggle', 'dance-spin'];
+      const randomDance = danceTypes[Math.floor(Math.random() * danceTypes.length)];
+
+      // Add bet-yes or bet-no class for outfit coloring, sky-drop for entrance
+      const betClass = team === 'yes' ? 'bet-yes' : 'bet-no';
+      avatar.className = `iso-avatar sky-drop ${randomDance} ${betClass}`;
+
+      // Random animation delay for staggered sky drops and dancing
+      const dropDelay = index * 0.08 + Math.random() * 0.2;
+      const danceDelay = Math.random() * 2; // Desync the dancing
+      avatar.style.animationDelay = `${dropDelay.toFixed(2)}s, ${danceDelay.toFixed(2)}s`;
 
       // Position within the crowd area
       const posX = position ? position.x : 50;
@@ -9324,11 +9460,17 @@
       const zIndex = 10 + Math.floor(posY);
       avatar.style.zIndex = zIndex;
 
-      // PICTO-PARTY: Pure CSS Stick Figure with Xiao Xiao vibes!
+      // Random punctuation face
+      const faces = ['happy', 'cool', 'angry', 'surprised', 'wink', 'smirk'];
+      const randomFace = faces[Math.floor(Math.random() * faces.length)];
+
+      // PAPER MARIO: Pure CSS Stick Figure with punctuation face!
       avatar.innerHTML = `
         <div class="iso-avatar-sprite">
           <div class="iso-avatar-shadow"></div>
-          <div class="stick-head"></div>
+          <div class="stick-head">
+            <span class="stick-face ${randomFace}"></span>
+          </div>
           <div class="stick-body"></div>
           <div class="stick-arms"></div>
           <div class="stick-legs"></div>
@@ -9971,6 +10113,7 @@
       }
 
       // ═══ DRAG MOVE — Float the avatar ═══
+      // PAPER MARIO: Using elementFromPoint raycasting for proper isometric hit detection
       function onDragMove(e) {
         if (!isDragging) return;
         e.preventDefault();
@@ -9986,16 +10129,31 @@
         isoPlayer.style.left = newX + 'px';
         isoPlayer.style.bottom = newY + 'px';
 
-        // Zone detection based on screen position
-        const screenX = pos.x;
-        const screenCenter = window.innerWidth / 2;
-        const normalizedX = (screenX - screenCenter) / screenCenter;
+        // PAPER MARIO: Zone detection using elementFromPoint raycasting
+        // Hide the player temporarily so we can see what's underneath
+        const playerDisplay = isoPlayer.style.pointerEvents;
+        isoPlayer.style.pointerEvents = 'none';
 
-        // Highlight zones as player hovers over them
-        if (normalizedX < -ZONE_THRESHOLD) {
+        const elementUnder = document.elementFromPoint(pos.x, pos.y);
+
+        // Restore pointer events
+        isoPlayer.style.pointerEvents = playerDisplay;
+
+        // Check if element is within NO zone or YES zone
+        const isOverNo = elementUnder && (
+          elementUnder.closest('#floor-no') ||
+          elementUnder.closest('.floor-zone.no-zone')
+        );
+        const isOverYes = elementUnder && (
+          elementUnder.closest('#floor-yes') ||
+          elementUnder.closest('.floor-zone.yes-zone')
+        );
+
+        // Highlight zones with WHITE glow as player hovers over them
+        if (isOverNo) {
           zoneNo.classList.add('hovering');
           zoneYes.classList.remove('hovering');
-        } else if (normalizedX > ZONE_THRESHOLD) {
+        } else if (isOverYes) {
           zoneYes.classList.add('hovering');
           zoneNo.classList.remove('hovering');
         } else {
@@ -10066,6 +10224,7 @@
       }
 
       // ═══ DRAG END — Drop the avatar ═══
+      // PAPER MARIO: Using elementFromPoint raycasting for proper isometric hit detection
       function onDragEnd(e) {
         if (!isDragging) return;
         isDragging = false;
@@ -10074,20 +10233,32 @@
         const rect = isoPlayer.getBoundingClientRect();
         const screenX = rect.left + rect.width / 2;
         const screenY = rect.top + rect.height / 2;
-        const screenCenter = window.innerWidth / 2;
-        const normalizedX = (screenX - screenCenter) / screenCenter;
 
-        console.log('🎮 DROP! NormalizedX:', normalizedX);
+        // PAPER MARIO: Use elementFromPoint raycasting for accurate zone detection
+        isoPlayer.style.pointerEvents = 'none';
+        const elementUnder = document.elementFromPoint(screenX, screenY);
+        isoPlayer.style.pointerEvents = '';
+
+        const isOverNo = elementUnder && (
+          elementUnder.closest('#floor-no') ||
+          elementUnder.closest('.floor-zone.no-zone')
+        );
+        const isOverYes = elementUnder && (
+          elementUnder.closest('#floor-yes') ||
+          elementUnder.closest('.floor-zone.yes-zone')
+        );
+
+        console.log('🎮 DROP! elementFromPoint:', elementUnder?.className, 'NO:', isOverNo, 'YES:', isOverYes);
 
         // Clear zone hover states
         zoneNo.classList.remove('hovering');
         zoneYes.classList.remove('hovering');
 
-        // Determine vote based on drop position
+        // Determine vote based on elementFromPoint raycasting
         let targetVote = null;
-        if (normalizedX < -ZONE_THRESHOLD) {
+        if (isOverNo) {
           targetVote = 'no';
-        } else if (normalizedX > ZONE_THRESHOLD) {
+        } else if (isOverYes) {
           targetVote = 'yes';
         }
 
