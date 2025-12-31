@@ -3412,48 +3412,120 @@
        "A User is a Resident. A Page is a Room." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
 
-    /* THE ROOM CONTAINER — Maximum Ma: 100% width, bottom 70% of screen */
+    /* ═══════════════════════════════════════════════════════════════
+       THE ISOMETRIC ENGINE — True Nintendo/Habbo 2:1 Pixel Ratio
+       "The floor tilts. The walls stand. The avatars FACE YOU." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* ═══════════════════════════════════════════════════════════════
+       2D HUD — Question Display (Outside 3D space)
+       "The question floats above the chaos. Pure 2D. No warping." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
+    .hud-question {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .hud-question-text {
+      font-size: clamp(18px, 5vw, 28px);
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff;
+      text-shadow:
+        0 0 20px rgba(255, 255, 255, 0.8),
+        0 0 40px rgba(255, 255, 255, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.8);
+      text-align: center;
+      padding: 12px 24px;
+      background: linear-gradient(180deg,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .hud-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #FF3366;
+      text-shadow: 0 0 10px #FF3366;
+    }
+
+    .hud-live-dot {
+      width: 8px;
+      height: 8px;
+      background: #FF3366;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #FF3366, 0 0 16px #FF3366;
+      animation: hud-pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes hud-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* THE SCENE CONTAINER — Push perspective back to reduce warping */
     .iso-room {
       position: absolute;
-      top: 30%; /* Room fills bottom 70% */
+      top: 25%; /* Room fills bottom 75% */
       bottom: 80px;
       left: 0;
       right: 0;
       width: 100%;
       z-index: 5;
-      /* 3D Perspective — Camera looking down at the corner */
-      perspective: 1000px;
-      perspective-origin: 50% 20%;
+      /* CRITICAL: 1200px perspective reduces sprite warping */
+      perspective: 1200px;
+      perspective-origin: 50% 30%;
       transform-style: preserve-3d;
       overflow: visible;
     }
 
-    /* THE ROOM WORLD — Everything rotates together */
+    /* THE WORLD DIV — Standard Isometric Rotation */
     .iso-world {
       position: absolute;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
-      /* HABBO-STYLE ISOMETRIC: 60° tilt, 45° rotation */
-      transform: rotateX(60deg) rotateZ(-45deg);
+      /* TRUE ISOMETRIC: rotateX(60deg) rotateZ(45deg) — positive 45 for correct orientation */
+      transform: rotateX(60deg) rotateZ(45deg);
       transform-origin: center center;
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       THE FLOOR — Dynamic Territory Based on Market Probability
+       THE TETRIS FLOOR — Dynamic Territory Based on Market Probability
        "The floor tells the story. 70% NO = 70% Pink territory." — Toshiro
+
+       Layout: [NO Zone (Pink/Left)] [YES Zone (Cyan/Right)]
+       Walls are CHILDREN of zones, so they resize together.
     ═══════════════════════════════════════════════════════════════ */
     .iso-floor {
       position: absolute;
-      width: 320px;
-      height: 280px;
+      width: 360px;
+      height: 260px;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
       transform-style: preserve-3d;
       display: flex;
+      flex-direction: row; /* NO (left) | YES (right) */
       gap: 4px;
-      /* Dynamic columns set by JS via CSS custom property */
+      /* Dynamic ratios set by JS — with 15% minimum clamp */
       --yes-ratio: 0.5;
       --no-ratio: 0.5;
     }
@@ -3463,15 +3535,116 @@
       position: relative;
       transform-style: preserve-3d;
       transition: flex 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: visible; /* Allow walls to extend upward */
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NO Zone on LEFT (Pink) */
+    .floor-zone.no {
+      flex: var(--no-ratio);
+      order: 1; /* First (left) */
+    }
+
+    /* YES Zone on RIGHT (Cyan) */
+    .floor-zone.yes {
+      flex: var(--yes-ratio);
+      order: 2; /* Second (right) */
+    }
+
+    /* Zone Wall — Child of zone, sits "North" of floor tiles */
+    .zone-wall {
+      position: absolute;
+      bottom: 100%; /* Sits above the floor */
+      left: 0;
+      right: 0;
+      height: 140px;
+      transform: rotateX(-90deg);
+      transform-origin: bottom center;
+      transform-style: preserve-3d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
       overflow: hidden;
     }
 
-    .floor-zone.yes {
-      flex: var(--yes-ratio);
+    /* NO Wall (Pink) */
+    .zone-wall.no {
+      background: linear-gradient(180deg, #1a0515 0%, #0f030a 100%);
+      border: 2px solid rgba(255, 0, 85, 0.4);
+      box-shadow:
+        inset 0 0 60px rgba(255, 0, 85, 0.2),
+        0 0 30px rgba(255, 0, 85, 0.15);
     }
 
-    .floor-zone.no {
-      flex: var(--no-ratio);
+    /* YES Wall (Cyan) */
+    .zone-wall.yes {
+      background: linear-gradient(180deg, #051520 0%, #030a0f 100%);
+      border: 2px solid rgba(0, 240, 255, 0.4);
+      box-shadow:
+        inset 0 0 60px rgba(0, 240, 255, 0.2),
+        0 0 30px rgba(0, 240, 255, 0.15);
+    }
+
+    /* Wall pixel grid texture */
+    .zone-wall::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 6px 6px;
+      pointer-events: none;
+    }
+
+    /* Wall scanlines */
+    .zone-wall::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.08) 2px,
+        rgba(0, 0, 0, 0.08) 4px
+      );
+      pointer-events: none;
+    }
+
+    /* Wall content */
+    .wall-label {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+      z-index: 2;
+    }
+
+    .zone-wall.no .wall-label { color: #FF0055; }
+    .zone-wall.yes .wall-label { color: #00F0FF; }
+
+    .wall-odds {
+      font-size: 48px;
+      font-weight: 900;
+      text-shadow: 0 0 30px currentColor;
+      z-index: 2;
+    }
+
+    .zone-wall.no .wall-odds { color: #FF0055; }
+    .zone-wall.yes .wall-odds { color: #00F0FF; }
+
+    /* The Tile Surface within each zone */
+    .zone-tiles {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+      grid-auto-rows: 1fr;
+      gap: 2px;
+      transform-style: preserve-3d;
     }
 
     /* The Tile Grid within each zone */
@@ -3981,8 +4154,8 @@
       position: absolute;
       left: 50%;
       bottom: 100%;
-      /* Billboard counter-rotation + translateZ to stand on top of booth */
-      transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg) translateZ(30px);
+      /* FIXED: Correct counter-rotation rotateZ(-45deg) rotateX(-60deg) */
+      transform: translateX(-50%) rotateZ(-45deg) rotateX(-60deg) translateZ(30px);
       transform-style: preserve-3d;
     }
 
@@ -4049,8 +4222,11 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       BILLBOARD AVATARS — Social Signaling + Habbo Floor Shadows
-       "Clothes match your bet. Shadow locks you to the floor." — Toshiro
+       BILLBOARD AVATARS — The Squircle Fix
+       "The avatar STANDS UP. The shadow LIES DOWN." — Toshiro
+
+       World rotation: rotateX(60deg) rotateZ(45deg)
+       Counter-rotation: rotateZ(-45deg) rotateX(-60deg) ← EXACT INVERSE
     ═══════════════════════════════════════════════════════════════ */
     .crowd-area {
       position: absolute;
@@ -4060,28 +4236,30 @@
       transform-style: preserve-3d;
     }
 
-    /* Billboard Sprite — Counter-rotate to face camera */
+    /* Billboard Sprite — Counter-rotate to STAND UP and face camera */
     .iso-avatar {
       position: absolute;
       transform-style: preserve-3d;
-      /* Counter-rotate: rotateZ(45deg) cancels room's -45deg, rotateX(-60deg) cancels room's 60deg */
-      transform: rotateZ(45deg) rotateX(-60deg) translateZ(20px);
+      /* CRITICAL: Exact inverse of world rotation to make sprite face camera 100% */
+      /* World: rotateX(60deg) rotateZ(45deg) → Counter: rotateZ(-45deg) rotateX(-60deg) */
+      transform: rotateZ(-45deg) rotateX(-60deg) translateZ(15px);
       pointer-events: auto;
       cursor: pointer;
     }
 
-    /* HABBO "J" FLOOR SHADOW — Dark squircle locked to floor tile */
-    .iso-avatar::after {
-      content: '';
+    /* SQUIRCLE SHADOW — Separate element, stays FLAT on floor */
+    .iso-avatar-shadow {
       position: absolute;
-      width: 24px;
-      height: 10px;
-      bottom: -8px;
+      width: 28px;
+      height: 12px;
+      bottom: 0;
       left: 50%;
-      transform: translateX(-50%) rotateX(60deg) rotateZ(-45deg);
-      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 70%);
+      /* Shadow lies flat on the tilted floor — DO NOT counter-rotate */
+      transform: translateX(-50%) translateZ(-15px);
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%);
       border-radius: 50%;
       pointer-events: none;
+      z-index: -1;
     }
 
     .iso-avatar-sprite {
@@ -4167,56 +4345,29 @@
     }
 
     @keyframes avatar-bounce {
-      0%, 100% { transform: rotateZ(45deg) rotateX(-60deg) translateZ(20px) translateY(0); }
-      50% { transform: rotateZ(45deg) rotateX(-60deg) translateZ(20px) translateY(-4px); }
+      /* FIXED: Use correct counter-rotation rotateZ(-45deg) rotateX(-60deg) */
+      0%, 100% { transform: rotateZ(-45deg) rotateX(-60deg) translateZ(15px) translateY(0); }
+      50% { transform: rotateZ(-45deg) rotateX(-60deg) translateZ(15px) translateY(-5px); }
     }
 
-    /* Zone Labels — Floating in 3D space */
+    /* Zone Labels — REMOVED from 3D space, now in HUD */
     .iso-zone-label {
-      position: absolute;
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      /* Billboard: face camera */
-      transform: rotateZ(45deg) rotateX(-60deg) translateZ(30px);
-      text-shadow: 0 0 20px currentColor, 0 2px 8px rgba(0, 0, 0, 0.8);
-      z-index: 80;
+      display: none; /* Labels now on wall screens */
     }
 
-    .iso-zone-label.yes {
-      left: 20%;
-      top: 80%;
-      color: #00F0FF;
-    }
-
+    .iso-zone-label.yes,
     .iso-zone-label.no {
-      right: 20%;
-      top: 80%;
-      color: #FF0055;
+      display: none;
     }
 
-    /* Zone Scores */
+    /* Zone Scores — HIDDEN (now on wall screens) */
     .iso-zone-score {
-      position: absolute;
-      font-size: 32px;
-      font-weight: 900;
-      opacity: 0.6;
-      transform: rotateZ(45deg) rotateX(-60deg) translateZ(10px);
-      text-shadow: 0 0 30px currentColor;
-      z-index: 70;
+      display: none; /* Scores now on wall screens */
     }
 
-    .iso-zone-score.yes {
-      left: 25%;
-      top: 50%;
-      color: #00F0FF;
-    }
-
+    .iso-zone-score.yes,
     .iso-zone-score.no {
-      right: 25%;
-      top: 50%;
-      color: #FF0055;
+      display: none;
     }
 
     /* ═══ PLAYER AVATAR — Liftable with floor shadow ═══ */
@@ -4230,16 +4381,17 @@
 
     .iso-player:active { cursor: grabbing; }
 
-    /* Player sprite (counter-rotated billboard) */
+    /* Player sprite — CORRECT counter-rotation to stand up */
     .iso-player-sprite {
-      transform: rotateZ(45deg) rotateX(-60deg);
+      /* FIXED: rotateZ(-45deg) rotateX(-60deg) to match world rotation */
+      transform: rotateZ(-45deg) rotateX(-60deg);
       transform-origin: center bottom;
       transition: transform 0.2s ease;
     }
 
     /* Lifted state — Player floats up */
     .iso-player.lifted .iso-player-sprite {
-      transform: rotateZ(45deg) rotateX(-60deg) translateZ(40px) scale(1.1);
+      transform: rotateZ(-45deg) rotateX(-60deg) translateZ(40px) scale(1.1);
       filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
     }
 
@@ -7931,33 +8083,22 @@
              HABBO 2026 — THE ISOMETRIC ROOM
              "A User is a Resident. A Page is a Room." — Toshiro
         ═══════════════════════════════════════════════════════════════ -->
+        <!-- 2D HUD — Question Overlay (Outside 3D space) -->
+        <div class="hud-question" id="hud-question">
+          <div class="hud-question-text" id="hud-question-text">WILL BTC HIT $100K?</div>
+          <div class="hud-live">
+            <span class="hud-live-dot"></span>
+            <span>LIVE</span>
+          </div>
+        </div>
+
         <div class="iso-room" id="iso-room">
           <!-- THE 3D WORLD — Everything rotates together -->
           <div class="iso-world" id="iso-world">
 
-            <!-- THE CORNER WALLS — Two massive SCREENS meeting at 120° angle -->
-            <!-- BACK-LEFT WALL: The NO Screen (Pink) -->
-            <div class="iso-wall back-left">
-              <div class="wall-screen-content">
-                <div class="wall-screen-label">NO</div>
-                <div class="wall-screen-odds" id="wall-no-odds">35%</div>
-                <div class="wall-screen-stat">Kalshi: <span id="wall-no-kalshi">35¢</span></div>
-              </div>
-              <div class="wall-scanlines"></div>
-              <div class="wall-floor-bloom"></div>
-            </div>
-            <!-- BACK-RIGHT WALL: The YES Screen (Cyan) -->
-            <div class="iso-wall back-right">
-              <div class="wall-screen-content">
-                <div class="wall-screen-label">YES</div>
-                <div class="wall-screen-odds" id="wall-yes-odds">65%</div>
-                <div class="wall-screen-stat">Kalshi: <span id="wall-yes-kalshi">65¢</span></div>
-              </div>
-              <div class="wall-scanlines"></div>
-              <div class="wall-floor-bloom"></div>
-            </div>
+            <!-- WALLS ARE NOW CHILDREN OF FLOOR ZONES — See .floor-zone .zone-wall -->
 
-            <!-- THE JUMBOTRON — Wall-mounted screen -->
+            <!-- THE JUMBOTRON — Wall-mounted screen (HIDDEN - data now on zone walls) -->
             <div class="iso-jumbotron" id="iso-jumbotron">
               <div class="iso-jumbotron-frame"></div>
               <div class="iso-jumbotron-screen">
@@ -7998,12 +8139,36 @@
               </div>
             </div>
 
-            <!-- THE FLOOR — Diamond grid with YES/NO zones -->
+            <!-- THE TETRIS FLOOR — [NO (Pink/Left)] [YES (Cyan/Right)] -->
             <div class="iso-floor" id="iso-floor">
-              <!-- YES Zone (LEFT side) — Cyan/Blue -->
+
+              <!-- NO Zone (LEFT) — Pink/Red — Wall is CHILD of zone -->
+              <div class="floor-zone no" id="zone-no">
+                <!-- NO WALL — Sits "North" of NO floor, resizes with zone -->
+                <div class="zone-wall no">
+                  <div class="wall-label">NO</div>
+                  <div class="wall-odds" id="wall-no-odds">35%</div>
+                </div>
+                <div class="iso-tile-grid" id="iso-grid-no">
+                  <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
+                  <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
+                  <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
+                  <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
+                  <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
+                  <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
+                  <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
+                </div>
+                <div class="crowd-area" id="crowd-no"></div>
+              </div>
+
+              <!-- YES Zone (RIGHT) — Cyan/Blue — Wall is CHILD of zone -->
               <div class="floor-zone yes" id="zone-yes">
+                <!-- YES WALL — Sits "North" of YES floor, resizes with zone -->
+                <div class="zone-wall yes">
+                  <div class="wall-label">YES</div>
+                  <div class="wall-odds" id="wall-yes-odds">65%</div>
+                </div>
                 <div class="iso-tile-grid" id="iso-grid-yes">
-                  <!-- 35 tiles (5x7 grid) -->
                   <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
                   <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
                   <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
@@ -8015,27 +8180,7 @@
                 <div class="crowd-area" id="crowd-yes"></div>
               </div>
 
-              <!-- NO Zone (RIGHT side) — Pink/Red -->
-              <div class="floor-zone no" id="zone-no">
-                <div class="iso-tile-grid" id="iso-grid-no">
-                  <!-- 35 tiles (5x7 grid) -->
-                  <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
-                  <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
-                  <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
-                  <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
-                  <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
-                  <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
-                  <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
-                </div>
-                <div class="crowd-area" id="crowd-no"></div>
-              </div>
             </div>
-
-            <!-- Zone Labels (Billboard style) -->
-            <div class="iso-zone-label yes">YES</div>
-            <div class="iso-zone-label no">NO</div>
-            <div class="iso-zone-score yes" id="yes-score">72%</div>
-            <div class="iso-zone-score no" id="no-score">28%</div>
 
           </div><!-- /iso-world -->
 
@@ -8478,22 +8623,39 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // HABBO 2026 — DYNAMIC FLOOR TERRITORY
+    // HABBO 2026 — DYNAMIC "TETRIS" FLOOR TERRITORY
     // "The floor tells the story. 70% NO = 70% Pink territory." — Toshiro
+    //
+    // MINIMUM CLAMP: Even if YES is 1%, it gets 15% visual width (3 tiles)
+    // so avatars can still stand there.
     // ═══════════════════════════════════════════════════════════════
     function setMarketRatio(yesPercentage) {
       const floor = document.getElementById('iso-floor');
       if (!floor) return;
 
-      // Clamp between 10-90% to always show both zones
-      const yesRatio = Math.max(0.1, Math.min(0.9, yesPercentage / 100));
-      const noRatio = 1 - yesRatio;
+      // THE WIDTH ALGORITHM — 15% minimum clamp
+      // If yesPercentage = 6%, visual = 15%
+      // If yesPercentage = 94%, visual = 85% (so NO gets 15%)
+      const MIN_WIDTH = 0.15; // 15% minimum for either zone
+      const MAX_WIDTH = 1 - MIN_WIDTH; // 85% maximum
+
+      let yesRatio = yesPercentage / 100;
+      let noRatio = 1 - yesRatio;
+
+      // Apply minimum clamp
+      if (yesRatio < MIN_WIDTH) {
+        yesRatio = MIN_WIDTH;
+        noRatio = MAX_WIDTH;
+      } else if (noRatio < MIN_WIDTH) {
+        noRatio = MIN_WIDTH;
+        yesRatio = MAX_WIDTH;
+      }
 
       // Update CSS custom properties for dynamic flex sizing
       floor.style.setProperty('--yes-ratio', yesRatio);
       floor.style.setProperty('--no-ratio', noRatio);
 
-      // Update wall screen stats
+      // Update wall screen stats (use ACTUAL percentages, not clamped)
       const wallYesOdds = document.getElementById('wall-yes-odds');
       const wallNoOdds = document.getElementById('wall-no-odds');
       const wallYesKalshi = document.getElementById('wall-yes-kalshi');
@@ -8504,13 +8666,7 @@
       if (wallYesKalshi) wallYesKalshi.textContent = `${yesPercentage}¢`;
       if (wallNoKalshi) wallNoKalshi.textContent = `${100 - yesPercentage}¢`;
 
-      // Update floor zone score labels
-      const yesScore = document.getElementById('yes-score');
-      const noScore = document.getElementById('no-score');
-      if (yesScore) yesScore.textContent = `${yesPercentage}%`;
-      if (noScore) noScore.textContent = `${100 - yesPercentage}%`;
-
-      console.log(`[HABBO 2026] Floor territory: YES ${Math.round(yesRatio * 100)}% | NO ${Math.round(noRatio * 100)}%`);
+      console.log(`[HABBO 2026] Market: ${yesPercentage}% YES → Floor: ${Math.round(yesRatio * 100)}% YES / ${Math.round(noRatio * 100)}% NO`);
     }
 
     // ═══════════════════════════════════════════════════════════════
