@@ -3418,15 +3418,17 @@
     ═══════════════════════════════════════════════════════════════ */
 
     /* ═══════════════════════════════════════════════════════════════
-       THE CEILING SIGN — Hanging Jumbotron (Paper Mario Style)
-       "It HANGS from the ceiling via chains. It floats ABOVE the DJ." — Toshiro
+       LAYER 1: THE HUD (Z-999) — Clean 2D Overlay
+       "Strictly separate 2D HUD from 3D World. No overlap glitches." — Toshiro
+
+       This is a FIXED 2D neon panel. It never intersects the 3D world.
     ═══════════════════════════════════════════════════════════════ */
     .ceiling-sign {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 200;
+      z-index: 999; /* LAYER 1: Above EVERYTHING */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -3565,11 +3567,14 @@
     .hud-progress-bar { display: none; }
     .hud-live { display: none; }
 
-    /* THE SCENE CONTAINER — Paper Mario Style Stage */
+    /* ═══════════════════════════════════════════════════════════════
+       LAYER 2: THE 3D WORLD (The Stage)
+       "120px margin-top clearance for the HUD sign." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
     .iso-room {
       position: absolute;
-      /* PAPER MARIO: Dance floor takes 60% of vertical space */
-      top: 100px; /* Leave room for hanging sign */
+      /* STRICT LAYERING: 120px clearance for the fixed HUD sign */
+      top: 120px;
       bottom: 40px;
       left: 0;
       right: 0;
@@ -3931,6 +3936,95 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       HOLOGRAM ZONES — Diegetic UI that exists IN the game world
+       "Vertical Energy Curtains rising from the back edge." — Toshiro
+
+       The labels float in 3D space ABOVE the crowd — never blocked.
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Energy Curtain — Semi-transparent gradient rising from zone edge */
+    .energy-curtain {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      right: 0;
+      height: 200px;
+      pointer-events: none;
+      transform: rotateX(-90deg);
+      transform-origin: bottom center;
+      opacity: 0.6;
+    }
+
+    .energy-curtain.no {
+      background: linear-gradient(
+        0deg,
+        rgba(255, 0, 85, 0.4) 0%,
+        rgba(255, 0, 85, 0.2) 30%,
+        rgba(255, 0, 85, 0.05) 70%,
+        transparent 100%
+      );
+    }
+
+    .energy-curtain.yes {
+      background: linear-gradient(
+        0deg,
+        rgba(0, 240, 255, 0.4) 0%,
+        rgba(0, 240, 255, 0.2) 30%,
+        rgba(0, 240, 255, 0.05) 70%,
+        transparent 100%
+      );
+    }
+
+    /* Floating Hologram Label — Glows like a hologram above the crowd */
+    .hologram-label {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%) rotateX(-55deg);
+      font-size: clamp(24px, 6vw, 40px);
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-align: center;
+      pointer-events: none;
+      z-index: 100;
+      /* Billboard counter-rotation to face camera */
+      transform-style: preserve-3d;
+    }
+
+    .hologram-label.no {
+      color: #FF0055;
+      text-shadow:
+        0 0 20px #FF0055,
+        0 0 40px rgba(255, 0, 85, 0.6),
+        0 0 80px rgba(255, 0, 85, 0.3);
+      animation: hologram-flicker 3s ease-in-out infinite;
+    }
+
+    .hologram-label.yes {
+      color: #00F0FF;
+      text-shadow:
+        0 0 20px #00F0FF,
+        0 0 40px rgba(0, 240, 255, 0.6),
+        0 0 80px rgba(0, 240, 255, 0.3);
+      animation: hologram-flicker 3s ease-in-out infinite;
+      animation-delay: -1.5s;
+    }
+
+    @keyframes hologram-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+      52% { opacity: 0.95; }
+      54% { opacity: 0.8; }
+    }
+
+    .hologram-percent {
+      display: block;
+      font-size: 0.6em;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        THE CORNER WALLS — Two massive SCREENS meeting at 120° angle
        Left Wall = Pink (NO) Screen | Right Wall = Cyan (YES) Screen
        "These walls are not walls. They are JUMBOTRONS." — Toshiro
@@ -4195,29 +4289,31 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       THE DJ BOOTH — Physical 3D Block Structure
-       "Not a sprite. A BLOCK. Top, Front-Left, Front-Right faces." — Toshiro
-       Sits ON the floor tiles, against the central corner seam.
+       THE DJ BOOTH — At the VERY BACK of the room (deepest Z-depth)
+       "Raised podium at the back. DJ clearly visible under the sign." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
     .iso-dj-booth {
       position: absolute;
       left: 50%;
-      /* PAPER MARIO: DJ sits at back corner, ON the floor, behind dancers */
-      top: 20%;
+      /* STRICT LAYERING: DJ at the BACK — top of 3D scene = deepest Z */
+      top: 10%;
       transform: translateX(-50%);
       transform-style: preserve-3d;
-      /* Z-index below dancers (50) but above floor tiles */
-      z-index: 30;
+      /* Z-index BEHIND dancers (50) but above floor tiles (10) */
+      z-index: 25;
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       DJ PREDICT — Stick Figure with Headphones
-       "He's a stick figure with ATTITUDE. The vibe master." — Toshiro
+       DJ PREDICT — 2D Billboard with Perspective Lock
+       "He faces the camera even though he's deep in the scene." — Toshiro
+
+       PERSPECTIVE LOCK: Counter-rotate so billboard faces viewer.
     ═══════════════════════════════════════════════════════════════ */
     .stick-dj {
       position: absolute;
       left: 50%;
       bottom: 100%;
+      /* PERSPECTIVE LOCK: Counter-rotate the 55deg world tilt to face camera */
       transform: translateX(-50%) rotateX(-55deg);
       transform-style: preserve-3d;
       width: 50px;
@@ -4225,6 +4321,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      /* Make DJ bigger so he's visible at the back */
+      scale: 1.3;
     }
 
     /* DJ HEAD — Bigger, with headphones */
@@ -4628,6 +4726,18 @@
       position: relative;
       z-index: 3;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* AVATAR PHOTO — Circular crop inside the head */
+    .avatar-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
     }
 
     /* STICK FIGURE BODY — The Torso Line */
@@ -8732,6 +8842,12 @@
 
               <!-- NO Zone (LEFT) — Pink/Red — Wall is CHILD of zone -->
               <div class="floor-zone no" id="zone-no">
+                <!-- HOLOGRAM: Energy curtain + floating label -->
+                <div class="energy-curtain no"></div>
+                <div class="hologram-label no" id="hologram-no">
+                  NO
+                  <span class="hologram-percent" id="hologram-no-pct">(35%)</span>
+                </div>
                 <!-- NO WALL — Sits "North" of NO floor, resizes with zone -->
                 <div class="zone-wall no">
                   <div class="wall-label">NO</div>
@@ -8749,6 +8865,12 @@
 
               <!-- YES Zone (RIGHT) — Cyan/Blue — Wall is CHILD of zone -->
               <div class="floor-zone yes" id="zone-yes">
+                <!-- HOLOGRAM: Energy curtain + floating label -->
+                <div class="energy-curtain yes"></div>
+                <div class="hologram-label yes" id="hologram-yes">
+                  YES
+                  <span class="hologram-percent" id="hologram-yes-pct">(65%)</span>
+                </div>
                 <!-- YES WALL — Sits "North" of YES floor, resizes with zone -->
                 <div class="zone-wall yes">
                   <div class="wall-label">YES</div>
@@ -9263,6 +9385,12 @@
       if (signProgressYes) signProgressYes.style.width = `${yesPercentage}%`;
       if (signProgressNo) signProgressNo.style.width = `${100 - yesPercentage}%`;
 
+      // HOLOGRAM: Update floating 3D labels above the crowd
+      const hologramYesPct = document.getElementById('hologram-yes-pct');
+      const hologramNoPct = document.getElementById('hologram-no-pct');
+      if (hologramYesPct) hologramYesPct.textContent = `(${yesPercentage}%)`;
+      if (hologramNoPct) hologramNoPct.textContent = `(${100 - yesPercentage}%)`;
+
       console.log(`[PICTO-PARTY] Market: ${yesPercentage}% YES → Floor: ${Math.round(yesRatio * 100)}% YES / ${Math.round(noRatio * 100)}% NO`);
     }
 
@@ -9431,8 +9559,10 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // PICTO-PARTY — Stick Figure Creation with Sky Drop!
-    // "A stick figure is not just lines; it is ATTITUDE." — Toshiro
+    // AVATAR ENGINE — Robust Image Loading with Stick Figure Fallback
+    // "Try image first. If it fails, GRACEFUL degradation to stick figures." — Toshiro
+    //
+    // CRITICAL: onerror fallback ensures no broken image icons ever appear.
     // ═══════════════════════════════════════════════════════════════
     function createVillager(member, index, team, position) {
       const avatar = document.createElement('div');
@@ -9460,16 +9590,28 @@
       const zIndex = 10 + Math.floor(posY);
       avatar.style.zIndex = zIndex;
 
-      // Random punctuation face
+      // Random punctuation face for fallback
       const faces = ['happy', 'cool', 'angry', 'surprised', 'wink', 'smirk'];
       const randomFace = faces[Math.floor(Math.random() * faces.length)];
 
-      // PAPER MARIO: Pure CSS Stick Figure with punctuation face!
+      // Generate unique avatar ID for image path
+      const avatarId = member?.id || (index + 1);
+      const imagePath = `./tg/user_${avatarId}.jpg`;
+
+      // AVATAR ENGINE: Try to load image, fallback to stick figure face
       avatar.innerHTML = `
         <div class="iso-avatar-sprite">
           <div class="iso-avatar-shadow"></div>
           <div class="stick-head">
-            <span class="stick-face ${randomFace}"></span>
+            <!-- CRITICAL: Image with onerror fallback -->
+            <img
+              src="${imagePath}"
+              alt=""
+              class="avatar-photo"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <!-- Fallback: Stick Figure Face (hidden by default, shown on error) -->
+            <span class="stick-face ${randomFace}" style="display: none;"></span>
           </div>
           <div class="stick-body"></div>
           <div class="stick-arms"></div>
