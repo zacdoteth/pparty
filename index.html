@@ -6811,6 +6811,14 @@
       // AUTO-OPEN FIRST MARKET — INSTANT PARTY VIBES!
       // Users should land DIRECTLY in the party, not an empty lobby.
       // This is the turntable.fm moment: you walk in and people are already dancing.
+
+      // DESKTOP: Both screens must be visible!
+      if (isDesktop()) {
+        screenHome.classList.add('active');
+        screenArena.classList.add('active');
+        tabBar.style.display = 'none';
+      }
+
       setTimeout(() => {
         openMarket(0);
         // Highlight first card in sidebar
