@@ -4743,30 +4743,37 @@
     /* TG NAME TAG — Member's name displayed below the avatar */
     .avatar-name {
       position: absolute;
-      bottom: -18px;
+      bottom: -22px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 9px;
-      font-weight: 700;
+      font-size: 10px;
+      font-weight: 800;
       color: #fff;
       text-shadow:
-        0 0 4px rgba(0, 0, 0, 0.9),
-        0 1px 2px rgba(0, 0, 0, 0.8),
-        0 0 8px currentColor;
+        0 0 6px rgba(0, 0, 0, 1),
+        0 1px 3px rgba(0, 0, 0, 1),
+        0 0 12px currentColor,
+        0 0 20px currentColor;
       white-space: nowrap;
       letter-spacing: 0.5px;
-      z-index: 10;
+      z-index: 100;
       pointer-events: none;
+      /* Make sure name is always visible */
+      background: rgba(0, 0, 0, 0.5);
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
     /* YES team names glow cyan */
     .iso-avatar.bet-yes .avatar-name {
       color: #00F0FF;
+      border: 1px solid rgba(0, 240, 255, 0.4);
     }
 
     /* NO team names glow pink */
     .iso-avatar.bet-no .avatar-name {
       color: #FF4B9B;
+      border: 1px solid rgba(255, 75, 155, 0.4);
     }
 
     /* STICK FIGURE BODY — The Torso Line */
@@ -4875,75 +4882,248 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       RHYTHM HEAVEN DANCE ANIMATIONS — 3 Types for Variety!
-       "Not synchronized robots. ORGANIC crowd." — Toshiro
+       🕺 FORTNITE-LEVEL EPIC DANCE ANIMATIONS — 10 Unique Moves! 🕺
+       "Make them SMILE like Miyamoto-san taught us." — Toshiro
+
+       Each dance has body, arms, and legs animations for full expression!
     ═══════════════════════════════════════════════════════════════ */
 
-    /* DANCE TYPE 1: BOUNCE (Up/Down) — The Classic */
+    /* ═══ DANCE 1: THE BOUNCE — Classic Jump! ═══ */
     .iso-avatar.dance-bounce {
-      animation: dance-bounce 0.5s ease-in-out infinite;
+      animation: dance-bounce 0.45s ease-in-out infinite;
     }
-
     @keyframes dance-bounce {
-      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0); }
-      50% { transform: rotateX(-55deg) translateZ(15px) translateY(-12px); }
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0) scale(1); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateY(-15px) scale(1.05); }
     }
-
     .iso-avatar.dance-bounce .stick-arms {
-      animation: arms-pump 0.5s ease-in-out infinite;
+      animation: bounce-arms 0.45s ease-in-out infinite;
+    }
+    @keyframes bounce-arms {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); width: 32px; }
+      50% { transform: translateX(-50%) rotate(-30deg); width: 40px; }
+    }
+    .iso-avatar.dance-bounce .stick-legs::before { animation: bounce-leg-l 0.45s ease-in-out infinite; }
+    .iso-avatar.dance-bounce .stick-legs::after { animation: bounce-leg-r 0.45s ease-in-out infinite; }
+    @keyframes bounce-leg-l {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(-25deg) translateY(-5px); }
+    }
+    @keyframes bounce-leg-r {
+      0%, 100% { transform: rotate(10deg); }
+      50% { transform: rotate(25deg) translateY(-5px); }
     }
 
-    @keyframes arms-pump {
-      0%, 100% { transform: translateX(-50%) rotate(0deg); }
-      50% { transform: translateX(-50%) rotate(-20deg) scaleY(0.9); }
+    /* ═══ DANCE 2: THE FLOSS — Fortnite Classic! ═══ */
+    .iso-avatar.dance-floss {
+      animation: dance-floss 0.6s ease-in-out infinite;
+    }
+    @keyframes dance-floss {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateX(-8px); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateX(8px); }
+    }
+    .iso-avatar.dance-floss .stick-arms {
+      animation: floss-arms 0.3s ease-in-out infinite;
+    }
+    @keyframes floss-arms {
+      0%, 100% { transform: translateX(-50%) rotate(-45deg) scaleX(1.4); }
+      50% { transform: translateX(-50%) rotate(45deg) scaleX(1.4); }
+    }
+    .iso-avatar.dance-floss .stick-body {
+      animation: floss-hips 0.3s ease-in-out infinite;
+    }
+    @keyframes floss-hips {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg); }
     }
 
-    /* DANCE TYPE 2: WIGGLE (Rotate Left/Right) — The Groovy */
-    .iso-avatar.dance-wiggle {
-      animation: dance-wiggle 0.6s ease-in-out infinite;
+    /* ═══ DANCE 3: THE ROBOT — Mechanical Precision! ═══ */
+    .iso-avatar.dance-robot {
+      animation: dance-robot 1.2s steps(4) infinite;
+    }
+    @keyframes dance-robot {
+      0%, 25% { transform: rotateX(-55deg) translateZ(15px) rotate(0deg); }
+      25%, 50% { transform: rotateX(-55deg) translateZ(15px) rotate(15deg) translateY(-5px); }
+      50%, 75% { transform: rotateX(-55deg) translateZ(15px) rotate(-15deg) translateY(-5px); }
+      75%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(0deg); }
+    }
+    .iso-avatar.dance-robot .stick-arms {
+      animation: robot-arms 1.2s steps(4) infinite;
+    }
+    @keyframes robot-arms {
+      0%, 25% { transform: translateX(-50%) rotate(90deg); }
+      25%, 50% { transform: translateX(-50%) rotate(0deg); }
+      50%, 75% { transform: translateX(-50%) rotate(-90deg); }
+      75%, 100% { transform: translateX(-50%) rotate(0deg); }
     }
 
-    @keyframes dance-wiggle {
-      0%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(-8deg); }
-      50% { transform: rotateX(-55deg) translateZ(15px) rotate(8deg); }
+    /* ═══ DANCE 4: THE WAVE — Smooth Body Roll! ═══ */
+    .iso-avatar.dance-wave {
+      animation: dance-wave 1.5s ease-in-out infinite;
+    }
+    @keyframes dance-wave {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0) scaleY(1); }
+      25% { transform: rotateX(-55deg) translateZ(15px) translateY(-8px) scaleY(1.1); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateY(0) scaleY(0.95); }
+      75% { transform: rotateX(-55deg) translateZ(15px) translateY(5px) scaleY(1.05); }
+    }
+    .iso-avatar.dance-wave .stick-arms {
+      animation: wave-arms 1.5s ease-in-out infinite;
+    }
+    @keyframes wave-arms {
+      0%, 100% { transform: translateX(-50%) rotate(0deg) translateY(0); }
+      25% { transform: translateX(-50%) rotate(30deg) translateY(-10px); }
+      50% { transform: translateX(-50%) rotate(0deg) translateY(0); }
+      75% { transform: translateX(-50%) rotate(-30deg) translateY(5px); }
     }
 
-    .iso-avatar.dance-wiggle .stick-arms {
-      animation: arms-wave 0.6s ease-in-out infinite;
+    /* ═══ DANCE 5: JUMPING JACKS — High Energy! ═══ */
+    .iso-avatar.dance-jumpjack {
+      animation: dance-jumpjack 0.5s ease-in-out infinite;
+    }
+    @keyframes dance-jumpjack {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0); }
+      50% { transform: rotateX(-55deg) translateZ(20px) translateY(-20px); }
+    }
+    .iso-avatar.dance-jumpjack .stick-arms {
+      animation: jumpjack-arms 0.5s ease-in-out infinite;
+    }
+    @keyframes jumpjack-arms {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); width: 32px; }
+      50% { transform: translateX(-50%) rotate(-90deg); width: 50px; }
+    }
+    .iso-avatar.dance-jumpjack .stick-legs::before { animation: jumpjack-leg-l 0.5s ease-in-out infinite; }
+    .iso-avatar.dance-jumpjack .stick-legs::after { animation: jumpjack-leg-r 0.5s ease-in-out infinite; }
+    @keyframes jumpjack-leg-l {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(-40deg); }
+    }
+    @keyframes jumpjack-leg-r {
+      0%, 100% { transform: rotate(10deg); }
+      50% { transform: rotate(40deg); }
     }
 
-    @keyframes arms-wave {
-      0%, 100% { transform: translateX(-50%) rotate(-25deg); }
-      50% { transform: translateX(-50%) rotate(25deg); }
+    /* ═══ DANCE 6: HEADBANG — Rock On! ═══ */
+    .iso-avatar.dance-headbang {
+      animation: dance-headbang 0.25s ease-in-out infinite;
+    }
+    @keyframes dance-headbang {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(0deg); }
+      50% { transform: rotateX(-55deg) translateZ(15px) rotate(15deg) translateY(8px); }
+    }
+    .iso-avatar.dance-headbang .stick-head {
+      animation: headbang-head 0.25s ease-in-out infinite;
+    }
+    @keyframes headbang-head {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px) scale(0.95); }
+    }
+    .iso-avatar.dance-headbang .stick-arms {
+      animation: headbang-arms 0.5s ease-in-out infinite;
+    }
+    @keyframes headbang-arms {
+      0%, 100% { transform: translateX(-50%) rotate(30deg); }
+      50% { transform: translateX(-50%) rotate(-30deg); }
     }
 
-    .iso-avatar.dance-wiggle .stick-legs::before,
-    .iso-avatar.dance-wiggle .stick-legs::after {
-      animation: legs-shuffle 0.3s ease-in-out infinite alternate;
+    /* ═══ DANCE 7: DISCO POINT — Saturday Night Fever! ═══ */
+    .iso-avatar.dance-disco {
+      animation: dance-disco 1s ease-in-out infinite;
+    }
+    @keyframes dance-disco {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(-5deg); }
+      25% { transform: rotateX(-55deg) translateZ(20px) translateY(-10px) rotate(5deg); }
+      50% { transform: rotateX(-55deg) translateZ(15px) rotate(-5deg); }
+      75% { transform: rotateX(-55deg) translateZ(20px) translateY(-10px) rotate(5deg); }
+    }
+    .iso-avatar.dance-disco .stick-arms {
+      animation: disco-arms 1s ease-in-out infinite;
+    }
+    @keyframes disco-arms {
+      0%, 50% { transform: translateX(-50%) rotate(-60deg) scaleX(1.2); }
+      25% { transform: translateX(-30%) rotate(60deg) scaleX(1.3); }
+      75% { transform: translateX(-70%) rotate(60deg) scaleX(1.3); }
+      100% { transform: translateX(-50%) rotate(-60deg) scaleX(1.2); }
     }
 
-    @keyframes legs-shuffle {
-      0% { transform: rotate(-15deg); }
-      100% { transform: rotate(15deg); }
+    /* ═══ DANCE 8: RUNNING MAN — Classic Hip Hop! ═══ */
+    .iso-avatar.dance-runman {
+      animation: dance-runman 0.4s ease-in-out infinite;
+    }
+    @keyframes dance-runman {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateY(-8px); }
+    }
+    .iso-avatar.dance-runman .stick-legs::before { animation: runman-leg-l 0.4s ease-in-out infinite; }
+    .iso-avatar.dance-runman .stick-legs::after { animation: runman-leg-r 0.4s ease-in-out infinite; }
+    @keyframes runman-leg-l {
+      0%, 100% { transform: rotate(-30deg) translateY(0); height: 20px; }
+      50% { transform: rotate(20deg) translateY(-10px); height: 15px; }
+    }
+    @keyframes runman-leg-r {
+      0%, 100% { transform: rotate(20deg) translateY(-10px); height: 15px; }
+      50% { transform: rotate(-30deg) translateY(0); height: 20px; }
+    }
+    .iso-avatar.dance-runman .stick-arms {
+      animation: runman-arms 0.4s ease-in-out infinite;
+    }
+    @keyframes runman-arms {
+      0%, 100% { transform: translateX(-50%) rotate(20deg); }
+      50% { transform: translateX(-50%) rotate(-20deg); }
     }
 
-    /* DANCE TYPE 3: SPIN (Full 360 flip) — The Showoff */
-    .iso-avatar.dance-spin {
-      animation: dance-spin 1.5s ease-in-out infinite;
+    /* ═══ DANCE 9: THE DAB — Iconic Move! ═══ */
+    .iso-avatar.dance-dab {
+      animation: dance-dab 1.5s ease-in-out infinite;
+    }
+    @keyframes dance-dab {
+      0%, 70%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(0deg); }
+      35% { transform: rotateX(-55deg) translateZ(20px) rotate(-25deg) translateY(-5px); }
+    }
+    .iso-avatar.dance-dab .stick-arms {
+      animation: dab-arms 1.5s ease-in-out infinite;
+    }
+    @keyframes dab-arms {
+      0%, 70%, 100% { transform: translateX(-50%) rotate(0deg); width: 32px; }
+      35% { transform: translateX(-30%) rotate(-60deg) scaleX(1.8); width: 45px; }
+    }
+    .iso-avatar.dance-dab .stick-head {
+      animation: dab-head 1.5s ease-in-out infinite;
+    }
+    @keyframes dab-head {
+      0%, 70%, 100% { transform: rotate(0deg); }
+      35% { transform: rotate(-30deg) translateX(-5px); }
     }
 
-    @keyframes dance-spin {
-      0%, 80%, 100% { transform: rotateX(-55deg) translateZ(15px) rotateY(0deg); }
-      40% { transform: rotateX(-55deg) translateZ(25px) rotateY(360deg); }
+    /* ═══ DANCE 10: THE TWIST — Classic 60s! ═══ */
+    .iso-avatar.dance-twist {
+      animation: dance-twist 0.5s ease-in-out infinite;
     }
-
-    .iso-avatar.dance-spin .stick-arms {
-      animation: arms-spin-pose 1.5s ease-in-out infinite;
+    @keyframes dance-twist {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) rotate(-15deg) translateY(0); }
+      50% { transform: rotateX(-55deg) translateZ(15px) rotate(15deg) translateY(-5px); }
     }
-
-    @keyframes arms-spin-pose {
-      0%, 80%, 100% { transform: translateX(-50%) rotate(0deg); }
-      20%, 60% { transform: translateX(-50%) rotate(45deg) scaleX(1.3); }
+    .iso-avatar.dance-twist .stick-body {
+      animation: twist-body 0.5s ease-in-out infinite;
+    }
+    @keyframes twist-body {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg); }
+    }
+    .iso-avatar.dance-twist .stick-arms {
+      animation: twist-arms 0.5s ease-in-out infinite;
+    }
+    @keyframes twist-arms {
+      0%, 100% { transform: translateX(-50%) rotate(20deg); }
+      50% { transform: translateX(-50%) rotate(-20deg); }
+    }
+    .iso-avatar.dance-twist .stick-legs::before,
+    .iso-avatar.dance-twist .stick-legs::after {
+      animation: twist-legs 0.25s ease-in-out infinite;
+    }
+    @keyframes twist-legs {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(20deg); }
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -9596,8 +9776,19 @@
     function createVillager(member, index, team, position) {
       const avatar = document.createElement('div');
 
-      // RHYTHM HEAVEN: Random dance type for organic crowd
-      const danceTypes = ['dance-bounce', 'dance-wiggle', 'dance-spin'];
+      // 🕺 FORTNITE-LEVEL EPIC DANCES: 10 unique moves for party vibes!
+      const danceTypes = [
+        'dance-bounce',    // Classic jump
+        'dance-floss',     // Fortnite classic
+        'dance-robot',     // Mechanical precision
+        'dance-wave',      // Smooth body roll
+        'dance-jumpjack',  // High energy
+        'dance-headbang',  // Rock on!
+        'dance-disco',     // Saturday Night Fever
+        'dance-runman',    // Classic hip hop
+        'dance-dab',       // Iconic move
+        'dance-twist'      // Classic 60s
+      ];
       const randomDance = danceTypes[Math.floor(Math.random() * danceTypes.length)];
 
       // Add bet-yes or bet-no class for outfit coloring, sky-drop for entrance
