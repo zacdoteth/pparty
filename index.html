@@ -50,6 +50,11 @@
       /* Safe Areas */
       --safe-top: env(safe-area-inset-top, 20px);
       --safe-bottom: env(safe-area-inset-bottom, 34px);
+
+      /* Responsive Layout */
+      --sidebar-width: 360px;
+      --arena-min-width: 500px;
+      --desktop-breakpoint: 769px;
     }
 
     * {
@@ -77,12 +82,68 @@
     ═══════════════════════════════════════════════════════════════ */
     .app {
       width: 100%;
-      max-width: 500px; /* Slightly wider for tablets */
+      max-width: 500px; /* Mobile: centered narrow */
       height: 100vh;
       height: 100dvh;
       margin: 0 auto;
       position: relative;
       overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DESKTOP LAYOUT — Sidebar + Main Arena (turntable.fm vibes!)
+    ═══════════════════════════════════════════════════════════════ */
+    @media (min-width: 769px) {
+      .app {
+        max-width: 1400px;
+        display: grid;
+        grid-template-columns: var(--sidebar-width) 1fr;
+        grid-template-rows: 1fr;
+        gap: 0;
+        margin: 0 auto;
+      }
+
+      /* Desktop: Home screen becomes sidebar - FIXED WIDTH! */
+      .home-screen {
+        position: relative;
+        opacity: 1;
+        pointer-events: auto;
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 0;
+        border-right: 1px solid rgba(0, 245, 255, 0.15);
+        background: linear-gradient(180deg, rgba(10, 6, 18, 0.98) 0%, rgba(5, 3, 10, 0.99) 100%);
+        /* CRITICAL: Lock sidebar width so it doesn't stretch! */
+        width: var(--sidebar-width);
+        min-width: var(--sidebar-width);
+        max-width: var(--sidebar-width);
+        overflow-x: hidden;
+      }
+
+      /* Desktop: Arena is always visible on right */
+      .arena-screen {
+        position: relative;
+        opacity: 1;
+        pointer-events: auto;
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0; /* Prevent grid blowout */
+      }
+
+      /* Desktop: NUKE the mobile tab bar - use !important to override inline styles */
+      .tab-bar {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      /* Desktop: Screen base styles don't apply */
+      .screen {
+        position: relative;
+        inset: auto;
+      }
     }
 
     /* Screens */
@@ -525,25 +586,125 @@
     .home-screen::-webkit-scrollbar-track { background: transparent; }
     .home-screen::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
-    /* Hero Section — Classy logo */
+    /* Hero Section — Sophisticated Logo Treatment */
     .hero {
       text-align: center;
-      padding: 12px 0 0 0;
+      padding: 16px 0 8px 0;
       margin: 0 0 4px 0;
       position: relative;
       z-index: 1;
     }
 
-    .logo-image {
-      width: 70%;
-      max-width: 280px;
-      height: auto;
+    /* Logo Container — Premium Glass Treatment */
+    .logo-container {
+      position: relative;
+      display: inline-block;
+      padding: 12px 24px;
       margin: 0 auto;
+      overflow: hidden; /* Contain the shine sweep */
+      /* Subtle glass morphism - NOT overdone */
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.03) 0%,
+        rgba(255, 255, 255, 0.01) 50%,
+        rgba(0, 0, 0, 0.02) 100%
+      );
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      /* Soft ambient glow */
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* Animated glow ring behind logo */
+    .logo-container::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80%;
+      height: 80%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(
+        ellipse at center,
+        rgba(77, 166, 255, 0.15) 0%,
+        rgba(255, 75, 155, 0.08) 40%,
+        transparent 70%
+      );
+      filter: blur(20px);
+      animation: logo-glow-pulse 4s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes logo-glow-pulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .logo-image {
+      /* Sophisticated sizing - readable but refined */
+      width: 180px;
+      max-width: 200px;
+      height: auto;
       display: block;
-      /* Remove black background via blend mode */
-      mix-blend-mode: lighten;
-      filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.3))
-              drop-shadow(0 0 60px rgba(255, 0, 128, 0.2));
+      margin: 0 auto;
+      /* EXPERT BLENDING: Screen mode for luminous effect */
+      mix-blend-mode: screen;
+      /* Multi-layer glow for depth */
+      filter:
+        drop-shadow(0 0 2px rgba(255, 255, 255, 0.9))
+        drop-shadow(0 0 8px rgba(77, 166, 255, 0.6))
+        drop-shadow(0 0 20px rgba(77, 166, 255, 0.3))
+        drop-shadow(0 0 40px rgba(255, 75, 155, 0.15));
+      /* Slight contrast boost for crispness */
+      image-rendering: -webkit-optimize-contrast;
+    }
+
+    /* Hover state for interactivity */
+    .logo-container:hover .logo-image {
+      filter:
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 12px rgba(77, 166, 255, 0.8))
+        drop-shadow(0 0 30px rgba(77, 166, 255, 0.4))
+        drop-shadow(0 0 50px rgba(255, 75, 155, 0.25));
+      transition: filter 0.3s ease;
+    }
+
+    /* Premium shine sweep effect */
+    .logo-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        transparent 100%
+      );
+      transform: skewX(-20deg);
+      animation: logo-shine 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes logo-shine {
+      0%, 100% { left: -100%; opacity: 0; }
+      50% { opacity: 1; }
+      80% { left: 150%; opacity: 0; }
+    }
+
+    /* Tagline styling if present */
+    .hero .tagline {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 8px;
+      font-weight: 500;
     }
 
     /* Section Headers */
@@ -555,6 +716,11 @@
       padding: 0 16px;
       position: relative;
       z-index: 1;
+    }
+
+    /* Desktop nav - hidden on mobile */
+    .desktop-nav {
+      display: none;
     }
 
     .section-title {
@@ -852,6 +1018,23 @@
       border: 2px solid var(--bg-dark);
       margin-left: -6px;
       box-shadow: 0 0 8px rgba(0, 245, 255, 0.3);
+      background-color: #0a0a12; /* Dark fallback */
+      position: relative;
+    }
+
+    /* Vignette for mini avatars too */
+    .crowd-avatars .mini-avatar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at center,
+        transparent 35%,
+        rgba(0, 0, 0, 0.4) 80%,
+        rgba(0, 0, 0, 0.7) 100%
+      );
+      pointer-events: none;
     }
 
     .crowd-avatars .mini-avatar:first-child {
@@ -868,6 +1051,14 @@
       font-size: 11px;
       color: var(--neon-gold);
       font-weight: 600;
+    }
+
+    .vol-label {
+      font-size: 9px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      opacity: 0.7;
+      margin-left: 2px;
     }
 
     /* Party Score Badge — VIP Status */
@@ -1079,15 +1270,391 @@
       100% { transform: scaleX(1); }
     }
 
-    /* Logo — Subtle Float */
-    .hero .logo {
-      animation: logo-float 6s ease-in-out infinite;
+    /* Logo — Refined Subtle Float */
+    .logo-container {
+      animation: logo-float 8s ease-in-out infinite;
     }
 
     @keyframes logo-float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      25% { transform: translateY(-3px) rotate(0.5deg); }
-      75% { transform: translateY(-3px) rotate(-0.5deg); }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DESKTOP SIDEBAR — Markets List (Left Panel)
+    ═══════════════════════════════════════════════════════════════ */
+    @media (min-width: 769px) {
+      /* Sidebar - NO scrollbar on whole sidebar! */
+      .home-screen {
+        overflow: hidden; /* Hide sidebar-level scroll */
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Only market-grid scrolls! */
+      .market-grid {
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(77, 166, 255, 0.3) transparent;
+      }
+
+      .market-grid::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .market-grid::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+
+      .market-grid::-webkit-scrollbar-thumb {
+        background: rgba(77, 166, 255, 0.4);
+        border-radius: 3px;
+      }
+
+      .market-grid::-webkit-scrollbar-thumb:hover {
+        background: rgba(77, 166, 255, 0.6);
+      }
+
+      /* Compact hero for sidebar - Logo stays in sidebar! */
+      .hero {
+        padding: 20px 16px 16px;
+        flex-shrink: 0; /* Don't compress logo area */
+        border-bottom: 1px solid rgba(77, 166, 255, 0.08);
+        background: linear-gradient(180deg, rgba(15, 8, 30, 0.95) 0%, transparent 100%);
+      }
+
+      .hero .logo-container {
+        padding: 10px 20px;
+      }
+
+      .hero .logo-image {
+        width: 160px;
+        max-width: 180px;
+      }
+
+      .hero .tagline {
+        font-size: 10px;
+        margin-top: 6px;
+      }
+
+      /* Market grid in sidebar */
+      .market-grid {
+        padding: 0 12px;
+        gap: 10px;
+        flex: 1;
+      }
+
+      /* More compact market cards */
+      .market-card {
+        padding: 12px;
+        border-radius: 12px;
+      }
+
+      .market-question {
+        font-size: 13px;
+        line-height: 1.3;
+      }
+
+      .market-card-header {
+        margin-bottom: 8px;
+      }
+
+      .market-stats {
+        margin-bottom: 8px;
+      }
+
+      .stat-pill {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+
+      /* Selected market highlight */
+      .market-card.active {
+        border: 2px solid var(--neon-cyan);
+        box-shadow: 0 0 25px rgba(0, 245, 255, 0.4),
+                    0 0 50px rgba(0, 245, 255, 0.2),
+                    inset 0 0 20px rgba(0, 245, 255, 0.1);
+        transform: scale(1.02);
+      }
+
+      .market-card.active::before {
+        opacity: 1;
+        animation: active-glow 2s ease-in-out infinite;
+      }
+
+      @keyframes active-glow {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+      }
+
+      /* Section headers for sidebar */
+      .section-header {
+        padding: 12px 12px 8px;
+      }
+
+      .section-title {
+        font-size: 14px;
+      }
+
+      /* Desktop navigation tabs at bottom of sidebar */
+      .desktop-nav {
+        display: flex;
+        justify-content: space-around;
+        padding: 12px 8px;
+        border-top: 1px solid rgba(0, 245, 255, 0.15);
+        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        margin-top: auto;
+      }
+
+      .desktop-nav .tab-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 10px 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .desktop-nav .tab-btn:hover {
+        background: rgba(77, 166, 255, 0.1);
+        color: var(--text-primary);
+      }
+
+      .desktop-nav .tab-btn.active {
+        background: rgba(77, 166, 255, 0.15);
+        border-color: rgba(77, 166, 255, 0.3);
+        color: var(--neon-cyan);
+      }
+
+      .desktop-nav .icon {
+        font-size: 20px;
+      }
+
+      .desktop-nav .label {
+        font-size: 10px;
+        font-weight: 600;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DESKTOP ARENA — Epic Main Stage (Right Panel)
+    ═══════════════════════════════════════════════════════════════ */
+    @media (min-width: 769px) {
+      .arena-screen {
+        background: radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, #0a0612 40%, #000000 100%);
+        min-height: 100%;
+      }
+
+      /* Larger arena header */
+      .arena-header {
+        padding: 16px 24px;
+      }
+
+      .nav-btn {
+        padding: 10px 16px;
+        min-width: 70px;
+      }
+
+      .nav-icon {
+        font-size: 22px;
+      }
+
+      .nav-label {
+        font-size: 10px;
+      }
+
+      .market-title-bar .market-title {
+        font-size: 20px;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         EPIC DESKTOP % BARS — Nintendo-Level Visual Impact!
+      ═══════════════════════════════════════════════════════════════ */
+      .scores-container {
+        gap: 10px;
+        margin-bottom: 10px;
+        padding: 0 24px;
+      }
+
+      .score-row {
+        gap: 12px;
+      }
+
+      .score-source-label {
+        font-size: 10px;
+        width: 50px;
+        letter-spacing: 1px;
+      }
+
+      .score-progress-bar {
+        height: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+      }
+
+      .score-percent {
+        font-size: 11px;
+        padding: 0 8px;
+      }
+
+      .score-fill-yes, .score-fill-no {
+        box-shadow: 0 0 15px currentColor;
+      }
+
+      .score-row.party .score-fill-yes {
+        box-shadow: 0 0 20px rgba(77, 166, 255, 0.6);
+      }
+
+      .score-row.party .score-fill-no {
+        box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
+      }
+
+      /* Marquee sign - bigger on desktop */
+      .marquee-sign {
+        top: 8px;
+      }
+
+      /* DJ Booth — Below the marquee */
+      .dj-booth-visual {
+        top: 95px;
+      }
+
+      /* Nightclub takes full space */
+      .nightclub {
+        flex: 1;
+      }
+
+      /* Dance floor - floating stage (below marquee + DJ) */
+      .dance-floor {
+        top: 140px;
+        bottom: 130px;
+        left: 20px;
+        right: 20px;
+        max-height: 700px;
+        border-radius: 24px;
+        padding: 16px;
+      }
+
+      /* Larger floor zones */
+      .floor-zone {
+        border-radius: 16px;
+      }
+
+      .zone-label {
+        font-size: 32px;
+      }
+
+      .floor-score {
+        font-size: 22px;
+        padding: 10px 20px;
+        border-radius: 20px;
+      }
+
+      /* Bigger crowd avatars! */
+      .villager-avatar {
+        transform: scale(1.3);
+      }
+
+      .crowd-area {
+        gap: 16px;
+      }
+
+      /* Larger player */
+      .player-container {
+        transform: scale(1.25) translateX(-40%);
+      }
+
+      .player-container.at-door {
+        transform: scale(1.25) translateX(-40%);
+      }
+
+      /* Bigger player dock */
+      .player-dock {
+        width: 110px;
+        height: 110px;
+      }
+
+      .drag-hint {
+        font-size: 11px;
+      }
+
+      /* Control deck spacing */
+      .control-deck {
+        padding: 20px 24px 24px;
+      }
+
+      /* DJ booth more prominent */
+      .dj-booth {
+        padding: 20px 32px;
+      }
+
+      .booth-left-deck, .booth-right-deck {
+        transform: scale(1.1);
+      }
+
+      .booth-center .market-question-display {
+        font-size: 24px;
+        max-width: 400px;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ULTRA-WIDE DESKTOP — Maximum Epic
+    ═══════════════════════════════════════════════════════════════ */
+    @media (min-width: 1200px) {
+      /* Dance floor - even more spacious floating stage */
+      .dance-floor {
+        left: 32px;
+        right: 32px;
+        max-height: 800px;
+        border-radius: 28px;
+        padding: 20px;
+        gap: 10px;
+      }
+
+      .floor-zone {
+        border-radius: 20px;
+      }
+
+      .villager-avatar {
+        transform: scale(1.5);
+      }
+
+      .crowd-area {
+        gap: 24px;
+        padding: 20px;
+      }
+
+      .zone-label {
+        font-size: 40px;
+      }
+
+      .floor-score {
+        font-size: 28px;
+        padding: 12px 28px;
+      }
+
+      .booth-center .market-question-display {
+        font-size: 28px;
+        max-width: 500px;
+      }
+
+      .player-container {
+        transform: scale(1.4) translateX(-36%);
+      }
+
+      .player-dock {
+        width: 130px;
+        height: 130px;
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -1297,22 +1864,23 @@
     .scores-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 6px;
+      margin-bottom: 4px;
+      padding: 0 12px;
     }
 
     .score-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .score-source-label {
-      font-size: 8px;
+      font-size: 7px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      width: 38px;
+      width: 32px;
       text-align: right;
       color: var(--text-secondary);
     }
@@ -1322,9 +1890,9 @@
 
     .score-progress-bar {
       flex: 1;
-      height: 12px;
+      height: 10px;
       background: rgba(0, 0, 0, 0.3);
-      border-radius: 6px;
+      border-radius: 5px;
       overflow: hidden;
       display: flex;
       position: relative;
@@ -1449,6 +2017,25 @@
       background: linear-gradient(180deg, #1a1428 0%, #0d0a14 100%);
     }
 
+    /* Ambient glow layer — shows through the glass floor! */
+    .nightclub::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 50% 40% at 25% 60%, rgba(255, 0, 128, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 75% 60%, rgba(0, 245, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 30% at 50% 30%, rgba(255, 215, 0, 0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+      animation: ambient-pulse 8s ease-in-out infinite;
+    }
+
+    @keyframes ambient-pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
     /* ═══════════════════════════════════════════════════════════════
        WALL LIGHTS — Stage Spotlights
     ═══════════════════════════════════════════════════════════════ */
@@ -1461,7 +2048,7 @@
       display: flex;
       justify-content: space-around;
       padding: 0 20px;
-      z-index: 10;
+      z-index: 2; /* BEHIND the dance floor for that glow-through effect! */
     }
 
     .spotlight-mount {
@@ -1490,9 +2077,9 @@
     .spotlight-beam {
       position: absolute;
       top: 14px;
-      left: calc(50% - 30px); /* Center the 60px beam */
-      width: 60px;
-      height: 200px;
+      left: calc(50% - 40px); /* Center the beam */
+      width: 80px;
+      height: 500px; /* TALLER - goes behind the glass floor! */
       transform-origin: top center; /* Rotate from fixture connection point! */
       pointer-events: none;
     }
@@ -1531,11 +2118,215 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       MARQUEE SIGN — Turntable.fm Inspired "Now Playing" Display!
+    ═══════════════════════════════════════════════════════════════ */
+    .marquee-sign {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      perspective: 800px;
+    }
+
+    .marquee-frame {
+      background: linear-gradient(180deg, #1a1520 0%, #0d0a12 100%);
+      border: 3px solid #2a2535;
+      border-radius: 12px;
+      padding: 6px 8px;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        inset 0 2px 0 rgba(255, 255, 255, 0.05),
+        0 0 40px rgba(255, 215, 0, 0.1);
+      transform: rotateX(5deg);
+      transform-origin: center bottom;
+    }
+
+    /* Chase lights around the frame */
+    .marquee-lights {
+      display: flex;
+      justify-content: space-around;
+      padding: 2px 4px;
+      gap: 4px;
+    }
+
+    .marquee-lights span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ffd700;
+      box-shadow: 0 0 8px #ffd700, 0 0 16px rgba(255, 215, 0, 0.5);
+      animation: chase-lights 1.5s ease-in-out infinite;
+    }
+
+    .marquee-lights span:nth-child(1) { animation-delay: 0s; }
+    .marquee-lights span:nth-child(2) { animation-delay: 0.1s; }
+    .marquee-lights span:nth-child(3) { animation-delay: 0.2s; }
+    .marquee-lights span:nth-child(4) { animation-delay: 0.3s; }
+    .marquee-lights span:nth-child(5) { animation-delay: 0.4s; }
+    .marquee-lights span:nth-child(6) { animation-delay: 0.5s; }
+    .marquee-lights span:nth-child(7) { animation-delay: 0.6s; }
+    .marquee-lights span:nth-child(8) { animation-delay: 0.7s; }
+    .marquee-lights span:nth-child(9) { animation-delay: 0.8s; }
+    .marquee-lights span:nth-child(10) { animation-delay: 0.9s; }
+
+    .marquee-lights.bottom span {
+      animation-direction: reverse;
+    }
+
+    @keyframes chase-lights {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .marquee-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: linear-gradient(180deg, #1e1828 0%, #12101a 100%);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .marquee-vote-icon {
+      font-size: 20px;
+      filter: drop-shadow(0 0 8px currentColor);
+      animation: vote-icon-pulse 2s ease-in-out infinite;
+    }
+
+    .marquee-vote-icon.no {
+      color: var(--neon-pink);
+    }
+
+    .marquee-vote-icon.yes {
+      color: var(--neon-cyan);
+      animation-delay: 1s;
+    }
+
+    @keyframes vote-icon-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .marquee-center {
+      flex: 1;
+      text-align: center;
+      min-width: 150px;
+    }
+
+    .marquee-question {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      /* Truncate long questions */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .marquee-stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .marquee-stat {
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .marquee-stat.no {
+      color: var(--neon-pink);
+    }
+
+    .marquee-stat.yes {
+      color: var(--neon-cyan);
+    }
+
+    .marquee-stat .stat-pct {
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .marquee-divider {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Desktop: Bigger marquee */
+    @media (min-width: 769px) {
+      .marquee-sign {
+        top: 12px;
+      }
+
+      .marquee-frame {
+        padding: 8px 12px;
+        border-radius: 16px;
+      }
+
+      .marquee-content {
+        gap: 16px;
+        padding: 10px 20px;
+      }
+
+      .marquee-center {
+        min-width: 220px;
+      }
+
+      .marquee-question {
+        font-size: 14px;
+      }
+
+      .marquee-stats {
+        font-size: 11px;
+        gap: 12px;
+      }
+
+      .marquee-stat .stat-pct {
+        font-size: 13px;
+      }
+
+      .marquee-vote-icon {
+        font-size: 28px;
+      }
+
+      .marquee-lights span {
+        width: 8px;
+        height: 8px;
+      }
+    }
+
+    /* Ultra-wide: Even bigger */
+    @media (min-width: 1200px) {
+      .marquee-center {
+        min-width: 300px;
+      }
+
+      .marquee-question {
+        font-size: 16px;
+      }
+
+      .marquee-content {
+        gap: 24px;
+        padding: 12px 28px;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        DJ BOOTH — The Heart of the Party
     ═══════════════════════════════════════════════════════════════ */
     .dj-booth-visual {
       position: absolute;
-      top: 40px;
+      top: 85px; /* Pushed down to make room for marquee */
       left: 50%;
       transform: translateX(-50%);
       z-index: 20;
@@ -1842,29 +2633,62 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       THE DANCE FLOOR — Tiled with Team Colors
+       THE DANCE FLOOR — Floating Stage with Lights Behind!
     ═══════════════════════════════════════════════════════════════ */
     .dance-floor {
       position: absolute;
       top: 115px;
       bottom: 120px;
-      left: 0; /* Edge to edge - no margins! */
-      right: 0;
+      left: 12px;
+      right: 12px;
+      max-height: 600px; /* Height limit! */
+      margin: auto 0; /* Center vertically if smaller than space */
       display: flex;
       flex-direction: row; /* LEFT/RIGHT SPLIT: NO on left, YES on right */
-      gap: 4px;
+      gap: 6px;
       z-index: 5;
-      padding: 0 4px;
+      padding: 12px;
+      /* FLOATING GLASS CONTAINER */
+      background: rgba(10, 8, 20, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 80px rgba(77, 166, 255, 0.05),
+        0 0 80px rgba(255, 0, 128, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      /* Animated edge glow */
+      animation: floor-glow 6s ease-in-out infinite;
+    }
+
+    @keyframes floor-glow {
+      0%, 100% {
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.4),
+          0 0 60px rgba(77, 166, 255, 0.08),
+          0 0 60px rgba(255, 0, 128, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+      50% {
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.4),
+          0 0 100px rgba(77, 166, 255, 0.12),
+          0 0 100px rgba(255, 0, 128, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      }
     }
 
     .floor-zone {
       flex: 1;
       position: relative;
-      border-radius: 8px;
+      border-radius: 12px;
       overflow: visible; /* Allow speech bubbles to overflow! */
       transition: flex 0.5s var(--smooth);
-      /* Semi-transparent so lights shine through */
-      background: rgba(0, 0, 0, 0.3);
+      /* More transparent so lights shine through */
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.04);
     }
 
     /* Tiled Floor Pattern - Vertical layout for horizontal zone split (2 cols x 4 rows) */
@@ -2084,9 +2908,28 @@
       border-radius: 50%;
       background-size: cover;
       background-position: center;
+      background-color: #0a0a12; /* Dark fallback for transparent images */
       border: 3px solid var(--neon-cyan);
       box-shadow: 0 0 12px var(--neon-cyan), 0 4px 8px rgba(0,0,0,0.4);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Vignette overlay — blends bright backgrounds into dark theme */
+    .villager-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      /* Radial vignette: dark edges, clear center */
+      background: radial-gradient(
+        circle at center,
+        transparent 40%,
+        rgba(0, 0, 0, 0.3) 70%,
+        rgba(0, 0, 0, 0.6) 100%
+      );
+      pointer-events: none;
     }
 
     .villager:hover .villager-photo {
@@ -3110,13 +3953,15 @@
     .villager.dance-4 .stick-arm { animation: arms-up var(--dance-speed, 1s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
     .villager.dance-4 .stick-leg { animation: legs-squat var(--dance-speed, 1s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
 
-    /* Dance 5 - The Twist (Habbo disco) */
+    /* Dance 5 - THE FLOSS (Fortnite iconic!) */
     .villager.dance-5 .villager-avatar {
-      animation: disco-twist var(--dance-speed, 0.6s) ease-in-out infinite;
+      animation: floss-hips var(--dance-speed, 0.4s) linear infinite;
       animation-delay: var(--delay, 0s);
     }
-    .villager.dance-5 .stick-arm.left { animation: disco-point-left var(--dance-speed, 0.6s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
-    .villager.dance-5 .stick-arm.right { animation: disco-point-right var(--dance-speed, 0.6s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-5 .stick-arm.left { animation: floss-arm-left var(--dance-speed, 0.4s) linear infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-5 .stick-arm.right { animation: floss-arm-right var(--dance-speed, 0.4s) linear infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-5 .stick-leg.left { animation: floss-leg-left var(--dance-speed, 0.4s) linear infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-5 .stick-leg.right { animation: floss-leg-right var(--dance-speed, 0.4s) linear infinite; animation-delay: var(--delay, 0s); }
 
     /* Dance 6 - The Head Bob (chill vibes) */
     .villager.dance-6 .villager-avatar {
@@ -3174,10 +4019,33 @@
       50% { transform: rotate(10deg) translateX(2px); }
     }
 
+    /* ═══ THE FLOSS — Fortnite Iconic! ═══ */
+    @keyframes floss-hips {
+      0%, 100% { transform: translateX(-6px) rotate(5deg); }
+      50% { transform: translateX(6px) rotate(-5deg); }
+    }
+    @keyframes floss-arm-left {
+      0%, 100% { transform: rotate(60deg) translateX(8px); }  /* Behind right */
+      50% { transform: rotate(-60deg) translateX(-8px); }      /* In front left */
+    }
+    @keyframes floss-arm-right {
+      0%, 100% { transform: rotate(-60deg) translateX(-8px); } /* In front left */
+      50% { transform: rotate(60deg) translateX(8px); }        /* Behind right */
+    }
+    @keyframes floss-leg-left {
+      0%, 100% { transform: rotate(8deg); }
+      50% { transform: rotate(-8deg); }
+    }
+    @keyframes floss-leg-right {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
+    }
+
     @keyframes chill-bob {
       0%, 100% { transform: translateY(0) rotate(0deg); }
-      25% { transform: translateY(-2px) rotate(-1deg); }
-      75% { transform: translateY(-2px) rotate(1deg); }
+      25% { transform: translateY(-3px) rotate(-2deg); }
+      50% { transform: translateY(0) rotate(0deg); }
+      75% { transform: translateY(-3px) rotate(2deg); }
     }
 
     @keyframes running-man {
@@ -3188,7 +4056,7 @@
     }
 
     @keyframes robot {
-      0% { transform: translateX(-3px) rotate(-5deg); }
+      0%, 100% { transform: translateX(-3px) rotate(-5deg); }
       25% { transform: translateX(0) rotate(0deg); }
       50% { transform: translateX(3px) rotate(5deg); }
       75% { transform: translateX(0) rotate(0deg); }
@@ -3216,8 +4084,11 @@
       50% { transform: rotate(110deg); }
     }
     @keyframes arms-up {
-      0%, 60%, 100% { transform: rotate(0deg); }
+      0%, 100% { transform: rotate(0deg); }
+      15% { transform: rotate(-100deg); }
       30% { transform: rotate(-120deg); }
+      45% { transform: rotate(-100deg); }
+      60% { transform: rotate(0deg); }
     }
     @keyframes disco-point-left {
       0%, 100% { transform: rotate(-120deg); }
@@ -3240,7 +4111,7 @@
       50% { transform: rotate(-60deg); }
     }
     @keyframes robot-arms {
-      0%, 25% { transform: rotate(-90deg); }
+      0%, 25%, 100% { transform: rotate(-90deg); }
       50%, 75% { transform: rotate(0deg); }
     }
 
@@ -3262,8 +4133,11 @@
       50% { transform: rotate(10deg) translateX(-2px); }
     }
     @keyframes legs-squat {
-      0%, 60%, 100% { transform: rotate(0deg) scaleY(1); }
-      20% { transform: rotate(5deg) scaleY(0.8); }
+      0%, 100% { transform: rotate(0deg) scaleY(1); }
+      20% { transform: rotate(5deg) scaleY(0.85); }
+      40% { transform: rotate(0deg) scaleY(1); }
+      70% { transform: rotate(-5deg) scaleY(0.85); }
+      85% { transform: rotate(0deg) scaleY(1); }
     }
     @keyframes run-leg-left {
       0%, 100% { transform: rotate(40deg); }
@@ -3274,7 +4148,7 @@
       50% { transform: rotate(40deg); }
     }
     @keyframes robot-legs {
-      0%, 25% { transform: rotate(15deg); }
+      0%, 25%, 100% { transform: rotate(15deg); }
       50%, 75% { transform: rotate(-15deg); }
     }
 
@@ -3447,7 +4321,7 @@
       left: 50%;
       bottom: 30px;
       transform: translateX(-50%);
-      z-index: 150;
+      z-index: 300; /* Above tab-bar (z-200) */
       cursor: grab;
       touch-action: none;
       user-select: none;
@@ -3466,7 +4340,7 @@
       left: 50%;
       bottom: 30px;
       transform: translateX(-50%);
-      z-index: 200;
+      z-index: 300; /* MUST be above tab-bar (z-200) for drag to work! */
     }
 
     .player-container.on-stage {
@@ -3814,9 +4688,9 @@
       pointer-events: none; /* Let clicks pass through to player */
     }
 
-    .control-deck > * {
-      pointer-events: auto; /* But dock can still receive events */
-    }
+    /* NOTE: Removed .control-deck > * pointer-events: auto rule
+       that was blocking player drag. Player-dock already has
+       pointer-events: none which is what we want. */
 
     /* Player Home Base — Dock circle that surrounds the player */
     .player-dock {
@@ -4682,9 +5556,121 @@
       0%, 100% { opacity: 0.2; transform: scale(1); }
       50% { opacity: 1; transform: scale(1.5); }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DESKTOP VISUAL ENHANCEMENTS — Maximum Wow Factor!
+    ═══════════════════════════════════════════════════════════════ */
+    @media (min-width: 769px) {
+      /* More intense global party lights on desktop */
+      .global-haze {
+        background: radial-gradient(ellipse at 50% 0%, rgba(138, 43, 226, 0.15) 0%, transparent 60%),
+                    radial-gradient(ellipse at 20% 100%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 100%, rgba(0, 245, 255, 0.1) 0%, transparent 50%);
+      }
+
+      /* Bigger spotlights */
+      .global-spotlight {
+        width: 500px;
+      }
+
+      /* Wider laser beams */
+      .global-laser {
+        width: 4px;
+      }
+
+      /* Bigger disco dots */
+      .global-disco-dot {
+        width: 6px;
+        height: 6px;
+      }
+
+      /* Enhanced confirmation popup */
+      .drop-confirm-content {
+        padding: 32px 48px;
+        border-radius: 24px;
+      }
+
+      .drop-confirm-side {
+        font-size: 48px;
+      }
+
+      .drop-confirm-question {
+        font-size: 20px;
+      }
+
+      .drop-confirm-btn {
+        padding: 16px 48px;
+        font-size: 16px;
+        border-radius: 14px;
+      }
+
+      /* Hide back button on desktop (always showing sidebar) */
+      #back-btn {
+        display: none;
+      }
+
+      /* Enhanced chat bubbles for desktop */
+      .chat-message {
+        font-size: 14px;
+        padding: 10px 16px;
+        max-width: 300px;
+      }
+
+      /* Bigger celebration confetti */
+      .celebration-particle {
+        font-size: 32px;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DESKTOP EMPTY STATE — When no market is selected
+    ═══════════════════════════════════════════════════════════════ */
+    @media (min-width: 769px) {
+      .arena-screen:not(.has-market) .nightclub::before {
+        content: 'Select a market to join the party!';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        color: var(--text-muted);
+        text-align: center;
+        z-index: 10;
+        pointer-events: none;
+        animation: pulse-text 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse-text {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TABLET OPTIMIZATIONS (769px - 1024px)
+    ═══════════════════════════════════════════════════════════════ */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      :root {
+        --sidebar-width: 300px;
+      }
+
+      .market-card {
+        padding: 10px;
+      }
+
+      .market-question {
+        font-size: 12px;
+      }
+
+      .zone-label {
+        font-size: 28px;
+      }
+
+      .villager-avatar {
+        transform: scale(1.15);
+      }
+    }
   </style>
-  <!-- interact.js for bulletproof drag & drop -->
-  <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.27/dist/interact.min.js"></script>
 </head>
 <body>
   <!-- GLOBAL PARTY LIGHTS — Always visible, never resets! -->
@@ -4748,7 +5734,9 @@
       </div>
 
       <div class="hero">
-        <img src="/logologo.png" alt="PREDICTION PARTY" class="logo-image">
+        <div class="logo-container">
+          <img src="/logologo.png" alt="PREDICTION PARTY" class="logo-image">
+        </div>
       </div>
 
       <div class="section-header">
@@ -4762,6 +5750,22 @@
       <div class="market-grid" id="market-grid">
         <!-- Markets populated by JS -->
       </div>
+
+      <!-- Desktop Sidebar Navigation (hidden on mobile) -->
+      <nav class="desktop-nav" id="desktop-nav">
+        <button class="tab-btn active" data-tab="home">
+          <span class="icon">🏠</span>
+          <span class="label">Home</span>
+        </button>
+        <button class="tab-btn" data-tab="leaderboard">
+          <span class="icon">🏆</span>
+          <span class="label">Leaders</span>
+        </button>
+        <button class="tab-btn" data-tab="profile">
+          <span class="icon">👤</span>
+          <span class="label">Profile</span>
+        </button>
+      </nav>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════
@@ -4887,6 +5891,32 @@
             <div class="spotlight-arm"></div>
             <div class="spotlight-head cyan">
               <div class="spotlight-beam cyan"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EPIC MARQUEE SIGN — Turntable.fm Style! -->
+        <div class="marquee-sign">
+          <div class="marquee-frame">
+            <div class="marquee-lights">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="marquee-content">
+              <div class="marquee-vote-icon no">👎</div>
+              <div class="marquee-center">
+                <div class="marquee-question" id="marquee-question">Will BTC hit $100k by Dec 31?</div>
+                <div class="marquee-stats">
+                  <span class="marquee-stat no"><span class="stat-pct" id="marquee-no-pct">45%</span> NO</span>
+                  <span class="marquee-divider">•</span>
+                  <span class="marquee-stat yes"><span class="stat-pct" id="marquee-yes-pct">55%</span> YES</span>
+                </div>
+              </div>
+              <div class="marquee-vote-icon yes">👍</div>
+            </div>
+            <div class="marquee-lights bottom">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
             </div>
           </div>
         </div>
@@ -5136,7 +6166,11 @@
       { name: 'Rob', photo: '/tg/rob.jpg' },
       { name: 'Shinkiro', photo: '/tg/shinkiro14.jpg' },
       { name: 'Skely', photo: '/tg/skely.jpg' },
-      { name: 'VN', photo: '/tg/vn.jpg' }
+      { name: 'Tintin', photo: '/tg/Tintin.jpg' },
+      { name: 'VN', photo: '/tg/vn.jpg' },
+      { name: 'Ultra', photo: '/tg/ultra.png' },
+      { name: 'Icobeast', photo: '/tg/icobeast.jpg' },
+      { name: 'Bandit', photo: '/tg/bandit.jpg' }
     ];
 
     const MARKETS = [
@@ -5231,6 +6265,31 @@
       setupSlideToConfirm();
       createDiscoReflections();
       createGlobalDiscoDots();
+
+      // AUTO-OPEN FIRST MARKET — INSTANT PARTY VIBES!
+      // Users should land DIRECTLY in the party, not an empty lobby.
+      // This is the turntable.fm moment: you walk in and people are already dancing.
+      setTimeout(() => {
+        openMarket(0);
+        // Highlight first card in sidebar
+        highlightActiveMarket(0);
+      }, 100); // Tiny delay for DOM to settle
+
+      // Handle window resize for responsive behavior
+      window.addEventListener('resize', () => {
+        if (isDesktop()) {
+          // Ensure both screens visible on desktop
+          screenHome.classList.add('active');
+          screenArena.classList.add('active');
+          tabBar.style.display = 'none';
+        } else {
+          // On mobile, keep arena active if market is open
+          if (currentMarket) {
+            screenArena.classList.add('active');
+            screenHome.classList.remove('active');
+          }
+        }
+      });
     }
 
     // Create persistent global disco scatter dots
@@ -5300,7 +6359,7 @@
                 </div>
                 <span class="crowd-count">${market.count} in party</span>
               </div>
-              <span class="market-volume">${market.volume}</span>
+              <span class="market-volume">${market.volume} <span class="vol-label">VOL</span></span>
             </div>
           </div>
         `;
@@ -5362,13 +6421,46 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // RESPONSIVE HELPERS
+    // ═══════════════════════════════════════════════════════════════
+    function isDesktop() {
+      return window.innerWidth >= 769;
+    }
+
+    function highlightActiveMarket(index) {
+      // Remove active class from all cards
+      document.querySelectorAll('.market-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      // Add active class to selected card
+      const cards = document.querySelectorAll('.market-card');
+      if (cards[index]) {
+        cards[index].classList.add('active');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // OPEN MARKET (ARENA)
     // ═══════════════════════════════════════════════════════════════
     function openMarket(index) {
       currentMarket = MARKETS[index];
 
+      // Mark that we have an active market (hides "Select a market" text)
+      screenArena.classList.add('has-market');
+
       // Update arena UI
       document.getElementById('arena-title').textContent = currentMarket.question;
+
+      // Update the epic marquee sign behind DJ booth!
+      const marqueeQuestion = document.getElementById('marquee-question');
+      if (marqueeQuestion) {
+        marqueeQuestion.textContent = currentMarket.question;
+      }
+      // Update marquee stats
+      const marqueeYes = document.getElementById('marquee-yes-pct');
+      const marqueeNo = document.getElementById('marquee-no-pct');
+      if (marqueeYes) marqueeYes.textContent = `${currentMarket.partyYes}%`;
+      if (marqueeNo) marqueeNo.textContent = `${100 - currentMarket.partyYes}%`;
 
       // Update progress bars with percentages
       document.getElementById('kalshi-yes').textContent = `${currentMarket.kalshiYes}%`;
@@ -5401,10 +6493,18 @@
       playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
       playerContainer.classList.add('at-door');
 
-      // Switch screens
-      screenHome.classList.remove('active');
-      screenArena.classList.add('active');
-      tabBar.style.display = 'none';
+      // Desktop vs Mobile behavior
+      if (isDesktop()) {
+        // Desktop: Keep sidebar visible, highlight selected market
+        highlightActiveMarket(index);
+        // Ensure arena is visible (CSS handles this, but make sure)
+        screenArena.classList.add('active');
+      } else {
+        // Mobile: Full screen transition
+        screenHome.classList.remove('active');
+        screenArena.classList.add('active');
+        tabBar.style.display = 'none';
+      }
 
       // Start chat and disco
       startChat();
@@ -5587,9 +6687,17 @@
 
       // Back button
       document.getElementById('back-btn').addEventListener('click', () => {
-        screenArena.classList.remove('active');
-        screenHome.classList.add('active');
-        tabBar.style.display = 'flex';
+        if (isDesktop()) {
+          // Desktop: Just clear selection (arena stays visible)
+          document.querySelectorAll('.market-card').forEach(card => {
+            card.classList.remove('active');
+          });
+        } else {
+          // Mobile: Go back to home screen
+          screenArena.classList.remove('active');
+          screenHome.classList.add('active');
+          tabBar.style.display = 'flex';
+        }
         stopChat();
         stopCountdown();
         if (navigator.vibrate) navigator.vibrate(5);
@@ -5597,9 +6705,17 @@
 
       // Markets button (same as back for now - goes to home)
       document.getElementById('markets-btn').addEventListener('click', () => {
-        screenArena.classList.remove('active');
-        screenHome.classList.add('active');
-        tabBar.style.display = 'flex';
+        if (isDesktop()) {
+          // Desktop: Just clear selection
+          document.querySelectorAll('.market-card').forEach(card => {
+            card.classList.remove('active');
+          });
+        } else {
+          // Mobile: Go back to home screen
+          screenArena.classList.remove('active');
+          screenHome.classList.add('active');
+          tabBar.style.display = 'flex';
+        }
         stopChat();
         stopCountdown();
         if (navigator.vibrate) navigator.vibrate(5);
@@ -5860,14 +6976,20 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // DRAGGING — interact.js Powered Nintendo Physics
-    // Battle-tested library + our juice = MAGIC!
+    // DRAGGING — Native Touch/Pointer Events (BULLETPROOF!)
+    // No libraries, no dependencies, just works.
     // ═══════════════════════════════════════════════════════════════
     function setupDragging() {
+      console.log('🎮 Setting up BULLETPROOF drag system...');
+      console.log('🎮 Player container:', playerContainer);
+      console.log('🎮 Player container styles:', window.getComputedStyle(playerContainer).pointerEvents);
+
       let pendingVote = null;
-      let lastVelocityX = 0;
-      let dragStartX = 0;
-      let dragStartY = 0;
+      let isDragging = false;
+      let initialLeft = 0;
+      let initialBottom = 0;
+      let startX = 0;
+      let startY = 0;
 
       const ZONE_THRESHOLD = 0.3;
       const MAX_ROTATION = 15;
@@ -5879,264 +7001,220 @@
       const dropConfirmCancel = document.getElementById('drop-confirm-cancel');
       const dropConfirmYes = document.getElementById('drop-confirm-yes');
 
-      // Get the starting position
-      function getStartPosition() {
-        const rect = playerContainer.getBoundingClientRect();
-        return {
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2
-        };
+      // Get touch/mouse position
+      function getEventPos(e) {
+        if (e.touches && e.touches.length > 0) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
       }
 
-      // ═══ INTERACT.JS SETUP ═══
-      interact('#player-container').draggable({
-        // Enable inertial throwing
-        inertia: {
-          resistance: 12,
-          minSpeed: 200,
-          endSpeed: 50
-        },
+      // ═══ DRAG START ═══
+      function onDragStart(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-        // Keep within the arena
-        modifiers: [
-          interact.modifiers.restrict({
-            restriction: '#screen-arena',
-            endOnly: false
-          })
-        ],
+        if (isDragging) return;
+        isDragging = true;
 
-        // Unified touch + mouse
-        autoScroll: false,
+        const pos = getEventPos(e);
+        const rect = playerContainer.getBoundingClientRect();
+        const parentRect = playerContainer.parentElement.getBoundingClientRect();
 
-        listeners: {
-          start(event) {
-            const startPos = getStartPosition();
-            dragStartX = startPos.x;
-            dragStartY = startPos.y;
+        // Store starting touch position
+        startX = pos.x;
+        startY = pos.y;
 
-            // Reset data attributes
-            event.target.setAttribute('data-x', 0);
-            event.target.setAttribute('data-y', 0);
+        // Convert current visual position to absolute left/top
+        // This accounts for the CSS transform: translateX(-50%)
+        initialLeft = rect.left - parentRect.left;
+        initialBottom = parentRect.bottom - rect.bottom;
 
-            // Nintendo "lift" effect
-            playerContainer.classList.add('dragging');
-            player.classList.add('lifted');
-            player.style.transform = 'scale(1.15)';
-            player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
+        // Remove CSS-based positioning and switch to explicit left/bottom
+        playerContainer.classList.remove('at-door', 'team-yes-pos', 'team-no-pos');
+        playerContainer.style.left = initialLeft + 'px';
+        playerContainer.style.bottom = initialBottom + 'px';
+        playerContainer.style.transform = 'none';
 
-            // Hide dock
-            document.getElementById('player-dock').classList.add('hidden');
+        // Visual feedback
+        playerContainer.classList.add('dragging');
+        player.classList.add('lifted');
+        player.style.transform = 'scale(1.15)';
+        player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
+        document.getElementById('player-dock').classList.add('hidden');
 
-            // Haptic
-            if (navigator.vibrate) navigator.vibrate(10);
+        // Haptic
+        if (navigator.vibrate) navigator.vibrate(10);
 
-            console.log('🎮 interact.js: Drag started!');
-          },
+        console.log('🎮 Drag started! Initial pos:', initialLeft, initialBottom);
+      }
 
-          move(event) {
-            const target = event.target;
+      // ═══ DRAG MOVE ═══
+      function onDragMove(e) {
+        if (!isDragging) return;
+        e.preventDefault();
 
-            // Get cumulative position
-            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        const pos = getEventPos(e);
+        const deltaX = pos.x - startX;
+        const deltaY = pos.y - startY;
 
-            // Store velocity for doll swing
-            lastVelocityX = event.velocity.x;
+        // Apply position using left/bottom (bottom decreases as we go up)
+        const newLeft = initialLeft + deltaX;
+        const newBottom = initialBottom - deltaY;
 
-            // Calculate rotation based on velocity (doll swing!)
-            const rotation = Math.max(-MAX_ROTATION, Math.min(MAX_ROTATION, event.velocity.x * 0.15));
+        playerContainer.style.left = newLeft + 'px';
+        playerContainer.style.bottom = newBottom + 'px';
 
-            // Apply the transform
-            target.style.transform = `translate(${x}px, ${y}px)`;
-            player.style.transform = `scale(1.15) rotate(${rotation}deg)`;
+        // Calculate velocity-based rotation (tilt when moving)
+        const rotation = Math.max(-MAX_ROTATION, Math.min(MAX_ROTATION, deltaX * 0.05));
+        player.style.transform = `scale(1.15) rotate(${rotation}deg)`;
 
-            // Store position
-            target.setAttribute('data-x', x);
-            target.setAttribute('data-y', y);
+        // Zone detection based on screen position
+        const screenX = pos.x;
+        const screenCenter = window.innerWidth / 2;
+        const normalizedX = (screenX - screenCenter) / screenCenter;
 
-            // Calculate current screen position for zone detection
-            const currentX = dragStartX + x;
-            const screenCenter = window.innerWidth / 2;
-            const normalizedX = (currentX - screenCenter) / screenCenter;
-
-            // Zone feedback
-            if (normalizedX < -ZONE_THRESHOLD) {
-              zoneNo.classList.add('hovering');
-              zoneYes.classList.remove('hovering');
-              const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
-              zoneNo.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
-              zoneYes.style.setProperty('--spotlight-intensity', '0.25');
-              player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255, 0, 128, ${intensity * 0.6}))`;
-            } else if (normalizedX > ZONE_THRESHOLD) {
-              zoneYes.classList.add('hovering');
-              zoneNo.classList.remove('hovering');
-              const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
-              zoneYes.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
-              zoneNo.style.setProperty('--spotlight-intensity', '0.25');
-              player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(0, 245, 255, ${intensity * 0.6}))`;
-            } else {
-              zoneNo.classList.remove('hovering');
-              zoneYes.classList.remove('hovering');
-              zoneNo.style.setProperty('--spotlight-intensity', '0.4');
-              zoneYes.style.setProperty('--spotlight-intensity', '0.4');
-              player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
-            }
-          },
-
-          end(event) {
-            const target = event.target;
-            const x = parseFloat(target.getAttribute('data-x')) || 0;
-
-            // Remove dragging classes
-            playerContainer.classList.remove('dragging');
-            player.classList.remove('lifted');
-
-            // Clear zone states
-            zoneNo.classList.remove('hovering');
-            zoneYes.classList.remove('hovering');
-            zoneNo.style.setProperty('--spotlight-intensity', '0.4');
-            zoneYes.style.setProperty('--spotlight-intensity', '0.4');
-
-            // Calculate final position
-            const currentX = dragStartX + x;
-            const screenCenter = window.innerWidth / 2;
-            const normalizedX = (currentX - screenCenter) / screenCenter;
-
-            console.log(`🎮 interact.js: Release at normalized X: ${normalizedX.toFixed(2)}`);
-
-            // Determine vote based on position
-            let targetVote = null;
-            if (normalizedX < -ZONE_THRESHOLD) {
-              targetVote = 'no';
-            } else if (normalizedX > ZONE_THRESHOLD) {
-              targetVote = 'yes';
-            }
-
-            if (targetVote) {
-              // Landed on a side!
-              pendingVote = targetVote;
-
-              // Reset transform and use CSS class positioning
-              target.style.transform = '';
-              target.setAttribute('data-x', 0);
-              target.setAttribute('data-y', 0);
-
-              // Move to team position
-              playerContainer.classList.add('landing');
-              playerContainer.classList.remove('at-door');
-              playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
-
-              // Landing squash
-              player.classList.add('landing-squash');
-              player.style.transform = '';
-              player.style.filter = '';
-
-              setTimeout(() => {
-                player.classList.remove('landing-squash');
-                playerContainer.classList.remove('landing');
-              }, 300);
-
-              // Show confirmation popup
-              showDropConfirm(targetVote);
-
-              if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
-            } else {
-              // Snap back to dock
-              snapBackToDock(target);
-            }
-          }
+        if (normalizedX < -ZONE_THRESHOLD) {
+          zoneNo.classList.add('hovering');
+          zoneYes.classList.remove('hovering');
+          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
+          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255, 0, 128, ${intensity * 0.6}))`;
+        } else if (normalizedX > ZONE_THRESHOLD) {
+          zoneYes.classList.add('hovering');
+          zoneNo.classList.remove('hovering');
+          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
+          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(0, 245, 255, ${intensity * 0.6}))`;
+        } else {
+          zoneNo.classList.remove('hovering');
+          zoneYes.classList.remove('hovering');
+          player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
         }
-      });
+      }
 
-      // ═══ SNAP BACK TO DOCK ═══
-      function snapBackToDock(target) {
-        // Animate back
-        target.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        target.style.transform = '';
-        target.setAttribute('data-x', 0);
-        target.setAttribute('data-y', 0);
+      // ═══ DRAG END ═══
+      function onDragEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
 
-        playerContainer.classList.add('returning');
+        // Get final position for zone detection
+        const rect = playerContainer.getBoundingClientRect();
+        const screenX = rect.left + rect.width / 2;
+        const screenCenter = window.innerWidth / 2;
+        const normalizedX = (screenX - screenCenter) / screenCenter;
+
+        console.log('🎮 Drag ended! NormalizedX:', normalizedX);
+
+        // Clear dragging state
+        playerContainer.classList.remove('dragging');
+        player.classList.remove('lifted');
+        zoneNo.classList.remove('hovering');
+        zoneYes.classList.remove('hovering');
+
+        // Determine vote
+        let targetVote = null;
+        if (normalizedX < -ZONE_THRESHOLD) {
+          targetVote = 'no';
+        } else if (normalizedX > ZONE_THRESHOLD) {
+          targetVote = 'yes';
+        }
+
+        if (targetVote) {
+          pendingVote = targetVote;
+
+          // Snap to team position using CSS classes
+          playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          playerContainer.style.left = '';
+          playerContainer.style.bottom = '';
+          playerContainer.style.transform = '';
+          playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+
+          player.classList.add('landing-squash');
+          player.style.transform = '';
+          player.style.filter = '';
+
+          setTimeout(() => {
+            player.classList.remove('landing-squash');
+            playerContainer.style.transition = '';
+          }, 400);
+
+          // Show confirmation
+          showDropConfirm(targetVote);
+          if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
+        } else {
+          // Snap back to dock
+          snapBackToDock();
+        }
+      }
+
+      // ═══ SNAP BACK ═══
+      function snapBackToDock() {
+        // Clear ALL inline styles and restore CSS class positioning
+        playerContainer.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        playerContainer.style.left = '';
+        playerContainer.style.bottom = '';
+        playerContainer.style.transform = '';
         playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
         playerContainer.classList.add('at-door');
 
-        player.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease';
+        player.style.transition = 'transform 0.4s ease, filter 0.4s ease';
         player.style.transform = '';
         player.style.filter = '';
 
         playerTeam = null;
         player.classList.remove('team-yes', 'team-no', 'confirmed');
         player.classList.add('at-door');
-
         document.getElementById('player-dock').classList.remove('hidden');
 
         setTimeout(() => {
-          playerContainer.classList.remove('returning');
-          target.style.transition = '';
+          playerContainer.style.transition = '';
           player.style.transition = '';
         }, 500);
 
         if (navigator.vibrate) navigator.vibrate(12);
-        console.log('🎮 Snapping back to dock');
       }
 
-      // ═══ DROP CONFIRMATION POPUP ═══
+      // ═══ CONFIRMATION POPUP ═══
       function showDropConfirm(side) {
         dropConfirmSide.textContent = side.toUpperCase();
         dropConfirmSide.className = `drop-confirm-side ${side}`;
         dropConfirmQuestion.textContent = `Lock in your ${side.toUpperCase()} position?`;
-
-        const confirmBtn = document.getElementById('drop-confirm-yes');
-        confirmBtn.className = `drop-confirm-btn confirm ${side === 'no' ? 'no-side' : ''}`;
-
+        document.getElementById('drop-confirm-yes').className = `drop-confirm-btn confirm ${side === 'no' ? 'no-side' : ''}`;
         dropConfirm.classList.add('active');
         if (navigator.vibrate) navigator.vibrate(10);
       }
 
-      function hideDropConfirm() {
-        dropConfirm.classList.remove('active');
-      }
-
-      // ═══ CONFIRMATION HANDLERS ═══
       dropConfirmCancel.addEventListener('click', () => {
-        hideDropConfirm();
+        dropConfirm.classList.remove('active');
         pendingVote = null;
-        snapBackToDock(playerContainer);
-        if (navigator.vibrate) navigator.vibrate(8);
+        snapBackToDock();
       });
 
       dropConfirmYes.addEventListener('click', () => {
-        hideDropConfirm();
+        dropConfirm.classList.remove('active');
         if (pendingVote) {
-          confirmVote(pendingVote);
+          playerTeam = pendingVote;
+          player.classList.remove('at-door', 'team-yes', 'team-no');
+          player.classList.add(`team-${pendingVote}`, 'confirmed');
+          showPlayerSpeech(pendingVote);
+          showCelebration();
+          if (navigator.vibrate) navigator.vibrate([20, 50, 30, 50, 40]);
         }
         pendingVote = null;
       });
 
-      // ═══ CONFIRM VOTE (James Brown time!) ═══
-      function confirmVote(side) {
-        playerTeam = side;
-        player.classList.remove('at-door', 'team-yes', 'team-no');
-        player.classList.add(`team-${side}`, 'confirmed');
+      // ═══ EVENT LISTENERS ═══
+      // Touch events
+      playerContainer.addEventListener('touchstart', onDragStart, { passive: false });
+      document.addEventListener('touchmove', onDragMove, { passive: false });
+      document.addEventListener('touchend', onDragEnd);
+      document.addEventListener('touchcancel', onDragEnd);
 
-        // Show speech bubble
-        showPlayerSpeech(side);
+      // Mouse events
+      playerContainer.addEventListener('mousedown', onDragStart);
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('mouseup', onDragEnd);
 
-        console.log(`🎮 CONFIRMED! ${side.toUpperCase()} - Get on down! 🕺`);
-
-        // Epic haptic
-        if (navigator.vibrate) navigator.vibrate([20, 50, 30, 50, 40]);
-
-        // Show celebration
-        showCelebration();
-      }
-
-      console.log('🎮 interact.js drag system initialized!');
-    }
-
-    // Zone interaction is handled inline in drag handler
-    function updateZoneInteraction() {
-      // Compatibility stub
+      console.log('🎮 Native drag system ready! Try dragging the player.');
     }
 
     // ═══════════════════════════════════════════════════════════════
