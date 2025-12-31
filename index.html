@@ -1522,23 +1522,64 @@
         box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
       }
 
-      /* Marquee sign - HIDDEN on desktop (replaced by Jumbotron!) */
+      /* OG Marquee sign - The SOULFUL one with chase lights! */
       .marquee-sign {
-        display: none !important;
+        top: 70px; /* Below the roof */
+        transform: translateX(-50%);
       }
 
       .marquee-frame {
-        border-radius: 0 0 16px 16px;
-        padding: 6px 16px 10px;
+        border-radius: 16px;
+        padding: 10px 20px;
       }
 
       .marquee-content {
-        padding: 6px 16px;
+        padding: 10px 20px;
+        gap: 20px;
       }
 
-      /* DJ Booth — Below Jumbotron with overlap for depth */
+      .marquee-center {
+        min-width: 280px;
+      }
+
+      .marquee-question {
+        font-size: 16px;
+      }
+
+      /* Marquee bars - larger to match sidebar style */
+      .marquee-bars {
+        margin-top: 10px;
+        gap: 6px;
+      }
+
+      .marquee-bar-row {
+        gap: 10px;
+      }
+
+      .marquee-bar-label {
+        font-size: 9px;
+        width: 44px;
+      }
+
+      .marquee-bar-container {
+        height: 12px;
+        border-radius: 6px;
+      }
+
+      .marquee-bar-pct {
+        font-size: 11px;
+        font-weight: 800;
+        width: 36px;
+      }
+
+      /* HIDE the sterile Jumbotron - we want the OG marquee! */
+      .jumbotron {
+        display: none !important;
+      }
+
+      /* DJ Booth — Below the marquee sign */
       .dj-booth-visual {
-        top: 215px; /* Positioned to overlap jumbotron bottom edge */
+        top: 240px; /* Below the soulful marquee */
       }
 
       /* Nightclub takes full space */
