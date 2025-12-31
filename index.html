@@ -108,7 +108,7 @@
       padding: calc(var(--safe-top)) 0 calc(80px + var(--safe-bottom));
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      background: #000;
+      background: transparent;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -3445,12 +3445,14 @@
     .player-container {
       position: absolute;
       left: 50%;
-      bottom: 95px; /* At the door - above control deck */
+      bottom: 30px;
       transform: translateX(-50%);
-      z-index: 150; /* Above everything including control deck */
+      z-index: 150;
       cursor: grab;
       touch-action: none;
-      transition: left 0.4s var(--bounce), bottom 0.4s var(--bounce), transform 0.4s var(--bounce);
+      user-select: none;
+      -webkit-user-select: none;
+      will-change: transform, left, bottom;
     }
 
     .player-container:active {
@@ -3460,15 +3462,37 @@
     /* At door - INSIDE the dock circle, BELOW dance floor */
     .player-container.at-door {
       left: 50%;
-      bottom: 30px; /* Centered in the dock (dock center is ~65px, player is ~70px tall) */
+      bottom: 30px;
       transform: translateX(-50%);
-      z-index: 101; /* Above the dock */
+      z-index: 101;
+      transition: none;
     }
 
     .player-container.on-stage {
       left: 50%;
       bottom: 30px;
       transform: translateX(-50%);
+    }
+
+    /* When being dragged - lifted doll feel */
+    .player-container.dragging {
+      z-index: 9999 !important;
+      transition: none !important;
+      cursor: grabbing;
+    }
+
+    /* Smooth return animation */
+    .player-container.returning {
+      transition: left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Landing on a team */
+    .player-container.landing {
+      transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .player-container.team-yes-pos {
@@ -3489,13 +3513,52 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: transform 0.3s var(--bounce);
+      transform-origin: center bottom;
     }
 
-    /* Dance only when on a team */
-    .player.team-yes,
-    .player.team-no {
-      animation: player-bounce 0.46875s ease-in-out infinite;
+    /* Doll wobble when lifted */
+    .player.lifted {
+      animation: doll-wobble 0.15s ease-in-out;
+    }
+
+    @keyframes doll-wobble {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.1) rotate(-3deg); }
+      50% { transform: scale(1.15) rotate(2deg); }
+      75% { transform: scale(1.12) rotate(-1deg); }
+      100% { transform: scale(1.1) rotate(0deg); }
+    }
+
+    /* Doll swing while being dragged - controlled by JS */
+    .player.dragging-active {
+      animation: none;
+      will-change: transform;
+    }
+
+    /* Dance only when on a team AND confirmed */
+    .player.team-yes.confirmed,
+    .player.team-no.confirmed {
+      animation: james-brown-funk 0.46875s ease-in-out infinite;
+    }
+
+    /* Landing squash-stretch */
+    .player.landing-squash {
+      animation: landing-squash 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes landing-squash {
+      0% { transform: scale(1.1, 0.9) translateY(-20px); }
+      40% { transform: scale(0.9, 1.15) translateY(5px); }
+      70% { transform: scale(1.05, 0.95) translateY(-3px); }
+      100% { transform: scale(1, 1) translateY(0); }
+    }
+
+    /* James Brown funk dance */
+    @keyframes james-brown-funk {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      25% { transform: translateY(-8px) rotate(3deg); }
+      50% { transform: translateY(-2px) rotate(-3deg); }
+      75% { transform: translateY(-10px) rotate(2deg); }
     }
 
     @keyframes player-bounce {
@@ -3505,7 +3568,6 @@
 
     .player.dragging {
       animation: none;
-      transform: scale(1.15);
     }
 
     .player-head {
@@ -4142,6 +4204,122 @@
     .slide-success.active {
       opacity: 1;
       transform: scale(1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DROP CONFIRMATION POPUP — Nintendo-style Yes/No Dialog
+    ═══════════════════════════════════════════════════════════════ */
+    .drop-confirm-popup {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .drop-confirm-popup.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drop-confirm-card {
+      background: linear-gradient(180deg, rgba(30, 20, 50, 0.95), rgba(15, 10, 30, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 28px 32px;
+      max-width: 320px;
+      width: 90%;
+      text-align: center;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5),
+                  0 0 100px rgba(0, 245, 255, 0.1);
+    }
+
+    .drop-confirm-popup.active .drop-confirm-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .drop-confirm-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .drop-confirm-side {
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .drop-confirm-side.yes {
+      background: var(--neon-cyan);
+      color: #000;
+    }
+
+    .drop-confirm-side.no {
+      background: var(--neon-pink);
+      color: #fff;
+    }
+
+    .drop-confirm-question {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .drop-confirm-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .drop-confirm-btn {
+      flex: 1;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .drop-confirm-btn:active {
+      transform: scale(0.95);
+    }
+
+    .drop-confirm-btn.cancel {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .drop-confirm-btn.cancel:active {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .drop-confirm-btn.confirm {
+      background: linear-gradient(135deg, var(--neon-cyan), #00d4aa);
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0, 245, 255, 0.3);
+    }
+
+    .drop-confirm-btn.confirm.no-side {
+      background: linear-gradient(135deg, var(--neon-pink), #ff3366);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255, 0, 128, 0.3);
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -4868,6 +5046,19 @@
       </div>
     </div>
 
+    <!-- Drop Confirmation Popup -->
+    <div class="drop-confirm-popup" id="drop-confirm">
+      <div class="drop-confirm-card">
+        <div class="drop-confirm-title">Lock in your position?</div>
+        <div class="drop-confirm-side yes" id="drop-confirm-side">YES</div>
+        <div class="drop-confirm-question" id="drop-confirm-question">Are you sure you want to vote YES on this market?</div>
+        <div class="drop-confirm-buttons">
+          <button class="drop-confirm-btn cancel" id="drop-confirm-cancel">Go Back</button>
+          <button class="drop-confirm-btn confirm" id="drop-confirm-yes">Let's Go!</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Nintendo Victory Celebration Overlay -->
     <div class="celebration-overlay" id="celebration">
       <div class="celebration-text">WOW!</div>
@@ -5183,6 +5374,10 @@
       const yesPercent = currentMarket.partyYes;
       document.getElementById('zone-yes').style.flex = yesPercent;
       document.getElementById('zone-no').style.flex = 100 - yesPercent;
+
+      // Update floor score labels to match market data
+      document.getElementById('yes-score').textContent = `${yesPercent}%`;
+      document.getElementById('no-score').textContent = `${100 - yesPercent}%`;
 
       // Start countdown timer
       startCountdown();
@@ -5590,18 +5785,25 @@
       // Show success state on slider
       slideSuccessEl.classList.add('active');
 
-      // Trigger EPIC Nintendo celebration overlay!
-      const celebration = document.getElementById('celebration');
-      celebration.classList.add('active');
-
-      // Nintendo-style haptic pattern: short-pause-long-pause-short
-      if (navigator.vibrate) navigator.vibrate([30, 50, 100, 50, 30]);
+      // Trigger celebration
+      showCelebration();
 
       // Hide panel immediately, keep celebration visible
       setTimeout(() => {
         slidePanel.classList.remove('active');
         slideSuccessEl.classList.remove('active');
       }, 300);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // NINTENDO CELEBRATION — The Epic Moment!
+    // ═══════════════════════════════════════════════════════════════
+    function showCelebration() {
+      const celebration = document.getElementById('celebration');
+      celebration.classList.add('active');
+
+      // Nintendo-style haptic pattern: short-pause-long-pause-short
+      if (navigator.vibrate) navigator.vibrate([30, 50, 100, 50, 30]);
 
       // Hide celebration after the epic moment
       setTimeout(() => {
@@ -5649,150 +5851,211 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // DRAGGING — Clean Apple-Style Direct Manipulation
-    // Simple, responsive, delightful. LEFT = NO, RIGHT = YES
+    // DRAGGING — Nintendo-Quality Doll Physics
+    // Feel the weight. Feel the swing. Feel the JUICE!
     // ═══════════════════════════════════════════════════════════════
     function setupDragging() {
+      // State
       let isDragging = false;
-      let startX, startY;
-      let offsetX, offsetY;
       let hasMoved = false;
-      const TAP_THRESHOLD = 10;
-      const ZONE_THRESHOLD = 0.35; // 35% from center to commit
+      let pendingVote = null;
 
-      // Get screen dimensions for zone calculations
+      // Position tracking
+      let startPointerX = 0;
+      let startPointerY = 0;
+      let startElementX = 0;
+      let startElementY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      // Velocity for doll physics
+      let velocityX = 0;
+      let velocityY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let lastTime = 0;
+
+      // Constants
+      const TAP_THRESHOLD = 8;
+      const ZONE_THRESHOLD = 0.3; // 30% from center
+      const VELOCITY_DECAY = 0.92;
+      const MAX_ROTATION = 15; // degrees
+
+      // Get screen dimensions
       const getScreenWidth = () => window.innerWidth;
       const getScreenCenter = () => getScreenWidth() / 2;
 
-      // Pickup the player - instant response
-      playerContainer.addEventListener('pointerdown', (e) => {
+      // Confirmation popup elements
+      const dropConfirm = document.getElementById('drop-confirm');
+      const dropConfirmSide = document.getElementById('drop-confirm-side');
+      const dropConfirmQuestion = document.getElementById('drop-confirm-question');
+      const dropConfirmCancel = document.getElementById('drop-confirm-cancel');
+      const dropConfirmYes = document.getElementById('drop-confirm-yes');
+
+      // ═══ PICKUP ═══
+      function handlePointerDown(e) {
+        if (isDragging) return;
         e.preventDefault();
+        e.stopPropagation();
+
         isDragging = true;
         hasMoved = false;
-        player.classList.add('dragging');
+
+        // Capture pointer for reliable tracking
         playerContainer.setPointerCapture(e.pointerId);
+
+        // Record start positions
+        const rect = playerContainer.getBoundingClientRect();
+        startPointerX = e.clientX;
+        startPointerY = e.clientY;
+        startElementX = rect.left + rect.width / 2;
+        startElementY = rect.top + rect.height / 2;
+        currentX = startElementX;
+        currentY = startElementY;
+        lastX = startElementX;
+        lastY = startElementY;
+        lastTime = performance.now();
+        velocityX = 0;
+        velocityY = 0;
+
+        // Add dragging classes
+        playerContainer.classList.add('dragging');
+        player.classList.add('lifted');
+        player.classList.add('dragging-active');
 
         // Hide dock
         document.getElementById('player-dock').classList.add('hidden');
 
-        // Disable CSS transitions for 1:1 finger tracking
-        playerContainer.style.transition = 'none';
-
-        // Calculate offset from pointer to element center
-        const rect = playerContainer.getBoundingClientRect();
-        startX = e.clientX;
-        startY = e.clientY;
-        offsetX = rect.left + rect.width / 2;
-        offsetY = rect.top + rect.height / 2;
-
-        // Nintendo "lift" pop
-        player.style.transition = 'transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.12s ease';
-        player.style.transform = 'scale(1.1)';
-        player.style.filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))';
-        playerContainer.style.zIndex = '200';
+        // Nintendo "lift" effect - scale up with shadow
+        player.style.transform = 'scale(1.15)';
+        player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
 
         // Haptic lift
-        if (navigator.vibrate) navigator.vibrate(5);
-      }, { passive: false });
+        if (navigator.vibrate) navigator.vibrate(8);
 
-      // Move - 1:1 finger tracking
-      document.addEventListener('pointermove', (e) => {
+        console.log('🎮 Pickup! Starting drag...');
+      }
+
+      // ═══ MOVE ═══
+      function handlePointerMove(e) {
         if (!isDragging) return;
         e.preventDefault();
 
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+        const now = performance.now();
+        const dt = Math.max(now - lastTime, 1);
+
+        // Calculate delta from start
+        const dx = e.clientX - startPointerX;
+        const dy = e.clientY - startPointerY;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // Check if moved past threshold
+        // Check if we've moved past threshold
         if (!hasMoved && dist > TAP_THRESHOLD) {
           hasMoved = true;
-          player.style.transition = 'none';
+          player.classList.remove('lifted');
         }
 
         if (!hasMoved) return;
 
-        // Direct positioning - player follows finger exactly
-        const newLeft = offsetX + dx;
-        const newTop = offsetY + dy;
-        const newBottom = window.innerHeight - newTop;
+        // Update position (finger follows directly)
+        currentX = startElementX + dx;
+        currentY = startElementY + dy;
 
-        playerContainer.style.left = `${newLeft}px`;
+        // Calculate velocity for doll swing effect
+        velocityX = (currentX - lastX) / dt * 16; // normalize to ~60fps
+        velocityY = (currentY - lastY) / dt * 16;
+        lastX = currentX;
+        lastY = currentY;
+        lastTime = now;
+
+        // Apply damping
+        velocityX *= VELOCITY_DECAY;
+        velocityY *= VELOCITY_DECAY;
+
+        // Calculate rotation based on horizontal velocity (doll swing)
+        const rotation = Math.max(-MAX_ROTATION, Math.min(MAX_ROTATION, velocityX * 0.8));
+
+        // Convert to bottom-based positioning
+        const newBottom = window.innerHeight - currentY;
+
+        // Apply position directly (no transition during drag)
+        playerContainer.style.left = `${currentX}px`;
         playerContainer.style.bottom = `${newBottom}px`;
-        playerContainer.style.transform = 'translateX(-50%) translateY(50%)';
+        playerContainer.style.transform = 'translate(-50%, 50%)';
 
-        // Zone feedback - LEFT = NO (pink), RIGHT = YES (cyan)
+        // Doll swing rotation
+        player.style.transform = `scale(1.15) rotate(${rotation}deg)`;
+
+        // Zone feedback
         const screenCenter = getScreenCenter();
-        const normalizedX = (newLeft - screenCenter) / screenCenter; // -1 to 1
+        const normalizedX = (currentX - screenCenter) / screenCenter; // -1 to 1
 
         if (normalizedX < -ZONE_THRESHOLD) {
-          // NO zone (left side)
+          // NO zone (left)
           zoneNo.classList.add('hovering');
           zoneYes.classList.remove('hovering');
-          const intensity = Math.min(0.4 + Math.abs(normalizedX) * 0.8, 1);
+          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
           zoneNo.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
-          zoneYes.style.setProperty('--spotlight-intensity', '0.3');
-          player.style.filter = `drop-shadow(0 15px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255, 0, 128, ${intensity * 0.5}))`;
+          zoneYes.style.setProperty('--spotlight-intensity', '0.25');
+          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255, 0, 128, ${intensity * 0.6}))`;
         } else if (normalizedX > ZONE_THRESHOLD) {
-          // YES zone (right side)
+          // YES zone (right)
           zoneYes.classList.add('hovering');
           zoneNo.classList.remove('hovering');
-          const intensity = Math.min(0.4 + Math.abs(normalizedX) * 0.8, 1);
+          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
           zoneYes.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
-          zoneNo.style.setProperty('--spotlight-intensity', '0.3');
-          player.style.filter = `drop-shadow(0 15px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(0, 245, 255, ${intensity * 0.5}))`;
+          zoneNo.style.setProperty('--spotlight-intensity', '0.25');
+          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(0, 245, 255, ${intensity * 0.6}))`;
         } else {
-          // Center - no commitment
+          // Center - neutral
           zoneNo.classList.remove('hovering');
           zoneYes.classList.remove('hovering');
           zoneNo.style.setProperty('--spotlight-intensity', '0.4');
           zoneYes.style.setProperty('--spotlight-intensity', '0.4');
-          player.style.filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))';
+          player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
         }
-      }, { passive: false });
+      }
 
-      // Release - determine vote or snap back
-      document.addEventListener('pointerup', (e) => {
+      // ═══ RELEASE ═══
+      function handlePointerUp(e) {
         if (!isDragging) return;
         isDragging = false;
-        player.classList.remove('dragging');
-        playerContainer.style.zIndex = '';
 
-        // Clear zone states
+        // Release pointer capture
+        try {
+          playerContainer.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+
+        // Remove dragging classes
+        playerContainer.classList.remove('dragging');
+        player.classList.remove('lifted', 'dragging-active');
+
+        // Clear zone hover states
         zoneNo.classList.remove('hovering');
         zoneYes.classList.remove('hovering');
         zoneNo.style.setProperty('--spotlight-intensity', '0.4');
         zoneYes.style.setProperty('--spotlight-intensity', '0.4');
 
-        // Tap (no movement) - bounce and return
+        // Tap (no significant movement) - just bounce
         if (!hasMoved) {
-          player.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease';
-          player.style.transform = 'scale(1.15)';
+          player.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease';
+          player.style.transform = 'scale(1.2)';
           setTimeout(() => {
             player.style.transform = '';
             player.style.filter = '';
-          }, 125);
-          playerContainer.style.transition = '';
-          playerContainer.style.left = '';
-          playerContainer.style.bottom = '';
-          playerContainer.style.transform = '';
+            player.style.transition = '';
+          }, 150);
           document.getElementById('player-dock').classList.remove('hidden');
-          if (navigator.vibrate) navigator.vibrate([5, 20, 5]);
+          if (navigator.vibrate) navigator.vibrate([5, 30, 5]);
+          console.log('🎮 Tap detected, bouncing back');
           return;
         }
 
-        // Get final position
-        const rect = playerContainer.getBoundingClientRect();
-        const finalX = rect.left + rect.width / 2;
+        // Calculate final position
         const screenCenter = getScreenCenter();
-        const normalizedX = (finalX - screenCenter) / screenCenter;
+        const normalizedX = (currentX - screenCenter) / screenCenter;
 
-        // Reset player visual
-        player.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease';
-        player.style.transform = '';
-        player.style.filter = '';
-
-        // Determine vote
+        // Determine target
         let targetVote = null;
         if (normalizedX < -ZONE_THRESHOLD) {
           targetVote = 'no';
@@ -5800,36 +6063,134 @@
           targetVote = 'yes';
         }
 
+        console.log(`🎮 Release at normalized X: ${normalizedX.toFixed(2)}, target: ${targetVote}`);
+
         if (targetVote) {
-          // Commit vote - smooth settle to team position
-          playerContainer.style.transition = 'left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-          vote(targetVote);
-          if (navigator.vibrate) navigator.vibrate([10, 50, 20]);
-        } else {
-          // Snap back to dock
-          playerContainer.style.transition = 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-          playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
-          playerContainer.classList.add('at-door');
+          // Landed on a side - show confirmation popup
+          pendingVote = targetVote;
+          showDropConfirm(targetVote);
+
+          // Move player to holding position on that side
+          playerContainer.classList.add('landing');
+          playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
           playerContainer.style.left = '';
           playerContainer.style.bottom = '';
           playerContainer.style.transform = '';
-          playerTeam = null;
-          player.classList.remove('team-yes', 'team-no');
-          player.classList.add('at-door');
-          document.getElementById('player-dock').classList.remove('hidden');
-          if (navigator.vibrate) navigator.vibrate(10);
+
+          // Landing squash animation
+          player.classList.add('landing-squash');
+          player.style.filter = '';
+          player.style.transform = '';
+
+          setTimeout(() => {
+            player.classList.remove('landing-squash');
+            playerContainer.classList.remove('landing');
+          }, 300);
+
+          if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
+        } else {
+          // Snap back to dock with bounce
+          snapBackToDock();
         }
+      }
+
+      // ═══ SNAP BACK TO DOCK ═══
+      function snapBackToDock() {
+        playerContainer.classList.add('returning');
+        playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
+        playerContainer.classList.add('at-door');
+        playerContainer.style.left = '';
+        playerContainer.style.bottom = '';
+        playerContainer.style.transform = '';
+
+        player.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease';
+        player.style.transform = '';
+        player.style.filter = '';
+
+        playerTeam = null;
+        player.classList.remove('team-yes', 'team-no', 'confirmed');
+        player.classList.add('at-door');
+
+        document.getElementById('player-dock').classList.remove('hidden');
+
+        setTimeout(() => {
+          playerContainer.classList.remove('returning');
+          player.style.transition = '';
+        }, 500);
+
+        if (navigator.vibrate) navigator.vibrate(12);
+        console.log('🎮 Snapping back to dock');
+      }
+
+      // ═══ DROP CONFIRMATION POPUP ═══
+      function showDropConfirm(side) {
+        dropConfirmSide.textContent = side.toUpperCase();
+        dropConfirmSide.className = `drop-confirm-side ${side}`;
+        dropConfirmQuestion.textContent = `Lock in your ${side.toUpperCase()} position?`;
+
+        const confirmBtn = document.getElementById('drop-confirm-yes');
+        confirmBtn.className = `drop-confirm-btn confirm ${side === 'no' ? 'no-side' : ''}`;
+
+        dropConfirm.classList.add('active');
+        if (navigator.vibrate) navigator.vibrate(10);
+      }
+
+      function hideDropConfirm() {
+        dropConfirm.classList.remove('active');
+      }
+
+      // ═══ CONFIRMATION HANDLERS ═══
+      dropConfirmCancel.addEventListener('click', () => {
+        hideDropConfirm();
+        pendingVote = null;
+        snapBackToDock();
+        if (navigator.vibrate) navigator.vibrate(8);
       });
+
+      dropConfirmYes.addEventListener('click', () => {
+        hideDropConfirm();
+        if (pendingVote) {
+          confirmVote(pendingVote);
+        }
+        pendingVote = null;
+      });
+
+      // ═══ CONFIRM VOTE (James Brown time!) ═══
+      function confirmVote(side) {
+        playerTeam = side;
+        player.classList.remove('at-door', 'team-yes', 'team-no');
+        player.classList.add(`team-${side}`, 'confirmed');
+
+        // Show speech bubble
+        showPlayerSpeech(side);
+
+        // Start the James Brown funk!
+        console.log(`🎮 CONFIRMED! ${side.toUpperCase()} - Get on down! 🕺`);
+
+        // Epic haptic
+        if (navigator.vibrate) navigator.vibrate([20, 50, 30, 50, 40]);
+
+        // Show celebration
+        showCelebration();
+      }
+
+      // ═══ EVENT LISTENERS ═══
+      playerContainer.addEventListener('pointerdown', handlePointerDown, { passive: false });
+      document.addEventListener('pointermove', handlePointerMove, { passive: false });
+      document.addEventListener('pointerup', handlePointerUp);
+      document.addEventListener('pointercancel', handlePointerUp);
 
       // Prevent scroll on touch
       playerContainer.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) e.preventDefault();
       }, { passive: false });
+
+      console.log('🎮 Nintendo drag system initialized!');
     }
 
-    // Zone interaction is now handled inline in pointermove for simplicity
+    // Zone interaction is handled inline in drag handler
     function updateZoneInteraction() {
-      // Kept for compatibility - actual logic is in drag handler
+      // Compatibility stub
     }
 
     // ═══════════════════════════════════════════════════════════════
