@@ -1,0 +1,5837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PREDICTION PARTY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       PREDICTION PARTY — The Turntable.fm for Crypto Prediction Markets
+       Neo-Tokyo Underground Nightclub Aesthetic
+    ═══════════════════════════════════════════════════════════════ */
+
+    :root {
+      /* Neo-Tokyo Palette — Black to match logo */
+      --bg-dark: #000000;
+      --bg-mid: #0a0a12;
+      --bg-light: #0f0f1a;
+
+      /* Neon Accents — Matching the logo colors! */
+      --neon-cyan: #4da6ff;  /* Neon blue from logo */
+      --neon-pink: #ff4b9b;  /* Neon pink from logo */
+      --neon-red: #ff3366;
+      --neon-green: #39ff14;
+      --neon-purple: #bf00ff;
+      --neon-gold: #ffd700;
+
+      /* Kalshi Brand */
+      --kalshi-teal: #00d46a;
+      --kalshi-teal-dark: #00a854;
+
+      /* Party Brand — Match logo neon colors */
+      --party-yes: var(--neon-cyan);
+      --party-no: var(--neon-pink);
+
+      /* UI */
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.4);
+
+      /* Animation */
+      --bounce: cubic-bezier(0.25, 1.5, 0.5, 1);
+      --smooth: cubic-bezier(0.4, 0, 0.2, 1);
+      --bpm: 128;
+      --beat: calc(60s / var(--bpm));
+
+      /* Safe Areas */
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 34px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      background: #000;
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       APP CONTAINER
+    ═══════════════════════════════════════════════════════════════ */
+    .app {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Screens */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       HOME SCREEN — Matching the logo's black background
+    ═══════════════════════════════════════════════════════════════ */
+    .home-screen {
+      padding: calc(var(--safe-top)) 0 calc(80px + var(--safe-bottom));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #000;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       HOMEPAGE PARTY VIBES — Real Club Spotlights
+    ═══════════════════════════════════════════════════════════════ */
+    .home-party-vibes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    /* Atmospheric Haze/Fog Layer */
+    .home-haze {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(138, 43, 226, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 50%, rgba(0, 245, 255, 0.05) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 50%, rgba(255, 0, 128, 0.05) 0%, transparent 50%);
+      animation: haze-pulse 8s ease-in-out infinite;
+    }
+
+    @keyframes haze-pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Stage Spotlight — Dramatic Conic Beams */
+    .home-spotlight {
+      position: absolute;
+      top: -10%;
+      width: 200px;
+      height: 140%;
+      transform-origin: 50% 0%;
+      opacity: 0.35;
+      mix-blend-mode: screen;
+    }
+
+    /* Spotlight Beam Shape — Wide cone */
+    .home-spotlight::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 100%;
+      background: inherit;
+      clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+      filter: blur(2px);
+    }
+
+    /* Spotlight Glow Core */
+    .home-spotlight::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+      background: inherit;
+      border-radius: 50%;
+      filter: blur(10px);
+      opacity: 0.8;
+    }
+
+    /* Left Cyan Spotlight */
+    .home-spotlight.cyan {
+      left: 5%;
+      background: linear-gradient(180deg,
+        rgba(0, 245, 255, 1) 0%,
+        rgba(0, 245, 255, 0.6) 20%,
+        rgba(0, 245, 255, 0.2) 60%,
+        transparent 100%
+      );
+      animation: spotlight-sweep-left 6s ease-in-out infinite;
+    }
+
+    .home-spotlight.cyan::before {
+      background: linear-gradient(180deg,
+        rgba(0, 245, 255, 0.9) 0%,
+        rgba(0, 245, 255, 0.4) 40%,
+        rgba(0, 245, 255, 0.1) 70%,
+        transparent 100%
+      );
+      width: 100%;
+    }
+
+    /* Right Pink Spotlight */
+    .home-spotlight.pink {
+      right: 5%;
+      left: auto;
+      background: linear-gradient(180deg,
+        rgba(255, 0, 128, 1) 0%,
+        rgba(255, 0, 128, 0.6) 20%,
+        rgba(255, 0, 128, 0.2) 60%,
+        transparent 100%
+      );
+      animation: spotlight-sweep-right 7s ease-in-out infinite;
+      animation-delay: -2s;
+    }
+
+    .home-spotlight.pink::before {
+      background: linear-gradient(180deg,
+        rgba(255, 0, 128, 0.9) 0%,
+        rgba(255, 0, 128, 0.4) 40%,
+        rgba(255, 0, 128, 0.1) 70%,
+        transparent 100%
+      );
+      width: 100%;
+    }
+
+    /* Center Purple Spotlight */
+    .home-spotlight.purple {
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg,
+        rgba(191, 0, 255, 1) 0%,
+        rgba(191, 0, 255, 0.5) 20%,
+        rgba(191, 0, 255, 0.15) 60%,
+        transparent 100%
+      );
+      animation: spotlight-sweep-center 8s ease-in-out infinite;
+      animation-delay: -4s;
+      opacity: 0.25;
+    }
+
+    .home-spotlight.purple::before {
+      background: linear-gradient(180deg,
+        rgba(191, 0, 255, 0.8) 0%,
+        rgba(191, 0, 255, 0.3) 40%,
+        rgba(191, 0, 255, 0.1) 70%,
+        transparent 100%
+      );
+      width: 100%;
+    }
+
+    /* Extra Gold Accent Spotlight */
+    .home-spotlight.gold {
+      left: 30%;
+      background: linear-gradient(180deg,
+        rgba(255, 215, 0, 0.9) 0%,
+        rgba(255, 215, 0, 0.4) 20%,
+        rgba(255, 215, 0, 0.1) 60%,
+        transparent 100%
+      );
+      animation: spotlight-sweep-accent 9s ease-in-out infinite;
+      animation-delay: -1s;
+      opacity: 0.2;
+      width: 150px;
+    }
+
+    .home-spotlight.gold::before {
+      background: linear-gradient(180deg,
+        rgba(255, 215, 0, 0.7) 0%,
+        rgba(255, 215, 0, 0.2) 50%,
+        transparent 100%
+      );
+      width: 100%;
+    }
+
+    @keyframes spotlight-sweep-left {
+      0%, 100% {
+        transform: rotate(-25deg);
+        opacity: 0.25;
+      }
+      50% {
+        transform: rotate(15deg);
+        opacity: 0.4;
+      }
+    }
+
+    @keyframes spotlight-sweep-right {
+      0%, 100% {
+        transform: rotate(25deg);
+        opacity: 0.25;
+      }
+      50% {
+        transform: rotate(-15deg);
+        opacity: 0.4;
+      }
+    }
+
+    @keyframes spotlight-sweep-center {
+      0%, 100% {
+        transform: translateX(-50%) rotate(-8deg);
+        opacity: 0.2;
+      }
+      50% {
+        transform: translateX(-50%) rotate(8deg);
+        opacity: 0.3;
+      }
+    }
+
+    @keyframes spotlight-sweep-accent {
+      0%, 100% {
+        transform: rotate(-15deg);
+        opacity: 0.15;
+      }
+      30% {
+        transform: rotate(20deg);
+        opacity: 0.25;
+      }
+      70% {
+        transform: rotate(-10deg);
+        opacity: 0.2;
+      }
+    }
+
+    /* Floor Glow — Light hitting the ground */
+    .home-floor-glow {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(0deg,
+        rgba(138, 43, 226, 0.1) 0%,
+        transparent 100%
+      );
+      animation: floor-glow-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes floor-glow-pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 0.8; }
+    }
+
+    /* Disco Ball Reflections */
+    .home-disco-dots {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .disco-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: disco-dot-float 4s ease-in-out infinite;
+    }
+
+    .disco-dot:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+    .disco-dot:nth-child(2) { left: 25%; top: 45%; animation-delay: -0.5s; }
+    .disco-dot:nth-child(3) { left: 45%; top: 15%; animation-delay: -1s; }
+    .disco-dot:nth-child(4) { left: 60%; top: 55%; animation-delay: -1.5s; }
+    .disco-dot:nth-child(5) { left: 75%; top: 30%; animation-delay: -2s; }
+    .disco-dot:nth-child(6) { left: 85%; top: 60%; animation-delay: -2.5s; }
+    .disco-dot:nth-child(7) { left: 15%; top: 70%; animation-delay: -3s; }
+    .disco-dot:nth-child(8) { left: 55%; top: 75%; animation-delay: -3.5s; }
+
+    @keyframes disco-dot-float {
+      0%, 100% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.5);
+      }
+      20% {
+        opacity: 0.8;
+        transform: translate(10px, -15px) scale(1);
+      }
+      40% {
+        opacity: 0.4;
+        transform: translate(25px, -5px) scale(0.8);
+      }
+      60% {
+        opacity: 0.7;
+        transform: translate(15px, 10px) scale(1.1);
+      }
+      80% {
+        opacity: 0.3;
+        transform: translate(5px, 5px) scale(0.6);
+      }
+    }
+
+    /* Lens Flare — Top of screen */
+    .home-lens-flare {
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 100px;
+      background: radial-gradient(ellipse at center,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.05) 30%,
+        transparent 70%
+      );
+      animation: lens-flare-pulse 5s ease-in-out infinite;
+    }
+
+    @keyframes lens-flare-pulse {
+      0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+      50% { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
+    }
+
+    /* Secondary Spotlights */
+    .home-spotlight.cyan-2 {
+      left: 15%;
+      background: linear-gradient(180deg,
+        rgba(0, 200, 255, 0.9) 0%,
+        rgba(0, 200, 255, 0.4) 30%,
+        rgba(0, 200, 255, 0.1) 70%,
+        transparent 100%
+      );
+      animation: spotlight-sweep-left 5s ease-in-out infinite;
+      animation-delay: -1.5s;
+      opacity: 0.25;
+      width: 180px;
+    }
+
+    .home-spotlight.pink-2 {
+      right: 15%;
+      left: auto;
+      background: linear-gradient(180deg,
+        rgba(255, 50, 150, 0.9) 0%,
+        rgba(255, 50, 150, 0.4) 30%,
+        rgba(255, 50, 150, 0.1) 70%,
+        transparent 100%
+      );
+      animation: spotlight-sweep-right 5.5s ease-in-out infinite;
+      animation-delay: -0.5s;
+      opacity: 0.25;
+      width: 180px;
+    }
+
+    /* Home Laser Beams — Sharp Neon Lines */
+    .home-laser {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: 120%;
+      transform-origin: 50% 0%;
+      opacity: 0.5;
+    }
+
+    .home-laser::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      filter: blur(1px);
+    }
+
+    .home-laser.cyan-1 {
+      left: 20%;
+      background: linear-gradient(180deg, var(--neon-cyan), transparent 80%);
+      box-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+      animation: laser-sweep-1 3s ease-in-out infinite;
+    }
+
+    .home-laser.cyan-2 {
+      left: 30%;
+      background: linear-gradient(180deg, var(--neon-cyan), transparent 70%);
+      box-shadow: 0 0 6px var(--neon-cyan);
+      animation: laser-sweep-1 3.5s ease-in-out infinite;
+      animation-delay: -1s;
+      opacity: 0.35;
+    }
+
+    .home-laser.pink-1 {
+      right: 20%;
+      left: auto;
+      background: linear-gradient(180deg, var(--neon-pink), transparent 80%);
+      box-shadow: 0 0 8px var(--neon-pink), 0 0 20px var(--neon-pink);
+      animation: laser-sweep-2 3.2s ease-in-out infinite;
+    }
+
+    .home-laser.pink-2 {
+      right: 30%;
+      left: auto;
+      background: linear-gradient(180deg, var(--neon-pink), transparent 70%);
+      box-shadow: 0 0 6px var(--neon-pink);
+      animation: laser-sweep-2 4s ease-in-out infinite;
+      animation-delay: -1.5s;
+      opacity: 0.35;
+    }
+
+    .home-laser.purple {
+      left: 50%;
+      background: linear-gradient(180deg, var(--neon-purple), transparent 60%);
+      box-shadow: 0 0 10px var(--neon-purple);
+      animation: laser-sweep-3 5s ease-in-out infinite;
+      opacity: 0.4;
+    }
+
+    @keyframes laser-sweep-1 {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(15deg); }
+    }
+
+    @keyframes laser-sweep-2 {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-15deg); }
+    }
+
+    @keyframes laser-sweep-3 {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
+    }
+
+    .home-screen::-webkit-scrollbar { width: 3px; }
+    .home-screen::-webkit-scrollbar-track { background: transparent; }
+    .home-screen::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+    /* Hero Section — Classy logo */
+    .hero {
+      text-align: center;
+      padding: 12px 0 0 0;
+      margin: 0 0 4px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-image {
+      width: 70%;
+      max-width: 280px;
+      height: auto;
+      margin: 0 auto;
+      display: block;
+      /* Remove black background via blend mode */
+      mix-blend-mode: lighten;
+      filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.3))
+              drop-shadow(0 0 60px rgba(255, 0, 128, 0.2));
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 12px 0 10px;
+      padding: 0 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+
+    .section-title .icon {
+      font-size: 18px;
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    .see-all {
+      font-size: 12px;
+      color: var(--neon-cyan);
+      background: rgba(0, 245, 255, 0.1);
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      border-radius: 100px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+    }
+
+    .see-all:active {
+      transform: scale(0.95);
+      background: rgba(0, 245, 255, 0.2);
+    }
+
+    /* Market Cards — Nightclub VIP Rooms */
+    .market-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .market-card {
+      background: linear-gradient(135deg,
+        rgba(20, 18, 35, 0.95) 0%,
+        rgba(10, 8, 20, 0.98) 100%
+      );
+      border: 1px solid rgba(77, 166, 255, 0.15);
+      border-radius: 16px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s var(--bounce);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .market-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+      opacity: 0.6;
+    }
+
+    .market-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 80% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .market-card:active {
+      transform: scale(0.98);
+      border-color: var(--neon-cyan);
+    }
+
+    .market-card:active::after {
+      opacity: 1;
+    }
+
+    .market-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .market-question {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      flex: 1;
+      padding-right: 12px;
+      color: #fff;
+    }
+
+    .market-live {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--neon-green);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 8px;
+      background: rgba(57, 255, 20, 0.15);
+      border-radius: 100px;
+      border: 1px solid rgba(57, 255, 20, 0.3);
+    }
+
+    .live-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      animation: pulse 1s ease infinite;
+      box-shadow: 0 0 8px var(--neon-green);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--neon-green); }
+      50% { opacity: 0.7; transform: scale(0.9); box-shadow: 0 0 4px var(--neon-green); }
+    }
+
+    .market-stats {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .stat-pill {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-pill.yes {
+      background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(0, 200, 220, 0.15));
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 245, 255, 0.3);
+      box-shadow: 0 0 12px rgba(0, 245, 255, 0.2);
+    }
+
+    .stat-pill.no {
+      background: linear-gradient(135deg, rgba(255, 0, 128, 0.2), rgba(200, 0, 100, 0.15));
+      color: var(--neon-pink);
+      border: 1px solid rgba(255, 0, 128, 0.3);
+      box-shadow: 0 0 12px rgba(255, 0, 128, 0.2);
+    }
+
+    /* Card Progress Bars — Matching Arena Style */
+    .card-scores {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .card-score-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-source-label {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 38px;
+      text-align: right;
+      color: var(--text-secondary);
+    }
+
+    .card-score-row.kalshi .card-source-label { color: var(--kalshi-teal); }
+    .card-score-row.party .card-source-label { color: var(--party-yes); }
+
+    .card-progress-bar {
+      flex: 1;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .card-fill-yes {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 6px;
+      transition: width 0.5s var(--bounce);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Card shimmer effect */
+    .card-fill-yes::after,
+    .card-fill-no::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+      );
+      animation: shimmer 2.5s ease-in-out infinite;
+    }
+
+    .card-fill-no {
+      height: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-fill-no::after {
+      animation-delay: 0.8s;
+    }
+
+    .card-percent {
+      font-size: 8px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Kalshi style */
+    .card-score-row.kalshi .card-fill-yes {
+      background: linear-gradient(90deg, var(--kalshi-teal), #00b85a);
+    }
+    .card-score-row.kalshi .card-fill-no {
+      background: linear-gradient(90deg, #008844, var(--kalshi-teal-dark));
+      opacity: 0.5;
+    }
+
+    /* Party style - neon blue/pink matching logo */
+    .card-score-row.party .card-fill-yes {
+      background: linear-gradient(90deg, var(--party-yes), #00d0e8);
+      box-shadow: 0 0 8px rgba(77, 166, 255, 0.3);
+    }
+    .card-score-row.party .card-fill-no {
+      background: linear-gradient(90deg, var(--party-no), #e8005a);
+    }
+
+    .market-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .market-crowd {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .crowd-avatars {
+      display: flex;
+    }
+
+    .crowd-avatars .mini-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-dark);
+      margin-left: -6px;
+      box-shadow: 0 0 8px rgba(0, 245, 255, 0.3);
+    }
+
+    .crowd-avatars .mini-avatar:first-child {
+      margin-left: 0;
+    }
+
+    .crowd-count {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .market-volume {
+      font-size: 11px;
+      color: var(--neon-gold);
+      font-weight: 600;
+    }
+
+    /* Party Score Badge — VIP Status */
+    .party-score {
+      position: absolute;
+      top: -1px;
+      right: 12px;
+      background: linear-gradient(180deg, var(--neon-green) 0%, #00a854 100%);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px 6px;
+      border-radius: 0 0 8px 8px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NINTENDO JUICE — Bouncy, Playful, Delightful
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Staggered Card Entrance — Like Animal Crossing Menus */
+    .market-card {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      animation: card-pop-in 0.5s var(--bounce) forwards;
+    }
+
+    .market-card:nth-child(1) { animation-delay: 0.05s; }
+    .market-card:nth-child(2) { animation-delay: 0.1s; }
+    .market-card:nth-child(3) { animation-delay: 0.15s; }
+    .market-card:nth-child(4) { animation-delay: 0.2s; }
+    .market-card:nth-child(5) { animation-delay: 0.25s; }
+    .market-card:nth-child(6) { animation-delay: 0.3s; }
+
+    @keyframes card-pop-in {
+      0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-5px) scale(1.02);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Idle Breathing — Cards Feel Alive */
+    .market-card {
+      animation: card-pop-in 0.5s var(--bounce) forwards, card-breathe 4s ease-in-out infinite 1s;
+    }
+
+    @keyframes card-breathe {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+
+    /* Nintendo Hover — Bouncy Scale + Tilt */
+    .market-card:hover {
+      transform: scale(1.02) rotate(-0.5deg);
+      box-shadow: 0 8px 30px rgba(0, 245, 255, 0.2),
+                  0 0 20px rgba(0, 245, 255, 0.1);
+      z-index: 10;
+    }
+
+    .market-card:hover::after {
+      opacity: 1;
+    }
+
+    /* Shine Sweep on Hover — That Nintendo Polish */
+    .market-card::before {
+      transition: opacity 0.3s ease;
+    }
+
+    .market-card:hover::before {
+      animation: shine-sweep 0.8s ease-out;
+    }
+
+    @keyframes shine-sweep {
+      0% {
+        opacity: 0.6;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+      }
+      50% {
+        opacity: 1;
+        background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan), var(--neon-pink));
+      }
+      100% {
+        opacity: 0.6;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+      }
+    }
+
+    /* Press State — Satisfying Squish */
+    .market-card:active {
+      transform: scale(0.97) rotate(0deg) !important;
+      transition: transform 0.1s ease !important;
+    }
+
+    /* Section Title — Playful Bounce */
+    .section-title {
+      animation: title-bounce 0.6s var(--bounce);
+    }
+
+    @keyframes title-bounce {
+      0% { transform: translateX(-20px); opacity: 0; }
+      60% { transform: translateX(5px); opacity: 1; }
+      100% { transform: translateX(0); }
+    }
+
+    .section-title .icon {
+      display: inline-block;
+      animation: icon-wiggle 2s ease-in-out infinite;
+    }
+
+    @keyframes icon-wiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-10deg) scale(1.1); }
+      75% { transform: rotate(10deg) scale(1.1); }
+    }
+
+    /* See All Button — Nintendo Bounce */
+    .see-all {
+      transition: all 0.2s var(--bounce);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .see-all::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(0, 245, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease, height 0.4s ease;
+    }
+
+    .see-all:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 245, 255, 0.3);
+    }
+
+    .see-all:hover::before {
+      width: 200%;
+      height: 200%;
+    }
+
+    .see-all:active {
+      transform: scale(0.95);
+    }
+
+    /* Party Score Badge — Bouncy Pop */
+    .party-score {
+      animation: badge-pop 0.4s var(--bounce) 0.3s both;
+    }
+
+    @keyframes badge-pop {
+      0% { transform: translateY(-20px) scale(0); opacity: 0; }
+      60% { transform: translateY(3px) scale(1.1); }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* Mini Avatars — Staggered Pop In */
+    .crowd-avatars .mini-avatar {
+      animation: avatar-pop 0.3s var(--bounce) both;
+    }
+
+    .crowd-avatars .mini-avatar:nth-child(1) { animation-delay: 0.4s; }
+    .crowd-avatars .mini-avatar:nth-child(2) { animation-delay: 0.45s; }
+    .crowd-avatars .mini-avatar:nth-child(3) { animation-delay: 0.5s; }
+
+    @keyframes avatar-pop {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Volume Text — Slide In */
+    .market-volume {
+      animation: slide-up 0.4s var(--bounce) 0.5s both;
+    }
+
+    @keyframes slide-up {
+      0% { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Progress Bar Fill — Satisfying Grow */
+    .card-fill-yes, .card-fill-no {
+      animation: bar-grow 0.6s var(--bounce) 0.3s both;
+      transform-origin: left center;
+    }
+
+    .card-fill-no {
+      transform-origin: right center;
+    }
+
+    @keyframes bar-grow {
+      0% { transform: scaleX(0); }
+      100% { transform: scaleX(1); }
+    }
+
+    /* Logo — Subtle Float */
+    .hero .logo {
+      animation: logo-float 6s ease-in-out infinite;
+    }
+
+    @keyframes logo-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-3px) rotate(0.5deg); }
+      75% { transform: translateY(-3px) rotate(-0.5deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ARENA SCREEN — The Main Event
+    ═══════════════════════════════════════════════════════════════ */
+    .arena-screen {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NINTENDO-STYLE HEADER — Clean, Tactile, Premium
+    ═══════════════════════════════════════════════════════════════ */
+    .arena-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: calc(var(--safe-top) + 8px) 12px 12px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+      position: relative;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s var(--bounce);
+      min-width: 60px;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.92);
+      background: rgba(255,255,255,0.15);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .nav-label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .market-title-bar {
+      flex: 1;
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    .market-title-bar .market-title {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.85));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .market-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: rgba(255, 0, 128, 0.15);
+      border: 1px solid rgba(255, 0, 128, 0.25);
+      border-radius: 100px;
+    }
+
+    .live-indicator .live-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--neon-pink);
+      border-radius: 50%;
+      animation: pulse 1.5s ease infinite;
+    }
+
+    .live-text {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--neon-pink);
+      letter-spacing: 1px;
+    }
+
+    .countdown-clock {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: rgba(255, 215, 0, 0.15);
+      border: 1px solid rgba(255, 215, 0, 0.25);
+      border-radius: 100px;
+    }
+
+    .countdown-icon {
+      font-size: 10px;
+    }
+
+    .countdown-time {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--neon-gold);
+      letter-spacing: 0.5px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* DJ Booth */
+    .dj-booth {
+      padding: calc(var(--safe-top) + 12px) 16px 16px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+      position: relative;
+      z-index: 10;
+    }
+
+    .booth-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:active {
+      transform: scale(0.95);
+      background: rgba(255,255,255,0.15);
+    }
+
+    .booth-live {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(255, 0, 128, 0.2);
+      border: 1px solid rgba(255, 0, 128, 0.3);
+      border-radius: 100px;
+    }
+
+    .booth-live-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--neon-pink);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .booth-share {
+      width: 40px;
+      height: 40px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .market-info {
+      text-align: center;
+    }
+
+    .market-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+
+    /* Score Display — Compact Progress Bars (Nintendo-Style) */
+    .scores-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-source-label {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 38px;
+      text-align: right;
+      color: var(--text-secondary);
+    }
+
+    .score-source-label.kalshi { color: var(--kalshi-teal); }
+    .score-source-label.party { color: var(--party-yes); }
+
+    .score-progress-bar {
+      flex: 1;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      position: relative;
+    }
+
+    .score-fill-yes {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-cyan), #00c8e0);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 6px;
+      transition: width 0.5s var(--bounce);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ALIVE SHIMMER EFFECT! */
+    .score-fill-yes::after,
+    .score-fill-no::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+      );
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+
+    .score-fill-no {
+      height: 100%;
+      flex: 1;
+      background: linear-gradient(90deg, #d8006a, var(--neon-pink));
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-fill-no::after {
+      animation-delay: 0.5s;
+    }
+
+    .score-percent {
+      font-size: 8px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Kalshi style */
+    .score-row.kalshi .score-fill-yes {
+      background: linear-gradient(90deg, var(--kalshi-teal), #00b85a);
+    }
+    .score-row.kalshi .score-fill-no {
+      background: linear-gradient(90deg, #008844, var(--kalshi-teal-dark));
+      opacity: 0.6;
+    }
+
+    /* Party style - neon blue/pink matching logo */
+    .score-row.party .score-fill-yes {
+      background: linear-gradient(90deg, var(--party-yes), #00d0e8);
+      box-shadow: 0 0 10px rgba(77, 166, 255, 0.4);
+    }
+    .score-row.party .score-fill-no {
+      background: linear-gradient(90deg, var(--party-no), #e8005a);
+    }
+
+    /* Native Emoji with Juice */
+    .emoji {
+      display: inline-block;
+      font-style: normal;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      transform-origin: center;
+      animation: emoji-bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes emoji-bounce {
+      0%, 100% { transform: scale(1) rotate(-2deg); }
+      50% { transform: scale(1.05) rotate(2deg); }
+    }
+
+    .emoji.static {
+      animation: none;
+    }
+
+    /* Legacy pill styles for market cards */
+    .score-pills {
+      display: flex;
+      gap: 6px;
+    }
+
+    .score-pill {
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE NIGHTCLUB — Turntable.fm Meets Miiverse
+    ═══════════════════════════════════════════════════════════════ */
+    .nightclub {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a1428 0%, #0d0a14 100%);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       WALL LIGHTS — Stage Spotlights
+    ═══════════════════════════════════════════════════════════════ */
+    .wall-lights {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      display: flex;
+      justify-content: space-around;
+      padding: 0 20px;
+      z-index: 10;
+    }
+
+    .spotlight-mount {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .spotlight-arm {
+      width: 4px;
+      height: 20px;
+      background: #333;
+    }
+
+    .spotlight-head {
+      width: 20px;
+      height: 14px;
+      border-radius: 4px 4px 8px 8px;
+      position: relative;
+    }
+
+    .spotlight-head.pink { background: linear-gradient(180deg, #ff0080, #cc0066); }
+    .spotlight-head.cyan { background: linear-gradient(180deg, #00f5ff, #00c8d8); }
+    .spotlight-head.gold { background: linear-gradient(180deg, #ffd700, #ffaa00); }
+
+    .spotlight-beam {
+      position: absolute;
+      top: 14px;
+      left: calc(50% - 30px); /* Center the 60px beam */
+      width: 60px;
+      height: 200px;
+      transform-origin: top center; /* Rotate from fixture connection point! */
+      pointer-events: none;
+    }
+
+    .spotlight-beam.pink {
+      background: linear-gradient(180deg, rgba(255, 0, 128, 0.4), transparent 80%);
+      clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+      animation: beam-sway-1 4s ease-in-out infinite;
+    }
+
+    .spotlight-beam.cyan {
+      background: linear-gradient(180deg, rgba(0, 245, 255, 0.4), transparent 80%);
+      clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+      animation: beam-sway-2 5s ease-in-out infinite;
+    }
+
+    .spotlight-beam.gold {
+      background: linear-gradient(180deg, rgba(255, 215, 0, 0.3), transparent 80%);
+      clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+      animation: beam-sway-3 4.5s ease-in-out infinite;
+    }
+
+    @keyframes beam-sway-1 {
+      0%, 100% { transform: rotate(-15deg); }
+      50% { transform: rotate(15deg); }
+    }
+
+    @keyframes beam-sway-2 {
+      0%, 100% { transform: rotate(10deg); }
+      50% { transform: rotate(-20deg); }
+    }
+
+    @keyframes beam-sway-3 {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(25deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DJ BOOTH — The Heart of the Party
+    ═══════════════════════════════════════════════════════════════ */
+    .dj-booth-visual {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .dj-table {
+      width: 120px;
+      height: 50px;
+      background: linear-gradient(180deg, #2a2a3a, #1a1a2a);
+      border-radius: 8px;
+      border: 2px solid #3a3a4a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .turntable {
+      width: 32px;
+      height: 32px;
+      background: radial-gradient(circle, #222 60%, #111 100%);
+      border-radius: 50%;
+      border: 2px solid #444;
+      position: relative;
+      animation: spin-record 2s linear infinite;
+    }
+
+    .turntable::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin-record {
+      to { transform: rotate(360deg); }
+    }
+
+    .mixer {
+      width: 24px;
+      height: 28px;
+      background: linear-gradient(180deg, #333, #222);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .mixer-slider {
+      width: 3px;
+      height: 12px;
+      background: #444;
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .mixer-slider::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: -1px;
+      width: 5px;
+      height: 4px;
+      background: var(--neon-pink);
+      border-radius: 1px;
+    }
+
+    .dj-character {
+      position: absolute;
+      top: -55px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: dj-bounce 0.46875s ease-in-out infinite; /* 128 BPM */
+    }
+
+    @keyframes dj-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .dj-head {
+      width: 28px;
+      height: 28px;
+      background: #ffd5b8;
+      border-radius: 50%;
+      position: relative;
+      animation: dj-head-bob 0.9375s ease-in-out infinite; /* Half-time groove */
+    }
+
+    @keyframes dj-head-bob {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    /* DJ Body */
+    .dj-body {
+      width: 20px;
+      height: 25px;
+      background: linear-gradient(180deg, #1a1a2a, #0a0a1a);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      margin-top: -2px;
+    }
+
+    /* DJ Arms - scratching the decks! */
+    .dj-arm {
+      position: absolute;
+      width: 20px;
+      height: 4px;
+      background: #ffd5b8;
+      border-radius: 2px;
+      top: 8px;
+      transform-origin: 0 50%;
+    }
+
+    .dj-arm.left {
+      left: -18px;
+      animation: dj-scratch-left 0.9375s ease-in-out infinite;
+    }
+
+    .dj-arm.right {
+      right: -18px;
+      transform-origin: 100% 50%;
+      animation: dj-scratch-right 0.46875s ease-in-out infinite;
+    }
+
+    @keyframes dj-scratch-left {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(10deg); }
+    }
+
+    @keyframes dj-scratch-right {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-10deg); }
+    }
+
+    .dj-headphones {
+      position: absolute;
+      top: 4px;
+      left: -4px;
+      right: -4px;
+      height: 20px;
+      border: 3px solid #333;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .dj-headphones::before, .dj-headphones::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      width: 10px;
+      height: 12px;
+      background: #333;
+      border-radius: 3px;
+    }
+
+    .dj-headphones::before { left: -3px; }
+    .dj-headphones::after { right: -3px; }
+
+    .dj-label {
+      margin-top: 4px;
+      padding: 2px 8px;
+      background: rgba(0,0,0,0.6);
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PULSATING SPEAKERS — Newgrounds Flash Vibes
+    ═══════════════════════════════════════════════════════════════ */
+    .dj-speakers {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      justify-content: space-between;
+      width: 220px;
+      left: 50%;
+      margin-left: -110px;
+      pointer-events: none;
+    }
+
+    .speaker {
+      width: 36px;
+      height: 56px;
+      background: linear-gradient(180deg, #2a2a3a, #1a1a2a);
+      border-radius: 6px;
+      border: 2px solid #3a3a4a;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .speaker::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 24px;
+      background: radial-gradient(circle, #222 40%, #111 100%);
+      border-radius: 50%;
+      border: 2px solid #444;
+    }
+
+    .speaker::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle, #333 40%, #1a1a1a 100%);
+      border-radius: 50%;
+      border: 1px solid #444;
+    }
+
+    .speaker .speaker-cone {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      animation: speaker-pulse 0.46875s ease-in-out infinite;
+    }
+
+    .speaker.left .speaker-cone {
+      box-shadow: 0 0 0 2px var(--neon-pink), 0 0 15px var(--neon-pink);
+    }
+
+    .speaker.right .speaker-cone {
+      box-shadow: 0 0 0 2px var(--neon-cyan), 0 0 15px var(--neon-cyan);
+    }
+
+    @keyframes speaker-pulse {
+      0%, 100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: translateX(-50%) scale(1.15);
+        opacity: 1;
+      }
+    }
+
+    /* Speaker bass waves - Newgrounds flash style */
+    .speaker .bass-wave {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      animation: bass-ripple 0.9375s ease-out infinite;
+      pointer-events: none;
+    }
+
+    .speaker.left .bass-wave {
+      border: 2px solid var(--neon-pink);
+    }
+
+    .speaker.right .bass-wave {
+      border: 2px solid var(--neon-cyan);
+    }
+
+    .speaker .bass-wave:nth-child(2) {
+      animation-delay: 0.3125s;
+    }
+
+    .speaker .bass-wave:nth-child(3) {
+      animation-delay: 0.625s;
+    }
+
+    @keyframes bass-ripple {
+      0% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateX(-50%) scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE DANCE FLOOR — Tiled with Team Colors
+    ═══════════════════════════════════════════════════════════════ */
+    .dance-floor {
+      position: absolute;
+      top: 120px;
+      bottom: 130px; /* More space for the dock/player below */
+      left: 8px;
+      right: 8px;
+      display: flex;
+      flex-direction: row; /* LEFT/RIGHT SPLIT: NO on left, YES on right */
+      gap: 6px;
+      z-index: 5;
+    }
+
+    .floor-zone {
+      flex: 1;
+      position: relative;
+      border-radius: 12px;
+      overflow: visible; /* Allow speech bubbles to overflow! */
+      transition: flex 0.5s var(--smooth);
+    }
+
+    /* Tiled Floor Pattern - Vertical layout for horizontal zone split (2 cols x 4 rows) */
+    .floor-tiles {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 4px;
+      padding: 8px;
+      border-radius: 12px;
+      overflow: hidden; /* Clip tiles only, not speech bubbles */
+    }
+
+    .floor-tile {
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    /* NO Zone - Pink/Red Tiles */
+    .floor-zone.no .floor-tile {
+      background: linear-gradient(135deg, rgba(255, 0, 128, 0.4), rgba(200, 0, 100, 0.3));
+      box-shadow: inset 0 0 10px rgba(255, 0, 128, 0.2);
+    }
+
+    .floor-zone.no .floor-tile:nth-child(odd) {
+      background: linear-gradient(135deg, rgba(255, 0, 128, 0.5), rgba(220, 0, 110, 0.4));
+    }
+
+    /* YES Zone - Cyan/Blue Tiles */
+    .floor-zone.yes .floor-tile {
+      background: linear-gradient(135deg, rgba(0, 245, 255, 0.4), rgba(0, 200, 220, 0.3));
+      box-shadow: inset 0 0 10px rgba(0, 245, 255, 0.2);
+    }
+
+    .floor-zone.yes .floor-tile:nth-child(odd) {
+      background: linear-gradient(135deg, rgba(0, 245, 255, 0.5), rgba(0, 180, 200, 0.4));
+    }
+
+    /* Glow effect on tiles */
+    .floor-zone.no .floor-tile:hover,
+    .floor-zone.no.hovering .floor-tile {
+      box-shadow: 0 0 15px rgba(255, 0, 128, 0.6), inset 0 0 10px rgba(255, 0, 128, 0.3);
+    }
+
+    .floor-zone.yes .floor-tile:hover,
+    .floor-zone.yes.hovering .floor-tile {
+      box-shadow: 0 0 15px rgba(0, 245, 255, 0.6), inset 0 0 10px rgba(0, 245, 255, 0.3);
+    }
+
+    /* Zone Labels - Top Center for Horizontal Split */
+    .zone-label {
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      transform: translateX(-50%);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px currentColor;
+      z-index: 10;
+      opacity: 0.8;
+    }
+
+    .floor-zone.no .zone-label {
+      color: var(--neon-pink);
+    }
+
+    .floor-zone.yes .zone-label {
+      color: var(--neon-cyan);
+    }
+
+    /* Team Score Display - Bottom Center */
+    .floor-score {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      font-size: 24px;
+      font-weight: 800;
+      opacity: 0.5;
+      z-index: 1;
+    }
+
+    .floor-zone.no .floor-score {
+      color: var(--neon-pink);
+    }
+
+    .floor-zone.yes .floor-score {
+      color: var(--neon-cyan);
+    }
+
+    /* Crowd Container - PARTY SPREAD! Villagers fill the zone */
+    .crowd-area {
+      position: absolute;
+      top: 35px; /* Space for label */
+      left: 8px;
+      right: 8px;
+      bottom: 45px; /* Space for score */
+      z-index: 10;
+      overflow: visible; /* Let speech bubbles overflow */
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       VILLAGERS — With Speech Bubbles Above Heads (Miiverse Style)
+    ═══════════════════════════════════════════════════════════════ */
+    .villager {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: villager-dance 0.9375s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      position: relative;
+    }
+
+    /* Speech Bubble Above Head */
+    .villager-speech {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+      opacity: 0;
+      animation: speech-pop 4s ease-in-out infinite;
+      animation-delay: var(--speech-delay, 0s);
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .villager-speech::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: rgba(255, 255, 255, 0.95);
+    }
+
+    @keyframes speech-pop {
+      0%, 70%, 100% { opacity: 0; transform: translateX(-50%) translateY(5px) scale(0.8); }
+      10%, 60% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    /* Player Speech Bubble — Miiverse Style */
+    .player-speech {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 10px;
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #fff, #f8f8ff);
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+      opacity: 0;
+      z-index: 150;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.1);
+      pointer-events: none;
+      transition: all 0.3s var(--bounce);
+    }
+
+    .player-speech::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: #fff;
+    }
+
+    .player-speech.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+      animation: speech-bounce 0.4s var(--bounce);
+    }
+
+    @keyframes speech-bounce {
+      0% { transform: translateX(-50%) translateY(10px) scale(0.5); }
+      50% { transform: translateX(-50%) translateY(-3px) scale(1.05); }
+      100% { transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    @keyframes villager-dance {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      25% { transform: translateY(-6px) rotate(0deg); }
+      50% { transform: translateY(0) rotate(2deg); }
+      75% { transform: translateY(-4px) rotate(0deg); }
+    }
+
+    .villager-head {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      position: relative;
+      background: var(--skin, #ffd5b8);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+    }
+
+    /* Telegram Photo Avatar */
+    .villager-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      border: 3px solid var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan), 0 4px 8px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .villager:hover .villager-photo {
+      transform: scale(1.1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PLAYER PHOTO HEAD + STICK BODY — Like villagers but with your photo
+    ═══════════════════════════════════════════════════════════════ */
+    .player-photo-head {
+      border-color: var(--neon-gold) !important;
+      box-shadow: 0 0 15px var(--neon-gold), 0 4px 12px rgba(0,0,0,0.5) !important;
+    }
+
+    .player-stick-body {
+      --body-color: #fff;
+    }
+
+    /* Team colors for player */
+    .player.team-yes .player-photo-head {
+      border-color: var(--neon-cyan) !important;
+      box-shadow: 0 0 20px var(--neon-cyan), 0 4px 12px rgba(0,0,0,0.5) !important;
+    }
+
+    .player.team-yes .player-stick-body {
+      --body-color: var(--neon-cyan);
+    }
+
+    .player.team-no .player-photo-head {
+      border-color: var(--neon-pink) !important;
+      box-shadow: 0 0 20px var(--neon-pink), 0 4px 12px rgba(0,0,0,0.5) !important;
+    }
+
+    .player.team-no .player-stick-body {
+      --body-color: var(--neon-pink);
+    }
+
+    /* Player dancing when on team */
+    .player.team-yes .villager-avatar,
+    .player.team-no .villager-avatar {
+      animation: habbo-bounce 0.46875s ease-in-out infinite;
+    }
+
+    .player.team-yes .stick-arm.left,
+    .player.team-no .stick-arm.left {
+      animation: arms-pump-left 0.46875s ease-in-out infinite;
+    }
+
+    .player.team-yes .stick-arm.right,
+    .player.team-no .stick-arm.right {
+      animation: arms-pump-right 0.46875s ease-in-out infinite;
+    }
+
+    .player.team-yes .stick-leg.left,
+    .player.team-no .stick-leg.left {
+      animation: legs-march-left 0.46875s ease-in-out infinite;
+    }
+
+    .player.team-yes .stick-leg.right,
+    .player.team-no .stick-leg.right {
+      animation: legs-march-right 0.46875s ease-in-out infinite;
+    }
+
+    /* At door - no dancing, standing still */
+    .player.at-door .villager-avatar,
+    .player.at-door .stick-arm,
+    .player.at-door .stick-leg {
+      animation: none !important;
+    }
+
+    /* GET ON DOWN! James Brown funk when player commits to a side */
+    .player.team-yes .villager-avatar,
+    .player.team-no .villager-avatar {
+      animation: james-brown-head 0.3s ease-in-out infinite;
+    }
+
+    .player.team-yes .stick-arm.left,
+    .player.team-no .stick-arm.left {
+      animation: james-brown-arm-left 0.3s ease-in-out infinite !important;
+    }
+
+    .player.team-yes .stick-arm.right,
+    .player.team-no .stick-arm.right {
+      animation: james-brown-arm-right 0.3s ease-in-out infinite !important;
+    }
+
+    .player.team-yes .stick-leg.left,
+    .player.team-no .stick-leg.left {
+      animation: james-brown-leg-left 0.15s ease-in-out infinite !important;
+    }
+
+    .player.team-yes .stick-leg.right,
+    .player.team-no .stick-leg.right {
+      animation: james-brown-leg-right 0.15s ease-in-out infinite !important;
+    }
+
+    @keyframes james-brown-head {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      25% { transform: translateY(-3px) rotate(3deg); }
+      50% { transform: translateY(0) rotate(-3deg); }
+      75% { transform: translateY(-3px) rotate(3deg); }
+    }
+
+    @keyframes james-brown-arm-left {
+      0%, 100% { transform: rotate(-70deg) translateY(0); }
+      50% { transform: rotate(-30deg) translateY(-2px); }
+    }
+
+    @keyframes james-brown-arm-right {
+      0%, 100% { transform: rotate(30deg) translateY(-2px); }
+      50% { transform: rotate(70deg) translateY(0); }
+    }
+
+    @keyframes james-brown-leg-left {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-10deg); }
+    }
+
+    @keyframes james-brown-leg-right {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(20deg); }
+    }
+
+    .villager-hair {
+      position: absolute;
+      top: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 12px;
+      border-radius: 12px 12px 0 0;
+      background: var(--hair, #4a3728);
+    }
+
+    .villager-hair.spiky {
+      width: 30px;
+      height: 10px;
+      top: -5px;
+      clip-path: polygon(10% 100%, 0% 40%, 15% 100%, 25% 20%, 35% 100%, 50% 0%, 65% 100%, 75% 20%, 85% 100%, 100% 40%, 90% 100%);
+      border-radius: 0;
+    }
+
+    .villager-eyes {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 5px;
+    }
+
+    .villager-eye {
+      width: 4px;
+      height: 5px;
+      background: #1a1a1a;
+      border-radius: 50%;
+    }
+
+    .villager-body {
+      width: 26px;
+      height: 20px;
+      background: var(--shirt, #fff);
+      border-radius: 6px 6px 4px 4px;
+      margin-top: -4px;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+
+    .villager-feet {
+      display: flex;
+      gap: 3px;
+      margin-top: -2px;
+    }
+
+    .villager-foot {
+      width: 8px;
+      height: 5px;
+      background: #333;
+      border-radius: 2px;
+    }
+
+    .villager-name {
+      font-size: 7px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      margin-top: 3px;
+      text-align: center;
+      max-width: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Center Stage removed - player now directly on floor */
+    .zone-label-old {
+      position: absolute;
+      top: 16px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      text-shadow: 0 0 20px currentColor;
+    }
+
+    .zone.no .zone-label { left: 20px; color: var(--neon-pink); }
+    .zone.yes .zone-label { right: 20px; color: var(--neon-cyan); }
+
+    /* Center Divider — Neon Line */
+    .floor-divider {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 120px;
+      width: 2px;
+      background: linear-gradient(180deg,
+        transparent,
+        var(--neon-purple) 20%,
+        var(--neon-purple) 80%,
+        transparent
+      );
+      transform: translateX(-50%);
+      box-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
+      z-index: 2;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GRUNGY TECHNO FILTER — Underground Club Vibes
+    ═══════════════════════════════════════════════════════════════ */
+    .grunge-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0.6;
+    }
+
+    /* Film Grain — Animated Noise Texture */
+    .grunge-grain {
+      position: absolute;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.02;
+      animation: grain-shift 0.5s steps(10) infinite;
+      mix-blend-mode: overlay;
+    }
+
+    @keyframes grain-shift {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-2%, -2%); }
+      20% { transform: translate(2%, 2%); }
+      30% { transform: translate(-1%, 3%); }
+      40% { transform: translate(3%, -1%); }
+      50% { transform: translate(-3%, 1%); }
+      60% { transform: translate(1%, -3%); }
+      70% { transform: translate(-2%, 2%); }
+      80% { transform: translate(2%, -2%); }
+      90% { transform: translate(-1%, -1%); }
+    }
+
+    /* CRT Scanlines — VHS Techno Aesthetic */
+    .grunge-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.08) 3px,
+        rgba(0, 0, 0, 0.08) 6px
+      );
+      opacity: 0.25;
+    }
+
+    /* Vignette — Subtle Dark Edges */
+    .grunge-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(0, 0, 0, 0.15) 80%,
+        rgba(0, 0, 0, 0.3) 100%
+      );
+    }
+
+    /* Color Grade — Very Subtle Purple Hint */
+    .grunge-color-grade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(138, 43, 226, 0.03) 0%,
+        rgba(75, 0, 130, 0.04) 50%,
+        rgba(255, 0, 128, 0.02) 100%
+      );
+      mix-blend-mode: color;
+    }
+
+    /* Chromatic Aberration — RGB Split */
+    .grunge-aberration {
+      position: absolute;
+      inset: 0;
+      opacity: 0.4;
+    }
+
+    .grunge-aberration::before,
+    .grunge-aberration::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+    }
+
+    .grunge-aberration::before {
+      box-shadow: -1px 0 0 rgba(255, 0, 0, 0.15);
+    }
+
+    .grunge-aberration::after {
+      box-shadow: 1px 0 0 rgba(0, 255, 255, 0.15);
+    }
+
+    /* Subtle Flicker — Barely Perceptible */
+    .grunge-flicker {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.01);
+      animation: flicker 6s ease-in-out infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 0.01; }
+      95% { opacity: 0; }
+      96% { opacity: 0.015; }
+      97% { opacity: 0; }
+    }
+
+    /* Glow Bloom — Dreamy Haze */
+    .grunge-bloom {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(0.3px);
+      -webkit-backdrop-filter: blur(0.3px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ARENA STAGE LIGHTS — Epic Club Experience (FULLSCREEN!)
+    ═══════════════════════════════════════════════════════════════ */
+    .arena-stage-lights {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Only show when arena is active */
+    .arena-screen.active .arena-stage-lights {
+      opacity: 1;
+    }
+
+    /* Moving Stage Spotlights */
+    .arena-spotlight {
+      position: absolute;
+      top: -20%;
+      width: 250px;
+      height: 160%;
+      transform-origin: 50% 0%;
+      mix-blend-mode: screen;
+    }
+
+    .arena-spotlight::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);
+      filter: blur(3px);
+      background: inherit;
+    }
+
+    /* Left Cyan Spotlight */
+    .arena-spotlight.left-1 {
+      left: -5%;
+      background: linear-gradient(180deg,
+        rgba(0, 245, 255, 1) 0%,
+        rgba(0, 245, 255, 0.5) 30%,
+        rgba(0, 245, 255, 0.1) 70%,
+        transparent 100%
+      );
+      animation: arena-spot-left 4s ease-in-out infinite;
+      opacity: 0.5;
+    }
+
+    .arena-spotlight.left-2 {
+      left: 10%;
+      background: linear-gradient(180deg,
+        rgba(0, 200, 255, 0.9) 0%,
+        rgba(0, 200, 255, 0.4) 30%,
+        rgba(0, 200, 255, 0.1) 70%,
+        transparent 100%
+      );
+      animation: arena-spot-left 5s ease-in-out infinite;
+      animation-delay: -1.5s;
+      opacity: 0.35;
+      width: 180px;
+    }
+
+    /* Right Pink Spotlight */
+    .arena-spotlight.right-1 {
+      right: -5%;
+      left: auto;
+      background: linear-gradient(180deg,
+        rgba(255, 0, 128, 1) 0%,
+        rgba(255, 0, 128, 0.5) 30%,
+        rgba(255, 0, 128, 0.1) 70%,
+        transparent 100%
+      );
+      animation: arena-spot-right 4.5s ease-in-out infinite;
+      animation-delay: -2s;
+      opacity: 0.5;
+    }
+
+    .arena-spotlight.right-2 {
+      right: 10%;
+      left: auto;
+      background: linear-gradient(180deg,
+        rgba(255, 50, 150, 0.9) 0%,
+        rgba(255, 50, 150, 0.4) 30%,
+        rgba(255, 50, 150, 0.1) 70%,
+        transparent 100%
+      );
+      animation: arena-spot-right 5.5s ease-in-out infinite;
+      animation-delay: -0.5s;
+      opacity: 0.35;
+      width: 180px;
+    }
+
+    /* Center Purple Spotlight */
+    .arena-spotlight.center {
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg,
+        rgba(191, 0, 255, 1) 0%,
+        rgba(191, 0, 255, 0.4) 30%,
+        rgba(191, 0, 255, 0.1) 70%,
+        transparent 100%
+      );
+      animation: arena-spot-center 6s ease-in-out infinite;
+      opacity: 0.3;
+      width: 200px;
+    }
+
+    /* Gold VIP Spotlight */
+    .arena-spotlight.gold {
+      left: 35%;
+      background: linear-gradient(180deg,
+        rgba(255, 215, 0, 0.8) 0%,
+        rgba(255, 180, 0, 0.3) 40%,
+        transparent 100%
+      );
+      animation: arena-spot-gold 7s ease-in-out infinite;
+      animation-delay: -3s;
+      opacity: 0.25;
+      width: 150px;
+    }
+
+    @keyframes arena-spot-left {
+      0%, 100% { transform: rotate(-30deg); opacity: 0.4; }
+      50% { transform: rotate(20deg); opacity: 0.6; }
+    }
+
+    @keyframes arena-spot-right {
+      0%, 100% { transform: rotate(30deg); opacity: 0.4; }
+      50% { transform: rotate(-20deg); opacity: 0.6; }
+    }
+
+    @keyframes arena-spot-center {
+      0%, 100% { transform: translateX(-50%) rotate(-10deg); opacity: 0.25; }
+      50% { transform: translateX(-50%) rotate(10deg); opacity: 0.4; }
+    }
+
+    @keyframes arena-spot-gold {
+      0%, 100% { transform: rotate(-15deg); opacity: 0.2; }
+      30% { transform: rotate(25deg); opacity: 0.35; }
+      70% { transform: rotate(-5deg); opacity: 0.25; }
+    }
+
+    /* Laser Beams — Thin Sharp Lines */
+    .arena-laser {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: 120%;
+      transform-origin: 50% 0%;
+      opacity: 0.6;
+    }
+
+    .arena-laser::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      filter: blur(1px);
+    }
+
+    .arena-laser.cyan-1 {
+      left: 20%;
+      background: linear-gradient(180deg, var(--neon-cyan), transparent 80%);
+      box-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+      animation: laser-sweep-1 3s ease-in-out infinite;
+    }
+
+    .arena-laser.cyan-2 {
+      left: 30%;
+      background: linear-gradient(180deg, var(--neon-cyan), transparent 70%);
+      box-shadow: 0 0 6px var(--neon-cyan);
+      animation: laser-sweep-1 3.5s ease-in-out infinite;
+      animation-delay: -1s;
+      opacity: 0.4;
+    }
+
+    .arena-laser.pink-1 {
+      right: 20%;
+      left: auto;
+      background: linear-gradient(180deg, var(--neon-pink), transparent 80%);
+      box-shadow: 0 0 8px var(--neon-pink), 0 0 20px var(--neon-pink);
+      animation: laser-sweep-2 3.2s ease-in-out infinite;
+    }
+
+    .arena-laser.pink-2 {
+      right: 30%;
+      left: auto;
+      background: linear-gradient(180deg, var(--neon-pink), transparent 70%);
+      box-shadow: 0 0 6px var(--neon-pink);
+      animation: laser-sweep-2 4s ease-in-out infinite;
+      animation-delay: -1.5s;
+      opacity: 0.4;
+    }
+
+    .arena-laser.purple {
+      left: 50%;
+      background: linear-gradient(180deg, var(--neon-purple), transparent 60%);
+      box-shadow: 0 0 10px var(--neon-purple);
+      animation: laser-sweep-3 5s ease-in-out infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes laser-sweep-1 {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(15deg); }
+    }
+
+    @keyframes laser-sweep-2 {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-15deg); }
+    }
+
+    @keyframes laser-sweep-3 {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
+    }
+
+    /* Strobe Flash Effect */
+    .arena-strobe {
+      position: absolute;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      animation: strobe-flash 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes strobe-flash {
+      0%, 100% { opacity: 0; }
+      49% { opacity: 0; }
+      49.5% { opacity: 0.03; }
+      50% { opacity: 0; }
+      50.5% { opacity: 0.02; }
+      51% { opacity: 0; }
+      89% { opacity: 0; }
+      89.5% { opacity: 0.04; }
+      90% { opacity: 0; }
+    }
+
+    /* Disco Ball Light Scatter */
+    .arena-disco-scatter {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .scatter-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0;
+      animation: scatter-float 5s ease-in-out infinite;
+      box-shadow: 0 0 10px white, 0 0 20px rgba(255,255,255,0.5);
+    }
+
+    .scatter-dot:nth-child(1) { left: 15%; top: 25%; animation-delay: 0s; }
+    .scatter-dot:nth-child(2) { left: 35%; top: 40%; animation-delay: -0.7s; }
+    .scatter-dot:nth-child(3) { left: 55%; top: 20%; animation-delay: -1.4s; }
+    .scatter-dot:nth-child(4) { left: 75%; top: 50%; animation-delay: -2.1s; }
+    .scatter-dot:nth-child(5) { left: 25%; top: 60%; animation-delay: -2.8s; }
+    .scatter-dot:nth-child(6) { left: 65%; top: 70%; animation-delay: -3.5s; }
+    .scatter-dot:nth-child(7) { left: 85%; top: 35%; animation-delay: -4.2s; }
+    .scatter-dot:nth-child(8) { left: 45%; top: 55%; animation-delay: -4.9s; }
+    .scatter-dot:nth-child(9) { left: 10%; top: 45%; animation-delay: -1.1s; }
+    .scatter-dot:nth-child(10) { left: 90%; top: 65%; animation-delay: -2.5s; }
+
+    @keyframes scatter-float {
+      0%, 100% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.5);
+      }
+      15% {
+        opacity: 0.9;
+        transform: translate(15px, -20px) scale(1.2);
+      }
+      30% {
+        opacity: 0.5;
+        transform: translate(30px, -10px) scale(0.8);
+      }
+      50% {
+        opacity: 0.8;
+        transform: translate(20px, 15px) scale(1);
+      }
+      70% {
+        opacity: 0.4;
+        transform: translate(5px, 10px) scale(0.7);
+      }
+      85% {
+        opacity: 0.6;
+        transform: translate(-5px, -5px) scale(0.9);
+      }
+    }
+
+    /* Atmospheric Haze in Arena */
+    .arena-haze {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(0, 245, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 20%, rgba(255, 0, 128, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(191, 0, 255, 0.06) 0%, transparent 60%);
+      animation: haze-shift 10s ease-in-out infinite;
+    }
+
+    @keyframes haze-shift {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CENTER STAGE — Where the player stands before choosing
+    ═══════════════════════════════════════════════════════════════ */
+    .center-stage {
+      position: absolute;
+      left: 50%;
+      bottom: 100px;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 60px;
+      z-index: 45;
+    }
+
+    .stage-platform {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 14px;
+      background: linear-gradient(180deg,
+        rgba(255, 215, 0, 0.4),
+        rgba(191, 0, 255, 0.3)
+      );
+      border-radius: 50%;
+      box-shadow:
+        0 0 20px rgba(255, 215, 0, 0.5),
+        0 0 40px rgba(191, 0, 255, 0.3),
+        inset 0 2px 0 rgba(255,255,255,0.3);
+      animation: stage-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes stage-pulse {
+      0%, 100% {
+        box-shadow:
+          0 0 20px rgba(255, 215, 0, 0.5),
+          0 0 40px rgba(191, 0, 255, 0.3);
+      }
+      50% {
+        box-shadow:
+          0 0 30px rgba(255, 215, 0, 0.7),
+          0 0 60px rgba(191, 0, 255, 0.5);
+      }
+    }
+
+    .stage-glow {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 50px;
+      background: radial-gradient(ellipse,
+        rgba(255, 215, 0, 0.4),
+        rgba(191, 0, 255, 0.2) 50%,
+        transparent 70%
+      );
+      pointer-events: none;
+      animation: glow-breathe 3s ease-in-out infinite;
+    }
+
+    @keyframes glow-breathe {
+      0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+    }
+
+    .stage-label {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--neon-gold);
+      white-space: nowrap;
+      text-shadow: 0 0 10px var(--neon-gold);
+      animation: label-blink 2s ease-in-out infinite;
+    }
+
+    @keyframes label-blink {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LASER SHOW — Pure CSS, GPU-accelerated
+    ═══════════════════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════════
+       FESTIVAL LASER SHOW — Techno Energy
+    ═══════════════════════════════════════════════════════════════ */
+    .laser-show {
+      position: absolute;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .laser-beam {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 3px;
+      height: 400px;
+      transform-origin: 50% 0%;
+      opacity: 0.5;
+      will-change: transform;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FESTIVAL TOTEMS — Side Energy Pillars
+    ═══════════════════════════════════════════════════════════════ */
+    .festival-totem {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 120px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    .festival-totem.left {
+      left: 4px;
+      background: linear-gradient(180deg, var(--neon-pink), transparent);
+      box-shadow: 0 0 20px var(--neon-pink);
+      animation: totem-pulse-pink 2s ease-in-out infinite;
+    }
+
+    .festival-totem.right {
+      right: 4px;
+      background: linear-gradient(180deg, var(--neon-cyan), transparent);
+      box-shadow: 0 0 20px var(--neon-cyan);
+      animation: totem-pulse-cyan 2s ease-in-out infinite;
+      animation-delay: -1s;
+    }
+
+    .totem-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      animation: totem-glow-pulse 1s ease-in-out infinite;
+    }
+
+    .festival-totem.left .totem-glow {
+      background: radial-gradient(circle, var(--neon-pink), transparent 70%);
+    }
+
+    .festival-totem.right .totem-glow {
+      background: radial-gradient(circle, var(--neon-cyan), transparent 70%);
+    }
+
+    @keyframes totem-pulse-pink {
+      0%, 100% { box-shadow: 0 0 15px var(--neon-pink); }
+      50% { box-shadow: 0 0 30px var(--neon-pink), 0 0 50px var(--neon-pink); }
+    }
+
+    @keyframes totem-pulse-cyan {
+      0%, 100% { box-shadow: 0 0 15px var(--neon-cyan); }
+      50% { box-shadow: 0 0 30px var(--neon-cyan), 0 0 50px var(--neon-cyan); }
+    }
+
+    @keyframes totem-glow-pulse {
+      0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.3); }
+    }
+
+    .laser-beam.cyan {
+      background: linear-gradient(to top, var(--neon-cyan), transparent 90%);
+      box-shadow: 0 0 8px var(--neon-cyan), 0 0 15px var(--neon-cyan);
+      animation: laser-sweep-right 4s ease-in-out infinite;
+    }
+
+    .laser-beam.pink {
+      background: linear-gradient(to top, var(--neon-pink), transparent 90%);
+      box-shadow: 0 0 8px var(--neon-pink), 0 0 15px var(--neon-pink);
+      animation: laser-sweep-left 4.5s ease-in-out infinite;
+    }
+
+    .laser-beam.purple {
+      background: linear-gradient(to top, var(--neon-purple), transparent 90%);
+      box-shadow: 0 0 8px var(--neon-purple), 0 0 15px var(--neon-purple);
+      animation: laser-sweep-right 5s ease-in-out infinite;
+      animation-delay: -1s;
+    }
+
+    .laser-beam.gold {
+      background: linear-gradient(to top, var(--neon-gold), transparent 90%);
+      box-shadow: 0 0 8px var(--neon-gold), 0 0 15px var(--neon-gold);
+      animation: laser-sweep-left 3.5s ease-in-out infinite;
+      animation-delay: -0.5s;
+    }
+
+    @keyframes laser-sweep-right {
+      0%, 100% { transform: translateX(-50%) rotate(-45deg); opacity: 0.3; }
+      50% { transform: translateX(-50%) rotate(45deg); opacity: 0.6; }
+    }
+
+    @keyframes laser-sweep-left {
+      0%, 100% { transform: translateX(-50%) rotate(40deg); opacity: 0.4; }
+      50% { transform: translateX(-50%) rotate(-40deg); opacity: 0.6; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ANIMAL CROSSING STYLE VILLAGERS
+    ═══════════════════════════════════════════════════════════════ */
+    .crowd-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .villager {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      transition: filter 0.3s ease;
+      pointer-events: auto;
+      left: var(--pos-x, 50%);
+      top: var(--pos-y, 50%);
+      transform: translate(-50%, -50%) scale(var(--scale, 1));
+    }
+
+    .villager:hover {
+      filter: drop-shadow(0 0 12px var(--glow-color, rgba(255,255,255,0.5)));
+    }
+
+    .zone.yes .villager { --glow-color: var(--neon-cyan); }
+    .zone.no .villager { --glow-color: var(--neon-pink); }
+
+    /* Villager Avatar Container */
+    .villager-avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Stick Figure Body */
+    .stick-body {
+      position: relative;
+      width: 24px;
+      height: 32px;
+      margin-top: -4px;
+    }
+
+    .stick-torso {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 3px;
+      height: 16px;
+      background: var(--body-color, #fff);
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+
+    .stick-arm {
+      position: absolute;
+      top: 2px;
+      width: 3px;
+      height: 14px;
+      background: var(--body-color, #fff);
+      border-radius: 2px;
+      transform-origin: top center;
+    }
+
+    .stick-arm.left {
+      left: 2px;
+      animation: arm-wave-left var(--dance-speed, 0.9s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .stick-arm.right {
+      right: 2px;
+      animation: arm-wave-right var(--dance-speed, 0.9s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .stick-leg {
+      position: absolute;
+      top: 14px;
+      width: 3px;
+      height: 16px;
+      background: var(--body-color, #fff);
+      border-radius: 2px;
+      transform-origin: top center;
+    }
+
+    .stick-leg.left {
+      left: 6px;
+      animation: leg-kick-left var(--dance-speed, 0.9s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .stick-leg.right {
+      right: 6px;
+      animation: leg-kick-right var(--dance-speed, 0.9s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       HABBO HOTEL / ANIMAL CROSSING DANCE STYLES — Nintendo Magic!
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Dance 1 - The Habbo Bounce (classic up-down) */
+    .villager.dance-1 .villager-avatar {
+      animation: habbo-bounce var(--dance-speed, 0.8s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-1 .stick-arm.left { animation: arms-pump-left var(--dance-speed, 0.8s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-1 .stick-arm.right { animation: arms-pump-right var(--dance-speed, 0.8s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-1 .stick-leg.left { animation: legs-march-left var(--dance-speed, 0.8s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-1 .stick-leg.right { animation: legs-march-right var(--dance-speed, 0.8s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+
+    /* Dance 2 - The Side Step (Habbo classic) */
+    .villager.dance-2 .villager-avatar {
+      animation: habbo-sidestep var(--dance-speed, 0.9s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-2 .stick-arm { animation: arms-swing var(--dance-speed, 0.9s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-2 .stick-leg.left { animation: legs-step-left var(--dance-speed, 0.9s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-2 .stick-leg.right { animation: legs-step-right var(--dance-speed, 0.9s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+
+    /* Dance 3 - The Animal Crossing Wiggle */
+    .villager.dance-3 .villager-avatar {
+      animation: ac-wiggle var(--dance-speed, 0.7s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-3 .stick-arm.left { animation: arms-wave-happy-left var(--dance-speed, 0.7s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-3 .stick-arm.right { animation: arms-wave-happy-right var(--dance-speed, 0.7s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+
+    /* Dance 4 - The Jump & Pump */
+    .villager.dance-4 .villager-avatar {
+      animation: jump-pump var(--dance-speed, 1s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-4 .stick-arm { animation: arms-up var(--dance-speed, 1s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-4 .stick-leg { animation: legs-squat var(--dance-speed, 1s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+
+    /* Dance 5 - The Twist (Habbo disco) */
+    .villager.dance-5 .villager-avatar {
+      animation: disco-twist var(--dance-speed, 0.6s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-5 .stick-arm.left { animation: disco-point-left var(--dance-speed, 0.6s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-5 .stick-arm.right { animation: disco-point-right var(--dance-speed, 0.6s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+
+    /* Dance 6 - The Head Bob (chill vibes) */
+    .villager.dance-6 .villager-avatar {
+      animation: chill-bob var(--dance-speed, 1.2s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-6 .stick-arm { animation: arms-chill var(--dance-speed, 1.2s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+
+    /* Dance 7 - The Running Man */
+    .villager.dance-7 .villager-avatar {
+      animation: running-man var(--dance-speed, 0.5s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-7 .stick-arm.left { animation: run-arm-left var(--dance-speed, 0.5s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-7 .stick-arm.right { animation: run-arm-right var(--dance-speed, 0.5s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-7 .stick-leg.left { animation: run-leg-left var(--dance-speed, 0.5s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-7 .stick-leg.right { animation: run-leg-right var(--dance-speed, 0.5s) ease-in-out infinite; animation-delay: var(--delay, 0s); }
+
+    /* Dance 8 - The Robot */
+    .villager.dance-8 .villager-avatar {
+      animation: robot var(--dance-speed, 0.8s) steps(4) infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    .villager.dance-8 .stick-arm { animation: robot-arms var(--dance-speed, 0.8s) steps(4) infinite; animation-delay: var(--delay, 0s); }
+    .villager.dance-8 .stick-leg { animation: robot-legs var(--dance-speed, 0.8s) steps(4) infinite; animation-delay: var(--delay, 0s); }
+
+    /* ═══ BODY ANIMATIONS ═══ */
+    @keyframes habbo-bounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.02); }
+    }
+
+    @keyframes habbo-sidestep {
+      0%, 100% { transform: translateX(-4px) rotate(-2deg); }
+      50% { transform: translateX(4px) rotate(2deg); }
+    }
+
+    @keyframes ac-wiggle {
+      0%, 100% { transform: rotate(-8deg) translateY(0); }
+      25% { transform: rotate(0deg) translateY(-3px); }
+      50% { transform: rotate(8deg) translateY(0); }
+      75% { transform: rotate(0deg) translateY(-3px); }
+    }
+
+    @keyframes jump-pump {
+      0%, 100% { transform: translateY(0) scaleY(1); }
+      20% { transform: translateY(3px) scaleY(0.9); }
+      40% { transform: translateY(-15px) scaleY(1.1); }
+      60% { transform: translateY(0) scaleY(0.95); }
+      80% { transform: translateY(-5px) scaleY(1.02); }
+    }
+
+    @keyframes disco-twist {
+      0%, 100% { transform: rotate(-10deg) translateX(-2px); }
+      50% { transform: rotate(10deg) translateX(2px); }
+    }
+
+    @keyframes chill-bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-2px) rotate(-1deg); }
+      75% { transform: translateY(-2px) rotate(1deg); }
+    }
+
+    @keyframes running-man {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-4px) translateX(-2px); }
+      50% { transform: translateY(0) translateX(0); }
+      75% { transform: translateY(-4px) translateX(2px); }
+    }
+
+    @keyframes robot {
+      0% { transform: translateX(-3px) rotate(-5deg); }
+      25% { transform: translateX(0) rotate(0deg); }
+      50% { transform: translateX(3px) rotate(5deg); }
+      75% { transform: translateX(0) rotate(0deg); }
+    }
+
+    /* ═══ ARM ANIMATIONS ═══ */
+    @keyframes arms-pump-left {
+      0%, 100% { transform: rotate(-60deg); }
+      50% { transform: rotate(-20deg); }
+    }
+    @keyframes arms-pump-right {
+      0%, 100% { transform: rotate(60deg); }
+      50% { transform: rotate(20deg); }
+    }
+    @keyframes arms-swing {
+      0%, 100% { transform: rotate(-30deg); }
+      50% { transform: rotate(30deg); }
+    }
+    @keyframes arms-wave-happy-left {
+      0%, 100% { transform: rotate(-70deg); }
+      50% { transform: rotate(-110deg); }
+    }
+    @keyframes arms-wave-happy-right {
+      0%, 100% { transform: rotate(70deg); }
+      50% { transform: rotate(110deg); }
+    }
+    @keyframes arms-up {
+      0%, 60%, 100% { transform: rotate(0deg); }
+      30% { transform: rotate(-120deg); }
+    }
+    @keyframes disco-point-left {
+      0%, 100% { transform: rotate(-120deg); }
+      50% { transform: rotate(-30deg); }
+    }
+    @keyframes disco-point-right {
+      0%, 100% { transform: rotate(30deg); }
+      50% { transform: rotate(120deg); }
+    }
+    @keyframes arms-chill {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(-25deg); }
+    }
+    @keyframes run-arm-left {
+      0%, 100% { transform: rotate(-60deg); }
+      50% { transform: rotate(30deg); }
+    }
+    @keyframes run-arm-right {
+      0%, 100% { transform: rotate(30deg); }
+      50% { transform: rotate(-60deg); }
+    }
+    @keyframes robot-arms {
+      0%, 25% { transform: rotate(-90deg); }
+      50%, 75% { transform: rotate(0deg); }
+    }
+
+    /* ═══ LEG ANIMATIONS ═══ */
+    @keyframes legs-march-left {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-20deg); }
+    }
+    @keyframes legs-march-right {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(20deg); }
+    }
+    @keyframes legs-step-left {
+      0%, 100% { transform: rotate(10deg) translateX(-2px); }
+      50% { transform: rotate(-5deg) translateX(2px); }
+    }
+    @keyframes legs-step-right {
+      0%, 100% { transform: rotate(-5deg) translateX(2px); }
+      50% { transform: rotate(10deg) translateX(-2px); }
+    }
+    @keyframes legs-squat {
+      0%, 60%, 100% { transform: rotate(0deg) scaleY(1); }
+      20% { transform: rotate(5deg) scaleY(0.8); }
+    }
+    @keyframes run-leg-left {
+      0%, 100% { transform: rotate(40deg); }
+      50% { transform: rotate(-30deg); }
+    }
+    @keyframes run-leg-right {
+      0%, 100% { transform: rotate(-30deg); }
+      50% { transform: rotate(40deg); }
+    }
+    @keyframes robot-legs {
+      0%, 25% { transform: rotate(15deg); }
+      50%, 75% { transform: rotate(-15deg); }
+    }
+
+    .villager-head {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      position: relative;
+      background: var(--skin, #ffd5b8);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+
+    /* Hair */
+    .villager-hair {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 14px;
+      border-radius: 14px 14px 0 0;
+      background: var(--hair, #4a3728);
+    }
+
+    .villager-hair.spiky {
+      width: 36px;
+      height: 12px;
+      top: -6px;
+      clip-path: polygon(10% 100%, 0% 40%, 15% 100%, 25% 20%, 35% 100%, 50% 0%, 65% 100%, 75% 20%, 85% 100%, 100% 40%, 90% 100%);
+      border-radius: 0;
+    }
+
+    /* Eyes */
+    .villager-eyes {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+
+    .villager-eye {
+      width: 5px;
+      height: 6px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      position: relative;
+      animation: eye-blink 4s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes eye-blink {
+      0%, 95%, 100% { transform: scaleY(1); }
+      97% { transform: scaleY(0.1); }
+    }
+
+    .villager-eye::after {
+      content: '';
+      position: absolute;
+      top: 1px;
+      right: 0;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      animation: eye-sparkle 2s ease-in-out infinite;
+    }
+
+    @keyframes eye-sparkle {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    /* Team-colored eye glow */
+    .zone.yes .villager-eye {
+      box-shadow: 0 0 4px var(--neon-cyan);
+    }
+
+    .zone.no .villager-eye {
+      box-shadow: 0 0 4px var(--neon-pink);
+    }
+
+    /* Blush */
+    .villager-head::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 4px;
+      width: 6px;
+      height: 3px;
+      background: rgba(255,150,150,0.5);
+      border-radius: 50%;
+      box-shadow: 18px 0 0 rgba(255,150,150,0.5);
+    }
+
+    /* Body */
+    .villager-body {
+      width: 26px;
+      height: 20px;
+      background: var(--shirt, #fff);
+      border-radius: 8px 8px 4px 4px;
+      margin-top: -4px;
+      position: relative;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+
+    /* Arms */
+    .villager-body::before,
+    .villager-body::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      width: 8px;
+      height: 12px;
+      background: var(--shirt, #fff);
+      border-radius: 4px;
+      animation: arm-swing 0.9375s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .villager-body::before {
+      left: -6px;
+      transform-origin: top center;
+    }
+
+    .villager-body::after {
+      right: -6px;
+      transform-origin: top center;
+      animation-delay: calc(var(--delay, 0s) + 0.2s);
+    }
+
+    @keyframes arm-swing {
+      0%, 100% { transform: rotate(-15deg); }
+      50% { transform: rotate(15deg); }
+    }
+
+    /* Feet */
+    .villager-feet {
+      display: flex;
+      gap: 4px;
+      margin-top: -2px;
+    }
+
+    .villager-foot {
+      width: 10px;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+    }
+
+    /* Nametag */
+    .villager-name {
+      font-size: 8px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      text-align: center;
+      max-width: 50px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE PLAYER — You! White Stick Figure at the Door
+    ═══════════════════════════════════════════════════════════════ */
+    .player-container {
+      position: absolute;
+      left: 50%;
+      bottom: 95px; /* At the door - above control deck */
+      transform: translateX(-50%);
+      z-index: 150; /* Above everything including control deck */
+      cursor: grab;
+      touch-action: none;
+      transition: left 0.4s var(--bounce), bottom 0.4s var(--bounce), transform 0.4s var(--bounce);
+    }
+
+    .player-container:active {
+      cursor: grabbing;
+    }
+
+    /* At door - INSIDE the dock circle, BELOW dance floor */
+    .player-container.at-door {
+      left: 50%;
+      bottom: 30px; /* Centered in the dock (dock center is ~65px, player is ~70px tall) */
+      transform: translateX(-50%);
+      z-index: 101; /* Above the dock */
+    }
+
+    .player-container.on-stage {
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+    }
+
+    .player-container.team-yes-pos {
+      left: 75%;
+      bottom: 35%;
+      transform: translateX(-50%) translateY(50%);
+      z-index: 50;
+    }
+
+    .player-container.team-no-pos {
+      left: 25%;
+      bottom: 35%;
+      transform: translateX(-50%) translateY(50%);
+      z-index: 50;
+    }
+
+    .player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.3s var(--bounce);
+    }
+
+    /* Dance only when on a team */
+    .player.team-yes,
+    .player.team-no {
+      animation: player-bounce 0.46875s ease-in-out infinite;
+    }
+
+    @keyframes player-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .player.dragging {
+      animation: none;
+      transform: scale(1.15);
+    }
+
+    .player-head {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #ffe4c4, #dbb896);
+      position: relative;
+      box-shadow: 0 3px 0 #c49b78, 0 6px 15px rgba(0,0,0,0.3);
+    }
+
+    /* Party Hat */
+    .party-hat {
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 28px solid var(--neon-cyan);
+      filter: drop-shadow(0 2px 8px rgba(0, 245, 255, 0.5));
+    }
+
+    .party-hat::before {
+      content: '★';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--neon-gold);
+    }
+
+    .party-hat::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: -8px;
+      width: 16px;
+      height: 3px;
+      background: var(--neon-pink);
+      box-shadow: 0 6px 0 var(--neon-gold), 0 12px 0 var(--neon-pink);
+    }
+
+    .player-eyes {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .player-eye {
+      width: 7px;
+      height: 8px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .player-eye::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      right: 1px;
+      width: 3px;
+      height: 3px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    .player-head::before {
+      content: '';
+      position: absolute;
+      top: 26px;
+      left: 6px;
+      width: 8px;
+      height: 4px;
+      background: rgba(255,150,150,0.5);
+      border-radius: 50%;
+      box-shadow: 24px 0 0 rgba(255,150,150,0.5);
+    }
+
+    .player-head::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 3px;
+      border-bottom: 2px solid #c47070;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .player-body {
+      width: 36px;
+      height: 28px;
+      background: linear-gradient(180deg, #e8e8e8, #c8c8c8);
+      border-radius: 10px 10px 6px 6px;
+      margin-top: -6px;
+      position: relative;
+      box-shadow: 0 2px 0 #999;
+    }
+
+    .player.team-yes .player-body {
+      background: linear-gradient(180deg, var(--neon-cyan), #00c8d8);
+      box-shadow: 0 2px 0 #00a0b0, 0 0 20px rgba(0, 245, 255, 0.4);
+    }
+
+    .player.team-no .player-body {
+      background: linear-gradient(180deg, var(--neon-pink), #d80060);
+      box-shadow: 0 2px 0 #a00050, 0 0 20px rgba(255, 0, 128, 0.4);
+    }
+
+    .player-body::before,
+    .player-body::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      width: 10px;
+      height: 16px;
+      background: inherit;
+      border-radius: 5px;
+      animation: player-arm 0.9375s ease-in-out infinite;
+    }
+
+    .player-body::before {
+      left: -8px;
+      animation-delay: 0s;
+    }
+
+    .player-body::after {
+      right: -8px;
+      animation-delay: 0.2s;
+    }
+
+    @keyframes player-arm {
+      0%, 100% { transform: rotate(-20deg); }
+      50% { transform: rotate(20deg); }
+    }
+
+    .player.dragging .player-body::before,
+    .player.dragging .player-body::after {
+      animation: none;
+      transform: rotate(-45deg);
+    }
+
+    .player-feet {
+      display: flex;
+      gap: 6px;
+      margin-top: -2px;
+    }
+
+    .player-foot {
+      width: 14px;
+      height: 8px;
+      background: #2a2a2a;
+      border-radius: 4px;
+    }
+
+    .player-label {
+      margin-top: 8px;
+      padding: 4px 12px;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FLOATING CHAT MESSAGES
+    ═══════════════════════════════════════════════════════════════ */
+    /* Hidden - replaced by speech bubbles above villager heads */
+    .chat-container {
+      display: none;
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 180px;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 40;
+    }
+
+    .chat-bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px 16px 16px 4px;
+      font-size: 13px;
+      animation: chat-float 4s ease-out forwards;
+      opacity: 0;
+    }
+
+    .chat-bubble.right {
+      align-self: flex-end;
+      border-radius: 16px 16px 4px 16px;
+    }
+
+    @keyframes chat-float {
+      0% { opacity: 0; transform: translateY(20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
+
+    .chat-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--neon-cyan);
+      margin-bottom: 2px;
+    }
+
+    .chat-text {
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CONTROL DECK — Drag-Only Mode
+    ═══════════════════════════════════════════════════════════════ */
+    .control-deck {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 16px calc(20px + var(--safe-bottom));
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.8) 40%);
+      display: flex;
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Player Home Base — Dock circle that surrounds the player */
+    .player-dock {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.05), transparent 70%);
+      border: 3px dashed rgba(255,215,0,0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+      animation: dock-breathe 2s ease-in-out infinite;
+      box-shadow: 0 0 30px rgba(255,215,0,0.1), inset 0 0 20px rgba(255,215,0,0.05);
+    }
+
+    @keyframes dock-breathe {
+      0%, 100% { transform: scale(1); border-color: rgba(255,215,0,0.5); box-shadow: 0 0 30px rgba(255,215,0,0.1); }
+      50% { transform: scale(1.03); border-color: rgba(255,215,0,0.8); box-shadow: 0 0 40px rgba(255,215,0,0.2); }
+    }
+
+    .drag-hint {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255,215,0,0.9);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: hint-pulse 2s ease-in-out infinite;
+      text-shadow: 0 0 10px rgba(255,215,0,0.5);
+    }
+
+    @keyframes hint-pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .player-dock.hidden {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.3s var(--bounce);
+    }
+
+    .player-dock.hidden .drag-hint {
+      display: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TAB BAR — Nightclub Navigation
+    ═══════════════════════════════════════════════════════════════ */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(60px + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: linear-gradient(180deg, rgba(15, 12, 41, 0.95), rgba(10, 8, 30, 0.98));
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0, 245, 255, 0.15);
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      padding-top: 6px;
+      z-index: 200;
+      /* Fading edges for immersive fullscreen feel */
+      -webkit-mask-image: linear-gradient(90deg,
+        transparent 0%,
+        black 8%,
+        black 92%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(90deg,
+        transparent 0%,
+        black 8%,
+        black 92%,
+        transparent 100%
+      );
+    }
+
+    .tab-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), transparent);
+    }
+
+    .tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px 14px;
+      transition: all 0.2s var(--bounce);
+      position: relative;
+    }
+
+    .tab-btn:active {
+      transform: scale(0.92);
+    }
+
+    .tab-btn.active {
+      color: var(--neon-cyan);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    .tab-btn .icon {
+      font-size: 20px;
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+
+    .tab-btn .label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tab-btn.active .label {
+      text-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SLIDE-TO-CONFIRM PANEL — Glassmorphism 2.0
+    ═══════════════════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════════
+       COMPACT CONFIRM PANEL — High-Density 2026 Design
+    ═══════════════════════════════════════════════════════════════ */
+    .slide-confirm-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 430px;
+      margin: 0 auto;
+      background: rgba(15, 12, 41, 0.92);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px 20px 0 0;
+      padding: 12px 16px calc(12px + var(--safe-bottom));
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+      z-index: 500;
+    }
+
+    .slide-confirm-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 40%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .slide-confirm-panel.active {
+      transform: translateY(0);
+    }
+
+    .panel-handle {
+      width: 32px;
+      height: 3px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 2px;
+      margin: 0 auto 10px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-side-badge {
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .panel-side-badge.yes {
+      background: linear-gradient(135deg, var(--neon-cyan), #00c8d8);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+    }
+
+    .panel-side-badge.no {
+      background: linear-gradient(135deg, var(--neon-pink), #d80060);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255, 0, 128, 0.4);
+    }
+
+    .panel-close {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      color: var(--text-secondary);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .panel-close:active {
+      transform: scale(0.9);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .panel-why {
+      display: none; /* Hidden for compact 2026 design - can expand later */
+      margin-bottom: 12px;
+    }
+
+    .panel-why-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .panel-why-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 15px;
+      resize: none;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .panel-why-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .panel-why-input:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.1);
+    }
+
+    /* The Magic: SWIPE UP to Confirm Track — Vertical */
+    .slide-track {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .slide-track-fill {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 0%;
+      border-radius: 50px;
+      transition: height 0.1s ease;
+    }
+
+    .slide-track-fill.yes {
+      background: linear-gradient(0deg, var(--neon-cyan), rgba(0, 245, 255, 0.3));
+    }
+
+    .slide-track-fill.no {
+      background: linear-gradient(0deg, var(--neon-pink), rgba(255, 0, 128, 0.3));
+    }
+
+    .slide-track-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      transition: opacity 0.2s ease;
+    }
+
+    .slide-track-text::before {
+      content: '↑';
+      font-size: 20px;
+      margin-bottom: 4px;
+      animation: bounce-up 1s ease-in-out infinite;
+    }
+
+    @keyframes bounce-up {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .slide-thumb {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      touch-action: none;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+      z-index: 2;
+    }
+
+    .slide-thumb.yes {
+      background: linear-gradient(135deg, var(--neon-cyan), #00c8d8);
+      box-shadow: 0 4px 25px rgba(0, 245, 255, 0.6);
+    }
+
+    .slide-thumb.no {
+      background: linear-gradient(135deg, var(--neon-pink), #d80060);
+      box-shadow: 0 4px 25px rgba(255, 0, 128, 0.6);
+    }
+
+    .slide-thumb:active {
+      cursor: grabbing;
+      transform: translateX(-50%) scale(1.1);
+    }
+
+    .slide-thumb-icon {
+      font-size: 28px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .slide-thumb.yes .slide-thumb-icon { color: #000; }
+    .slide-thumb.no .slide-thumb-icon { color: #fff; }
+
+    .slide-success {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(0deg, var(--neon-cyan), var(--neon-green));
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #000;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.3s var(--bounce);
+    }
+
+    .slide-success.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NINTENDO VICTORY CELEBRATION — Epic Fireworks Overlay!
+    ═══════════════════════════════════════════════════════════════ */
+    .celebration-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 245, 255, 0.1), transparent 60%);
+      pointer-events: none;
+      z-index: 700;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .celebration-overlay.active {
+      opacity: 1;
+      animation: celebration-flash 0.6s ease-out;
+    }
+
+    @keyframes celebration-flash {
+      0% { background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4), transparent 60%); }
+      100% { background: radial-gradient(circle at 50% 50%, rgba(0, 245, 255, 0.1), transparent 60%); }
+    }
+
+    .celebration-text {
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 48px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-gold), var(--neon-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 40px rgba(0, 245, 255, 0.8);
+      opacity: 0;
+    }
+
+    .celebration-overlay.active .celebration-text {
+      animation: celebration-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
+    }
+
+    @keyframes celebration-pop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    }
+
+    .celebration-subtitle {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 2px;
+      opacity: 0;
+    }
+
+    .celebration-overlay.active .celebration-subtitle {
+      animation: fade-in 0.4s ease 0.4s forwards;
+    }
+
+    @keyframes fade-in {
+      to { opacity: 1; }
+    }
+
+    /* Firework Particles */
+    .firework {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      opacity: 0;
+    }
+
+    .celebration-overlay.active .firework {
+      animation: firework-burst 1s ease-out forwards;
+    }
+
+    .firework:nth-child(1) { top: 20%; left: 20%; background: var(--neon-cyan); animation-delay: 0ms; --tx: 50px; --ty: -80px; }
+    .firework:nth-child(2) { top: 20%; left: 20%; background: var(--neon-pink); animation-delay: 50ms; --tx: -40px; --ty: -60px; }
+    .firework:nth-child(3) { top: 20%; left: 20%; background: var(--neon-gold); animation-delay: 100ms; --tx: 30px; --ty: -90px; }
+    .firework:nth-child(4) { top: 20%; left: 80%; background: var(--neon-pink); animation-delay: 150ms; --tx: -50px; --ty: -70px; }
+    .firework:nth-child(5) { top: 20%; left: 80%; background: var(--neon-cyan); animation-delay: 200ms; --tx: 40px; --ty: -85px; }
+    .firework:nth-child(6) { top: 20%; left: 80%; background: #fff; animation-delay: 250ms; --tx: -30px; --ty: -55px; }
+    .firework:nth-child(7) { top: 60%; left: 15%; background: var(--neon-gold); animation-delay: 300ms; --tx: 60px; --ty: -40px; }
+    .firework:nth-child(8) { top: 60%; left: 15%; background: var(--neon-purple); animation-delay: 350ms; --tx: -35px; --ty: -65px; }
+    .firework:nth-child(9) { top: 60%; left: 85%; background: var(--neon-cyan); animation-delay: 200ms; --tx: -55px; --ty: -45px; }
+    .firework:nth-child(10) { top: 60%; left: 85%; background: var(--neon-pink); animation-delay: 250ms; --tx: 45px; --ty: -75px; }
+    .firework:nth-child(11) { top: 40%; left: 50%; background: #fff; animation-delay: 100ms; --tx: 0px; --ty: -100px; }
+    .firework:nth-child(12) { top: 40%; left: 50%; background: var(--neon-gold); animation-delay: 150ms; --tx: -70px; --ty: -50px; }
+
+    @keyframes firework-burst {
+      0% { opacity: 1; transform: translate(0, 0) scale(2); box-shadow: 0 0 20px currentColor; }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); box-shadow: 0 0 40px currentColor; }
+    }
+
+    /* Confetti Rain */
+    .confetti {
+      position: absolute;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      opacity: 0;
+    }
+
+    .celebration-overlay.active .confetti {
+      animation: confetti-fall 1.5s ease-out forwards;
+    }
+
+    .confetti:nth-child(13) { left: 10%; background: var(--neon-cyan); animation-delay: 0ms; --rot: 720deg; }
+    .confetti:nth-child(14) { left: 25%; background: var(--neon-pink); animation-delay: 100ms; --rot: -540deg; }
+    .confetti:nth-child(15) { left: 40%; background: var(--neon-gold); animation-delay: 200ms; --rot: 630deg; }
+    .confetti:nth-child(16) { left: 55%; background: var(--neon-purple); animation-delay: 50ms; --rot: -450deg; }
+    .confetti:nth-child(17) { left: 70%; background: #fff; animation-delay: 150ms; --rot: 810deg; }
+    .confetti:nth-child(18) { left: 85%; background: var(--neon-cyan); animation-delay: 250ms; --rot: -360deg; }
+
+    @keyframes confetti-fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(400px) rotate(var(--rot)); }
+    }
+
+    /* Legacy sparkle-burst for backwards compatibility */
+    .sparkle-burst {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 0;
+      pointer-events: none;
+      z-index: 600;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CHARACTER CUSTOMIZATION MODAL
+    ═══════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 340px;
+      background: var(--bg-mid);
+      border-radius: 24px;
+      padding: 24px;
+      transform: scale(0.9);
+      transition: transform 0.3s var(--bounce);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .customization-preview {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .color-section {
+      margin-bottom: 20px;
+    }
+
+    .color-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .color-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .color-option {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .color-option:active {
+      transform: scale(0.9);
+    }
+
+    .color-option.selected {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan);
+    }
+
+    .modal-close {
+      width: 100%;
+      padding: 14px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      color: var(--text-primary);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+      /* ═══════════════════════════════════════════════════════════════
+       GLOBAL PARTY LIGHTS — Persistent Across All Screens
+       These lights NEVER reset when switching screens!
+    ═══════════════════════════════════════════════════════════════ */
+    .global-party-lights {
+      position: fixed;
+      top: -20%;
+      left: -20%;
+      right: -20%;
+      bottom: -20%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: visible;
+    }
+
+    .global-haze {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(138, 43, 226, 0.1) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 100%, rgba(255, 0, 128, 0.05) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 100%, rgba(0, 245, 255, 0.05) 0%, transparent 50%);
+      animation: haze-drift 20s ease-in-out infinite;
+    }
+
+    @keyframes haze-drift {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* Global Spotlights - extend beyond viewport */
+    .global-spotlight {
+      position: absolute;
+      top: -30%;
+      width: 350px;
+      height: 200%;
+      transform-origin: 50% 0%;
+      mix-blend-mode: screen;
+    }
+
+    .global-spotlight::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+    }
+
+    .global-spotlight.g-cyan { left: 5%; animation: spotlight-sweep-1 8s ease-in-out infinite; }
+    .global-spotlight.g-cyan::before {
+      background: linear-gradient(180deg, rgba(0, 245, 255, 0.5) 0%, rgba(0, 245, 255, 0.1) 40%, transparent 80%);
+    }
+
+    .global-spotlight.g-pink { right: 5%; animation: spotlight-sweep-2 9s ease-in-out infinite; }
+    .global-spotlight.g-pink::before {
+      background: linear-gradient(180deg, rgba(255, 0, 128, 0.5) 0%, rgba(255, 0, 128, 0.1) 40%, transparent 80%);
+    }
+
+    .global-spotlight.g-purple { left: 35%; animation: spotlight-sweep-3 7s ease-in-out infinite; }
+    .global-spotlight.g-purple::before {
+      background: linear-gradient(180deg, rgba(138, 43, 226, 0.4) 0%, rgba(138, 43, 226, 0.1) 40%, transparent 80%);
+    }
+
+    .global-spotlight.g-gold { right: 35%; animation: spotlight-sweep-4 10s ease-in-out infinite; }
+    .global-spotlight.g-gold::before {
+      background: linear-gradient(180deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 215, 0, 0.05) 40%, transparent 80%);
+    }
+
+    @keyframes spotlight-sweep-1 { 0%, 100% { transform: rotate(-25deg); } 50% { transform: rotate(15deg); } }
+    @keyframes spotlight-sweep-2 { 0%, 100% { transform: rotate(25deg); } 50% { transform: rotate(-15deg); } }
+    @keyframes spotlight-sweep-3 { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(20deg); } }
+    @keyframes spotlight-sweep-4 { 0%, 100% { transform: rotate(10deg); } 50% { transform: rotate(-20deg); } }
+
+    /* Global Lasers - sharp beams that extend beyond screen */
+    .global-laser {
+      position: absolute;
+      top: -10%;
+      width: 3px;
+      height: 150%;
+      transform-origin: 50% 0%;
+      mix-blend-mode: screen;
+    }
+
+    .global-laser.gl-cyan-1 { left: 15%; background: linear-gradient(180deg, rgba(0,245,255,0.9), rgba(0,245,255,0.3) 50%, transparent); animation: laser-1 6s ease-in-out infinite; }
+    .global-laser.gl-cyan-2 { left: 25%; background: linear-gradient(180deg, rgba(0,245,255,0.7), rgba(0,245,255,0.2) 50%, transparent); animation: laser-2 7s ease-in-out infinite; }
+    .global-laser.gl-pink-1 { right: 15%; background: linear-gradient(180deg, rgba(255,0,128,0.9), rgba(255,0,128,0.3) 50%, transparent); animation: laser-3 5s ease-in-out infinite; }
+    .global-laser.gl-pink-2 { right: 25%; background: linear-gradient(180deg, rgba(255,0,128,0.7), rgba(255,0,128,0.2) 50%, transparent); animation: laser-4 8s ease-in-out infinite; }
+    .global-laser.gl-purple { left: 50%; background: linear-gradient(180deg, rgba(138,43,226,0.8), rgba(138,43,226,0.2) 50%, transparent); animation: laser-5 9s ease-in-out infinite; }
+
+    @keyframes laser-1 { 0%, 100% { transform: rotate(-35deg); opacity: 0.8; } 50% { transform: rotate(10deg); opacity: 1; } }
+    @keyframes laser-2 { 0%, 100% { transform: rotate(-20deg); opacity: 0.6; } 50% { transform: rotate(25deg); opacity: 0.9; } }
+    @keyframes laser-3 { 0%, 100% { transform: rotate(35deg); opacity: 0.8; } 50% { transform: rotate(-10deg); opacity: 1; } }
+    @keyframes laser-4 { 0%, 100% { transform: rotate(20deg); opacity: 0.6; } 50% { transform: rotate(-25deg); opacity: 0.9; } }
+    @keyframes laser-5 { 0%, 100% { transform: rotate(-5deg); opacity: 0.5; } 50% { transform: rotate(5deg); opacity: 0.8; } }
+
+    /* Disco scatter dots - global */
+    .global-disco-scatter {
+      position: absolute;
+      inset: 0;
+      overflow: visible;
+    }
+
+    .global-disco-dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: white;
+      animation: disco-twinkle 2s ease-in-out infinite;
+    }
+
+    @keyframes disco-twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <!-- GLOBAL PARTY LIGHTS — Always visible, never resets! -->
+  <div class="global-party-lights" id="global-lights">
+    <div class="global-haze"></div>
+    <!-- Spotlights that extend beyond viewport -->
+    <div class="global-spotlight g-cyan"></div>
+    <div class="global-spotlight g-pink"></div>
+    <div class="global-spotlight g-purple"></div>
+    <div class="global-spotlight g-gold"></div>
+    <!-- Sharp laser beams -->
+    <div class="global-laser gl-cyan-1"></div>
+    <div class="global-laser gl-cyan-2"></div>
+    <div class="global-laser gl-pink-1"></div>
+    <div class="global-laser gl-pink-2"></div>
+    <div class="global-laser gl-purple"></div>
+    <!-- Disco scatter -->
+    <div class="global-disco-scatter" id="global-disco"></div>
+  </div>
+
+  <div class="app">
+    <!-- ═══════════════════════════════════════════════════════════════
+         HOME SCREEN
+    ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen home-screen active" id="screen-home">
+      <!-- Party Vibes — Now handled by global lights -->
+      <div class="home-party-vibes" style="display: none;">
+        <!-- Atmospheric Haze -->
+        <div class="home-haze"></div>
+        <!-- Stage Spotlights -->
+        <div class="home-spotlight cyan"></div>
+        <div class="home-spotlight pink"></div>
+        <div class="home-spotlight purple"></div>
+        <div class="home-spotlight gold"></div>
+        <!-- Secondary Spotlights for extra drama -->
+        <div class="home-spotlight cyan-2"></div>
+        <div class="home-spotlight pink-2"></div>
+        <!-- Laser Beams -->
+        <div class="home-laser cyan-1"></div>
+        <div class="home-laser cyan-2"></div>
+        <div class="home-laser pink-1"></div>
+        <div class="home-laser pink-2"></div>
+        <div class="home-laser purple"></div>
+        <!-- Floor Glow -->
+        <div class="home-floor-glow"></div>
+        <!-- Disco Ball Reflections -->
+        <div class="home-disco-dots">
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+          <div class="disco-dot"></div>
+        </div>
+        <!-- Lens Flare -->
+        <div class="home-lens-flare"></div>
+      </div>
+
+      <div class="hero">
+        <img src="/logologo.png" alt="PREDICTION PARTY" class="logo-image">
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="icon">🔥</span>
+          Hot Right Now
+        </h2>
+        <button class="see-all">See all</button>
+      </div>
+
+      <div class="market-grid" id="market-grid">
+        <!-- Markets populated by JS -->
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ARENA SCREEN — The Nightclub
+    ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen arena-screen" id="screen-arena">
+      <!-- Epic Arena Stage Lights -->
+      <div class="arena-stage-lights" style="display: none;">
+        <!-- Now using global-party-lights instead -->
+        <div class="arena-haze"></div>
+        <!-- Wide Spotlights -->
+        <div class="arena-spotlight left-1"></div>
+        <div class="arena-spotlight left-2"></div>
+        <div class="arena-spotlight right-1"></div>
+        <div class="arena-spotlight right-2"></div>
+        <div class="arena-spotlight center"></div>
+        <div class="arena-spotlight gold"></div>
+        <!-- Sharp Laser Beams -->
+        <div class="arena-laser cyan-1"></div>
+        <div class="arena-laser cyan-2"></div>
+        <div class="arena-laser pink-1"></div>
+        <div class="arena-laser pink-2"></div>
+        <div class="arena-laser purple"></div>
+        <!-- Disco Ball Scatter -->
+        <div class="arena-disco-scatter">
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+          <div class="scatter-dot"></div>
+        </div>
+        <!-- Subtle Strobe -->
+        <div class="arena-strobe"></div>
+      </div>
+
+      <!-- Nintendo-Style Header Bar -->
+      <div class="arena-header">
+        <button class="nav-btn" id="back-btn">
+          <span class="nav-icon">←</span>
+          <span class="nav-label">Back</span>
+        </button>
+        <div class="market-title-bar">
+          <h1 class="market-title" id="arena-title">Will BTC hit $100k?</h1>
+          <div class="market-meta">
+            <div class="live-indicator">
+              <span class="live-dot"></span>
+              <span class="live-text">LIVE</span>
+            </div>
+            <div class="countdown-clock" id="countdown-clock">
+              <span class="countdown-icon">⏰</span>
+              <span class="countdown-time" id="countdown-time">--d --h --m</span>
+            </div>
+          </div>
+        </div>
+        <button class="nav-btn" id="markets-btn">
+          <span class="nav-icon">☰</span>
+          <span class="nav-label">Markets</span>
+        </button>
+      </div>
+
+      <!-- Score Bar — Progress Bars -->
+      <div class="scores-container">
+        <!-- Kalshi Row -->
+        <div class="score-row kalshi">
+          <span class="score-source-label kalshi">Kalshi</span>
+          <div class="score-progress-bar">
+            <div class="score-fill-yes" id="kalshi-bar-yes" style="width: 65%">
+              <span class="score-percent" id="kalshi-yes">65%</span>
+            </div>
+            <div class="score-fill-no">
+              <span class="score-percent" id="kalshi-no">35%</span>
+            </div>
+          </div>
+        </div>
+        <!-- Party Row -->
+        <div class="score-row party">
+          <span class="score-source-label party">Party</span>
+          <div class="score-progress-bar">
+            <div class="score-fill-yes" id="party-bar-yes" style="width: 72%">
+              <span class="score-percent" id="party-yes">72%</span>
+            </div>
+            <div class="score-fill-no">
+              <span class="score-percent" id="party-no">28%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The Nightclub -->
+      <div class="nightclub">
+        <!-- Wall Mounted Spotlights -->
+        <div class="wall-lights">
+          <div class="spotlight-mount">
+            <div class="spotlight-arm"></div>
+            <div class="spotlight-head pink">
+              <div class="spotlight-beam pink"></div>
+            </div>
+          </div>
+          <div class="spotlight-mount">
+            <div class="spotlight-arm"></div>
+            <div class="spotlight-head cyan">
+              <div class="spotlight-beam cyan"></div>
+            </div>
+          </div>
+          <div class="spotlight-mount">
+            <div class="spotlight-arm"></div>
+            <div class="spotlight-head gold">
+              <div class="spotlight-beam gold"></div>
+            </div>
+          </div>
+          <div class="spotlight-mount">
+            <div class="spotlight-arm"></div>
+            <div class="spotlight-head pink">
+              <div class="spotlight-beam pink"></div>
+            </div>
+          </div>
+          <div class="spotlight-mount">
+            <div class="spotlight-arm"></div>
+            <div class="spotlight-head cyan">
+              <div class="spotlight-beam cyan"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DJ Booth -->
+        <div class="dj-booth-visual">
+          <div class="dj-character">
+            <div class="dj-head">
+              <div class="dj-headphones"></div>
+            </div>
+            <div class="dj-body">
+              <div class="dj-arm left"></div>
+              <div class="dj-arm right"></div>
+            </div>
+          </div>
+          <div class="dj-table">
+            <div class="turntable"></div>
+            <div class="mixer">
+              <div class="mixer-slider"></div>
+              <div class="mixer-slider"></div>
+            </div>
+            <div class="turntable"></div>
+          </div>
+          <div class="dj-label">DJ PREDICT</div>
+          <!-- Pulsating Speakers -->
+          <div class="dj-speakers">
+            <div class="speaker left">
+              <div class="speaker-cone"></div>
+              <div class="bass-wave"></div>
+              <div class="bass-wave"></div>
+              <div class="bass-wave"></div>
+            </div>
+            <div class="speaker right">
+              <div class="speaker-cone"></div>
+              <div class="bass-wave"></div>
+              <div class="bass-wave"></div>
+              <div class="bass-wave"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FESTIVAL LASERS — Techno Energy -->
+        <div class="laser-show">
+          <div class="laser-beam cyan"></div>
+          <div class="laser-beam pink"></div>
+          <div class="laser-beam purple"></div>
+          <div class="laser-beam gold"></div>
+          <div class="laser-beam cyan" style="animation-delay: -2s"></div>
+          <div class="laser-beam pink" style="animation-delay: -1.5s"></div>
+        </div>
+
+        <!-- FESTIVAL TOTEMS — Crowd Energy -->
+        <div class="festival-totem left">
+          <div class="totem-glow"></div>
+        </div>
+        <div class="festival-totem right">
+          <div class="totem-glow"></div>
+        </div>
+
+        <!-- Dance Floor with Tiles — HORIZONTAL SPLIT: YES on top, NO on bottom -->
+        <div class="dance-floor">
+          <!-- Grungy Techno Filter Overlay -->
+          <div class="grunge-overlay">
+            <div class="grunge-grain"></div>
+            <div class="grunge-scanlines"></div>
+            <div class="grunge-vignette"></div>
+            <div class="grunge-color-grade"></div>
+            <div class="grunge-aberration"></div>
+            <div class="grunge-flicker"></div>
+            <div class="grunge-bloom"></div>
+          </div>
+          <!-- NO Zone (LEFT) — Pink/Red -->
+          <div class="floor-zone no" id="zone-no">
+            <div class="floor-tiles">
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+            </div>
+            <div class="crowd-area" id="crowd-no"></div>
+            <span class="zone-label">NO</span>
+            <span class="floor-score" id="no-score">28%</span>
+          </div>
+
+          <!-- YES Zone (RIGHT) — Cyan/Blue -->
+          <div class="floor-zone yes" id="zone-yes">
+            <div class="floor-tiles">
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+              <div class="floor-tile"></div><div class="floor-tile"></div>
+            </div>
+            <div class="crowd-area" id="crowd-yes"></div>
+            <span class="zone-label">YES</span>
+            <span class="floor-score" id="yes-score">72%</span>
+          </div>
+        </div>
+
+        <!-- Player (You) — Photo head with stick figure body like villagers -->
+        <div class="player-container at-door" id="player-container">
+          <div class="player at-door" id="player">
+            <div class="player-speech" id="player-speech"></div>
+            <div class="villager-avatar">
+              <div class="villager-photo player-photo-head" style="background-image: url('/tg/zac.jpg')"></div>
+              <div class="stick-body player-stick-body">
+                <div class="stick-torso"></div>
+                <div class="stick-arm left"></div>
+                <div class="stick-arm right"></div>
+                <div class="stick-leg left"></div>
+                <div class="stick-leg right"></div>
+              </div>
+            </div>
+          </div>
+          <div class="player-label">You</div>
+        </div>
+      </div>
+
+      <!-- Vote Buttons -->
+      <div class="control-deck">
+        <!-- Player Dock - visual home base (drag-only mode) -->
+        <div class="player-dock" id="player-dock">
+          <div class="drag-hint">← NO &nbsp;|&nbsp; YES →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar" id="tab-bar">
+      <button class="tab-btn active" data-tab="home">
+        <span class="icon">🏠</span>
+        <span class="label">Home</span>
+      </button>
+      <button class="tab-btn" data-tab="leaderboard">
+        <span class="icon">🏆</span>
+        <span class="label">Leaders</span>
+      </button>
+      <button class="tab-btn" data-tab="profile">
+        <span class="icon">👤</span>
+        <span class="label">Profile</span>
+      </button>
+    </nav>
+
+    <!-- Slide-to-Confirm Panel -->
+    <div class="slide-confirm-panel" id="slide-panel">
+      <div class="panel-handle"></div>
+      <div class="panel-header">
+        <div class="panel-title">
+          Confirm Bet
+          <span class="panel-side-badge yes" id="panel-badge">YES</span>
+        </div>
+        <button class="panel-close" id="panel-close">✕</button>
+      </div>
+      <div class="panel-why">
+        <label class="panel-why-label">Why? (optional)</label>
+        <textarea class="panel-why-input" id="panel-why-input" placeholder="Share your reasoning with the party..." rows="2"></textarea>
+      </div>
+      <div class="slide-track" id="slide-track">
+        <div class="slide-track-fill yes" id="slide-fill"></div>
+        <div class="slide-track-text">Swipe UP</div>
+        <div class="slide-thumb yes" id="slide-thumb">
+          <span class="slide-thumb-icon">↑</span>
+        </div>
+        <div class="slide-success" id="slide-success">
+          CONFIRMED!
+        </div>
+      </div>
+    </div>
+
+    <!-- Nintendo Victory Celebration Overlay -->
+    <div class="celebration-overlay" id="celebration">
+      <div class="celebration-text">WOW!</div>
+      <div class="celebration-subtitle">Your vote is locked in!</div>
+      <!-- Fireworks -->
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <div class="firework"></div>
+      <!-- Confetti -->
+      <div class="confetti"></div>
+      <div class="confetti"></div>
+      <div class="confetti"></div>
+      <div class="confetti"></div>
+      <div class="confetti"></div>
+      <div class="confetti"></div>
+    </div>
+
+    <!-- Legacy Sparkle Burst -->
+    <div class="sparkle-burst" id="sparkle-burst"></div>
+
+    <!-- Character Customization Modal -->
+    <div class="modal-overlay" id="modal-customize">
+      <div class="modal">
+        <h2 class="modal-title">Customize Your Look</h2>
+        <div class="customization-preview" id="customize-preview"></div>
+
+        <div class="color-section">
+          <div class="color-label">Skin Tone</div>
+          <div class="color-options" id="skin-options"></div>
+        </div>
+
+        <div class="color-section">
+          <div class="color-label">Hair Color</div>
+          <div class="color-options" id="hair-options"></div>
+        </div>
+
+        <button class="modal-close" id="modal-close">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // PREDICTION PARTY — Main Script
+    // ═══════════════════════════════════════════════════════════════
+
+    // AZFLIN'S AI EMPORIUM — Demo Data
+    // REAL TELEGRAM AVATARS ONLY — The Party Crew!
+    const MEMBERS = [
+      { name: 'AzFlin', photo: '/tg/AzFlin.jpg' },
+      { name: 'biz', photo: '/tg/biz.jpg' },
+      { name: 'Ferengi', photo: '/tg/ferengi.jpg' },
+      { name: 'Frosty', photo: '/tg/frostyflakes.jpg' },
+      { name: 'jin', photo: '/tg/jin.jpg' },
+      { name: 'Phanes', photo: '/tg/phanes.jpg' },
+      { name: 'Pupul', photo: '/tg/pupul.jpg' },
+      { name: 'Rob', photo: '/tg/rob.jpg' },
+      { name: 'Shinkiro', photo: '/tg/shinkiro14.jpg' },
+      { name: 'Skely', photo: '/tg/skely.jpg' },
+      { name: 'VN', photo: '/tg/vn.jpg' }
+    ];
+
+    const MARKETS = [
+      {
+        id: 1,
+        question: "Will BTC hit $100k by Dec 31?",
+        kalshiYes: 65,
+        partyYes: 72,
+        count: 74,
+        volume: "$2.4M",
+        endDate: new Date('2025-12-31T23:59:59')
+      },
+      {
+        id: 2,
+        question: "Will Elon visit Mars before 2030?",
+        kalshiYes: 6,
+        partyYes: 12,
+        count: 39,
+        volume: "$890K",
+        endDate: new Date('2030-01-01T00:00:00')
+      },
+      {
+        id: 3,
+        question: "Will there be a US recession in 2025?",
+        kalshiYes: 38,
+        partyYes: 45,
+        count: 47,
+        volume: "$1.2M",
+        endDate: new Date('2025-12-31T23:59:59')
+      },
+      {
+        id: 4,
+        question: "Will GPT-5 release by June 2025?",
+        kalshiYes: 71,
+        partyYes: 68,
+        count: 28,
+        volume: "$560K",
+        endDate: new Date('2025-06-30T23:59:59')
+      }
+    ];
+
+    const CHAT_MESSAGES = [
+      { name: 'AzFlin', text: 'BTC to the moon! 🚀', side: 'left' },
+      { name: 'Chris', text: 'Nah, we\'re gonna dump', side: 'right' },
+      { name: 'Rina', text: 'Already past 95k tho...', side: 'left' },
+      { name: 'biz', text: 'WAGMI', side: 'right' },
+      { name: 'satsmonkes', text: 'Stack sats!', side: 'left' },
+      { name: 'Skely', text: 'ded either way', side: 'right' }
+    ];
+
+    // Villager speech bubble messages - Miiverse style
+    const VILLAGER_THOUGHTS = {
+      yes: ['LFG! 🚀', 'WAGMI', 'bullish!', '📈📈', 'ez money', 'to the moon', 'we got this', '100%', 'stack it', 'lfgggg'],
+      no: ['ngmi', 'ded 💀', 'rekt soon', '📉📉', 'nah fam', 'its over', 'sell sell', 'dump it', 'RIP', 'bearish']
+    };
+
+    let currentMarket = null;
+    let playerTeam = null;
+
+    // ═══════════════════════════════════════════════════════════════
+    // NINTENDO SPRING PHYSICS CONFIG — The "Snappy" Feel
+    // ═══════════════════════════════════════════════════════════════
+    const SPRING = {
+      stiffness: 400,
+      damping: 25,
+      mass: 0.8
+    };
+
+    // Spring physics state
+    let springVelocity = { x: 0, y: 0 };
+    let lastDragPos = { x: 0, y: 0 };
+
+    // DOM Elements
+    const screenHome = document.getElementById('screen-home');
+    const screenArena = document.getElementById('screen-arena');
+    const marketGrid = document.getElementById('market-grid');
+    const tabBar = document.getElementById('tab-bar');
+    const player = document.getElementById('player');
+    const playerContainer = document.getElementById('player-container');
+    const slidePanel = document.getElementById('slide-panel');
+    const zoneYes = document.getElementById('zone-yes');
+    const zoneNo = document.getElementById('zone-no');
+
+    // ═══════════════════════════════════════════════════════════════
+    // INITIALIZE
+    // ═══════════════════════════════════════════════════════════════
+    function init() {
+      renderMarkets();
+      setupTabBar();
+      setupVoting();
+      setupDragging();
+      setupSlideToConfirm();
+      createDiscoReflections();
+      createGlobalDiscoDots();
+    }
+
+    // Create persistent global disco scatter dots
+    function createGlobalDiscoDots() {
+      const container = document.getElementById('global-disco');
+      if (!container) return;
+
+      // Create 30 scattered disco dots
+      for (let i = 0; i < 30; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'global-disco-dot';
+        dot.style.left = `${Math.random() * 140 - 20}%`;
+        dot.style.top = `${Math.random() * 140 - 20}%`;
+        dot.style.animationDelay = `${Math.random() * 2}s`;
+        dot.style.animationDuration = `${1.5 + Math.random() * 2}s`;
+        const colors = ['#fff', '#00f5ff', '#ff0080', '#ffd700', '#8a2be2'];
+        dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+        container.appendChild(dot);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // RENDER MARKET CARDS
+    // ═══════════════════════════════════════════════════════════════
+    function renderMarkets() {
+      marketGrid.innerHTML = MARKETS.map((market, index) => {
+        const partyDiff = market.partyYes - market.kalshiYes;
+        const partyLabel = partyDiff > 0 ? `+${partyDiff}% YES` : `${partyDiff}% YES`;
+
+        return `
+          <div class="market-card" data-market="${index}">
+            <div class="party-score">
+              <span class="fluent-emoji" data-emoji="party" style="width:14px;height:14px;"></span>
+              <span>${partyLabel}</span>
+            </div>
+            <div class="market-card-header">
+              <span class="market-question">${market.question}</span>
+            </div>
+            <div class="card-scores">
+              <div class="card-score-row kalshi">
+                <span class="card-source-label">KALSHI</span>
+                <div class="card-progress-bar">
+                  <div class="card-fill-yes" style="width: ${market.kalshiYes}%">
+                    <span class="card-percent">${market.kalshiYes}%</span>
+                  </div>
+                  <div class="card-fill-no">
+                    <span class="card-percent">${100 - market.kalshiYes}%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-score-row party">
+                <span class="card-source-label">PARTY</span>
+                <div class="card-progress-bar">
+                  <div class="card-fill-yes" style="width: ${market.partyYes}%">
+                    <span class="card-percent">${market.partyYes}%</span>
+                  </div>
+                  <div class="card-fill-no">
+                    <span class="card-percent">${100 - market.partyYes}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="market-footer">
+              <div class="market-crowd">
+                <div class="crowd-avatars">
+                  ${[0,1,2].map(i => '<div class="mini-avatar" style="background-image: url(' + MEMBERS[(i + index) % MEMBERS.length].photo + '); background-size: cover;"></div>').join('')}
+                </div>
+                <span class="crowd-count">${market.count} in party</span>
+              </div>
+              <span class="market-volume">${market.volume}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Add click handlers
+      document.querySelectorAll('.market-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const marketIndex = parseInt(card.dataset.market);
+          openMarket(marketIndex);
+        });
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // COUNTDOWN TIMER
+    // ═══════════════════════════════════════════════════════════════
+    let countdownInterval = null;
+
+    function updateCountdown() {
+      if (!currentMarket || !currentMarket.endDate) return;
+
+      const now = new Date();
+      const diff = currentMarket.endDate - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown-time').textContent = 'ENDED';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      let timeStr = '';
+      if (days > 0) {
+        timeStr = `${days}d ${hours}h`;
+      } else if (hours > 0) {
+        timeStr = `${hours}h ${mins}m`;
+      } else {
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        timeStr = `${mins}m ${secs}s`;
+      }
+
+      document.getElementById('countdown-time').textContent = timeStr;
+    }
+
+    function startCountdown() {
+      updateCountdown();
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    function stopCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // OPEN MARKET (ARENA)
+    // ═══════════════════════════════════════════════════════════════
+    function openMarket(index) {
+      currentMarket = MARKETS[index];
+
+      // Update arena UI
+      document.getElementById('arena-title').textContent = currentMarket.question;
+
+      // Update progress bars with percentages
+      document.getElementById('kalshi-yes').textContent = `${currentMarket.kalshiYes}%`;
+      document.getElementById('kalshi-no').textContent = `${100 - currentMarket.kalshiYes}%`;
+      document.getElementById('kalshi-bar-yes').style.width = `${currentMarket.kalshiYes}%`;
+
+      document.getElementById('party-yes').textContent = `${currentMarket.partyYes}%`;
+      document.getElementById('party-no').textContent = `${100 - currentMarket.partyYes}%`;
+      document.getElementById('party-bar-yes').style.width = `${currentMarket.partyYes}%`;
+
+      // Adjust zone sizes based on party percentage
+      const yesPercent = currentMarket.partyYes;
+      document.getElementById('zone-yes').style.flex = yesPercent;
+      document.getElementById('zone-no').style.flex = 100 - yesPercent;
+
+      // Start countdown timer
+      startCountdown();
+
+      // Populate crowds
+      populateCrowds();
+
+      // Reset player to door entrance
+      playerTeam = null;
+      player.classList.remove('team-yes', 'team-no');
+      player.classList.add('at-door');
+      playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
+      playerContainer.classList.add('at-door');
+
+      // Switch screens
+      screenHome.classList.remove('active');
+      screenArena.classList.add('active');
+      tabBar.style.display = 'none';
+
+      // Start chat and disco
+      startChat();
+      startDiscoReflections();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // POPULATE CROWDS — One unique character per side for demo
+    // ═══════════════════════════════════════════════════════════════
+    // Grid-based positioning to prevent overlaps
+    function calculateGridPositions(count, cols = 4) {
+      const positions = [];
+      const rows = Math.ceil(count / cols);
+      const cellWidth = 80 / cols;  // 80% usable width (10% padding each side)
+      const cellHeight = 80 / rows; // 80% usable height (10% padding each side)
+
+      for (let i = 0; i < count; i++) {
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+        // Add small random offset within cell for organic feel (max 20% of cell)
+        const jitterX = (Math.random() - 0.5) * cellWidth * 0.4;
+        const jitterY = (Math.random() - 0.5) * cellHeight * 0.4;
+        positions.push({
+          x: 10 + col * cellWidth + cellWidth / 2 + jitterX,
+          y: 10 + row * cellHeight + cellHeight / 2 + jitterY
+        });
+      }
+      // Shuffle positions for variety
+      return positions.sort(() => Math.random() - 0.5);
+    }
+
+    function populateCrowds() {
+      const crowdNo = document.getElementById('crowd-no');
+      const crowdYes = document.getElementById('crowd-yes');
+
+      crowdNo.innerHTML = '';
+      crowdYes.innerHTML = '';
+
+      // Shuffle members for random distribution
+      const shuffled = [...MEMBERS].sort(() => Math.random() - 0.5);
+
+      // Split members between YES and NO - each person appears only ONCE
+      const yesRatio = currentMarket.partyYes / 100;
+      const splitIndex = Math.floor(shuffled.length * yesRatio);
+
+      const yesMembers = shuffled.slice(0, splitIndex);
+      const noMembers = shuffled.slice(splitIndex);
+
+      // Calculate grid positions for each crowd (2-3 cols for narrower vertical zones)
+      const yesPositions = calculateGridPositions(yesMembers.length, Math.min(3, Math.max(2, Math.ceil(Math.sqrt(yesMembers.length)))));
+      const noPositions = calculateGridPositions(noMembers.length, Math.min(3, Math.max(2, Math.ceil(Math.sqrt(noMembers.length)))));
+
+      // NO crowd - unique members only with grid positions
+      noMembers.forEach((member, i) => {
+        crowdNo.appendChild(createVillager(member, i, 'no', noPositions[i]));
+      });
+
+      // YES crowd - unique members only with grid positions
+      yesMembers.forEach((member, i) => {
+        crowdYes.appendChild(createVillager(member, i, 'yes', yesPositions[i]));
+      });
+    }
+
+    function createVillager(member, index, team, position) {
+      const villager = document.createElement('div');
+      villager.className = 'villager';
+
+      // 8 different Habbo/Animal Crossing dance styles!
+      const danceStyle = Math.floor(Math.random() * 8) + 1;
+      villager.classList.add(`dance-${danceStyle}`);
+
+      // Random animation delay for organic crowd feel
+      const delay = Math.random() * 3;
+      villager.style.setProperty('--delay', `${delay.toFixed(2)}s`);
+
+      // Varied animation speeds (some fast dancers, some slow groovers)
+      const speed = 0.6 + Math.random() * 0.8;
+      villager.style.setProperty('--dance-speed', `${speed.toFixed(2)}s`);
+
+      // Stagger speech bubble timing
+      villager.style.setProperty('--speech-delay', `${index * 2 + Math.random() * 8}s`);
+
+      // Use calculated grid position - no overlaps!
+      const posX = position ? position.x : 50;
+      const posY = position ? position.y : 50;
+
+      villager.style.setProperty('--pos-x', `${posX.toFixed(1)}%`);
+      villager.style.setProperty('--pos-y', `${posY.toFixed(1)}%`);
+
+      // Scale - keep them visible!
+      const scale = 0.85 + Math.random() * 0.1;
+      villager.style.setProperty('--scale', scale.toFixed(2));
+
+      // Z-index based on Y position (lower Y = further back = lower z-index)
+      const zIndex = 10 + Math.floor(posY);
+      villager.style.zIndex = zIndex;
+
+      const borderColor = team === 'yes' ? 'var(--neon-cyan)' : 'var(--neon-pink)';
+      const borderGlow = team === 'yes' ? '0 0 12px var(--neon-cyan)' : '0 0 12px var(--neon-pink)';
+      const bodyColor = team === 'yes' ? 'var(--neon-cyan)' : 'var(--neon-pink)';
+      const thoughts = VILLAGER_THOUGHTS[team];
+      const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
+
+      // Stick figure with Habbo-style body!
+      villager.innerHTML = `
+        <div class="villager-speech">${thought}</div>
+        <div class="villager-avatar">
+          <div class="villager-photo" style="background-image: url('${member.photo}'); border-color: ${borderColor}; box-shadow: ${borderGlow}"></div>
+          <div class="stick-body" style="--body-color: ${bodyColor}">
+            <div class="stick-torso"></div>
+            <div class="stick-arm left"></div>
+            <div class="stick-arm right"></div>
+            <div class="stick-leg left"></div>
+            <div class="stick-leg right"></div>
+          </div>
+        </div>
+        <div class="villager-name">${member.name}</div>
+      `;
+
+      return villager;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CHAT SYSTEM
+    // ═══════════════════════════════════════════════════════════════
+    let chatInterval = null;
+    let chatIndex = 0;
+
+    function startChat() {
+      const container = document.getElementById('chat-container');
+      container.innerHTML = '';
+      chatIndex = 0;
+
+      if (chatInterval) clearInterval(chatInterval);
+
+      chatInterval = setInterval(() => {
+        if (chatIndex >= CHAT_MESSAGES.length) {
+          chatIndex = 0;
+        }
+
+        const msg = CHAT_MESSAGES[chatIndex];
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${msg.side === 'right' ? 'right' : ''}`;
+        bubble.innerHTML = `
+          <div class="chat-name">${msg.name}</div>
+          <div class="chat-text">${msg.text}</div>
+        `;
+
+        container.appendChild(bubble);
+
+        // Remove old bubbles
+        if (container.children.length > 3) {
+          container.removeChild(container.firstChild);
+        }
+
+        chatIndex++;
+      }, 3000);
+    }
+
+    function stopChat() {
+      if (chatInterval) {
+        clearInterval(chatInterval);
+        chatInterval = null;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // TAB BAR
+    // ═══════════════════════════════════════════════════════════════
+    function setupTabBar() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          // Haptic feedback
+          if (navigator.vibrate) navigator.vibrate(5);
+        });
+      });
+
+      // Back button
+      document.getElementById('back-btn').addEventListener('click', () => {
+        screenArena.classList.remove('active');
+        screenHome.classList.add('active');
+        tabBar.style.display = 'flex';
+        stopChat();
+        stopCountdown();
+        if (navigator.vibrate) navigator.vibrate(5);
+      });
+
+      // Markets button (same as back for now - goes to home)
+      document.getElementById('markets-btn').addEventListener('click', () => {
+        screenArena.classList.remove('active');
+        screenHome.classList.add('active');
+        tabBar.style.display = 'flex';
+        stopChat();
+        stopCountdown();
+        if (navigator.vibrate) navigator.vibrate(5);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // VOTING
+    // ═══════════════════════════════════════════════════════════════
+    function setupVoting() {
+      document.getElementById('vote-yes').addEventListener('click', () => vote('yes'));
+      document.getElementById('vote-no').addEventListener('click', () => vote('no'));
+    }
+
+    // Player speech reactions
+    const PLAYER_REACTIONS = {
+      yes: ['LFG! 🚀', 'bullish af', 'ez call', 'to the moon!', 'WAGMI', 'lets goooo', '100%', 'no doubt'],
+      no: ['nah fam', 'its over', 'ded 💀', 'rekt incoming', 'sell sell sell', 'ngmi', 'bearish', 'dump it']
+    };
+
+    function showPlayerSpeech(side) {
+      const speechEl = document.getElementById('player-speech');
+      const reactions = PLAYER_REACTIONS[side];
+      const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+
+      speechEl.textContent = reaction;
+      speechEl.classList.add('visible');
+
+      // Hide after 2.5 seconds
+      setTimeout(() => {
+        speechEl.classList.remove('visible');
+      }, 2500);
+    }
+
+    function vote(side) {
+      playerTeam = side;
+      player.classList.remove('team-yes', 'team-no', 'at-door');
+      player.classList.add(`team-${side}`);
+
+      // Hide the dock when player moves to vote
+      document.getElementById('player-dock').classList.add('hidden');
+
+      // Clear any inline styles from dragging
+      playerContainer.style.left = '';
+      playerContainer.style.bottom = '';
+      playerContainer.style.transition = '';
+      playerContainer.style.transform = ''; // Let CSS class handle transform
+
+      // Move player to side using CSS classes - remove at-door
+      playerContainer.classList.remove('on-stage', 'at-door', 'team-yes-pos', 'team-no-pos');
+      playerContainer.classList.add(side === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+
+      // Show player's reaction speech bubble
+      showPlayerSpeech(side);
+
+      // Show slide-to-confirm panel
+      showSlidePanel(side);
+
+      // Haptic
+      if (navigator.vibrate) navigator.vibrate(20);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // SLIDE-TO-CONFIRM — The iPhone-style Commitment
+    // ═══════════════════════════════════════════════════════════════
+    let slideIsDragging = false;
+    let slideStartX = 0;
+    let slideThumbEl, slideFillEl, slideTrackEl, slideSuccessEl;
+
+    function setupSlideToConfirm() {
+      slideThumbEl = document.getElementById('slide-thumb');
+      slideFillEl = document.getElementById('slide-fill');
+      slideTrackEl = document.getElementById('slide-track');
+      slideSuccessEl = document.getElementById('slide-success');
+
+      document.getElementById('panel-close').addEventListener('click', cancelBet);
+
+      // Slide thumb drag - support both pointer and touch events
+      slideThumbEl.addEventListener('pointerdown', startSlide);
+      slideThumbEl.addEventListener('touchstart', startSlide, { passive: false });
+
+      document.addEventListener('pointermove', moveSlide);
+      document.addEventListener('touchmove', moveSlide, { passive: false });
+
+      document.addEventListener('pointerup', endSlide);
+      document.addEventListener('touchend', endSlide);
+      document.addEventListener('touchcancel', endSlide);
+    }
+
+    function showSlidePanel(side) {
+      const badge = document.getElementById('panel-badge');
+      const whyInput = document.getElementById('panel-why-input');
+
+      badge.textContent = side.toUpperCase();
+      badge.className = `panel-side-badge ${side}`;
+      slideThumbEl.className = `slide-thumb ${side}`;
+      slideFillEl.className = `slide-track-fill ${side}`;
+      whyInput.value = '';
+
+      // Reset slider position (vertical)
+      slideThumbEl.style.bottom = '4px';
+      slideFillEl.style.height = '0%';
+      slideSuccessEl.classList.remove('active');
+
+      slidePanel.classList.add('active');
+    }
+
+    let slideStartY = 0;
+    let slideCurrentY = 0;
+
+    function startSlide(e) {
+      e.preventDefault();
+      slideIsDragging = true;
+      slideStartY = e.clientY || (e.touches && e.touches[0].clientY);
+      slideCurrentY = slideStartY;
+
+      // Use setPointerCapture for better drag tracking
+      if (e.pointerId !== undefined) {
+        slideThumbEl.setPointerCapture(e.pointerId);
+      }
+
+      if (navigator.vibrate) navigator.vibrate(5);
+    }
+
+    function moveSlide(e) {
+      if (!slideIsDragging) return;
+      e.preventDefault();
+
+      // Get Y position (support both pointer and touch)
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      if (clientY === undefined) return;
+
+      slideCurrentY = clientY;
+
+      // Vertical swipe UP (negative Y direction)
+      const trackHeight = slideTrackEl.offsetHeight - slideThumbEl.offsetHeight - 8;
+      const deltaY = slideStartY - slideCurrentY; // Inverted for swipe UP
+      const newBottom = Math.max(4, Math.min(4 + deltaY, trackHeight));
+      const progress = (newBottom - 4) / trackHeight;
+
+      slideThumbEl.style.bottom = `${newBottom}px`;
+      slideFillEl.style.height = `${progress * 100}%`;
+
+      // Check if we've reached the top
+      if (progress >= 0.85) {
+        confirmBet();
+      }
+    }
+
+    function endSlide(e) {
+      if (!slideIsDragging) return;
+      slideIsDragging = false;
+
+      // Spring back if not confirmed
+      const trackHeight = slideTrackEl.offsetHeight - slideThumbEl.offsetHeight - 8;
+      const currentBottom = parseFloat(slideThumbEl.style.bottom) || 4;
+      const progress = (currentBottom - 4) / trackHeight;
+
+      if (progress < 0.85) {
+        // Spring back with Nintendo feel
+        slideThumbEl.style.transition = `bottom 0.4s cubic-bezier(0.25, 1.5, 0.5, 1)`;
+        slideFillEl.style.transition = `height 0.4s cubic-bezier(0.25, 1.5, 0.5, 1)`;
+        slideThumbEl.style.bottom = '4px';
+        slideFillEl.style.height = '0%';
+
+        setTimeout(() => {
+          slideThumbEl.style.transition = '';
+          slideFillEl.style.transition = '';
+        }, 400);
+      }
+    }
+
+    function cancelBet() {
+      slidePanel.classList.remove('active');
+
+      // Reset player to door entrance
+      playerTeam = null;
+      player.classList.remove('team-yes', 'team-no');
+      player.classList.add('at-door');
+      playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
+      playerContainer.classList.add('at-door');
+
+      // Show the dock again
+      document.getElementById('player-dock').classList.remove('hidden');
+
+      if (navigator.vibrate) navigator.vibrate(10);
+    }
+
+    function confirmBet() {
+      slideIsDragging = false;
+
+      // Show success state on slider
+      slideSuccessEl.classList.add('active');
+
+      // Trigger EPIC Nintendo celebration overlay!
+      const celebration = document.getElementById('celebration');
+      celebration.classList.add('active');
+
+      // Nintendo-style haptic pattern: short-pause-long-pause-short
+      if (navigator.vibrate) navigator.vibrate([30, 50, 100, 50, 30]);
+
+      // Hide panel immediately, keep celebration visible
+      setTimeout(() => {
+        slidePanel.classList.remove('active');
+        slideSuccessEl.classList.remove('active');
+      }, 300);
+
+      // Hide celebration after the epic moment
+      setTimeout(() => {
+        celebration.classList.remove('active');
+      }, 2000);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // DISCO BALL REFLECTIONS
+    // ═══════════════════════════════════════════════════════════════
+    let discoInterval = null;
+
+    function createDiscoReflections() {
+      const container = document.getElementById('disco-reflections');
+      if (!container) return;
+
+      // Create initial dots
+      for (let i = 0; i < 15; i++) {
+        createDiscoDot(container, i * 0.5);
+      }
+    }
+
+    function createDiscoDot(container, delay = 0) {
+      const dot = document.createElement('div');
+      dot.className = 'disco-dot';
+      dot.style.left = `${Math.random() * 100}%`;
+      dot.style.animationDelay = `${delay}s`;
+      dot.style.animationDuration = `${6 + Math.random() * 4}s`;
+
+      // Random colors
+      const colors = ['rgba(0, 245, 255, 0.8)', 'rgba(255, 0, 128, 0.8)', 'rgba(255, 215, 0, 0.8)', 'rgba(191, 0, 255, 0.8)', 'rgba(255, 255, 255, 0.9)'];
+      dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+      container.appendChild(dot);
+
+      // Remove and recreate after animation
+      dot.addEventListener('animationend', () => {
+        dot.remove();
+        createDiscoDot(container, 0);
+      });
+    }
+
+    function startDiscoReflections() {
+      // Disco is always running via CSS animations
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // DRAGGING — Clean Apple-Style Direct Manipulation
+    // Simple, responsive, delightful. LEFT = NO, RIGHT = YES
+    // ═══════════════════════════════════════════════════════════════
+    function setupDragging() {
+      let isDragging = false;
+      let startX, startY;
+      let offsetX, offsetY;
+      let hasMoved = false;
+      const TAP_THRESHOLD = 10;
+      const ZONE_THRESHOLD = 0.35; // 35% from center to commit
+
+      // Get screen dimensions for zone calculations
+      const getScreenWidth = () => window.innerWidth;
+      const getScreenCenter = () => getScreenWidth() / 2;
+
+      // Pickup the player - instant response
+      playerContainer.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        isDragging = true;
+        hasMoved = false;
+        player.classList.add('dragging');
+        playerContainer.setPointerCapture(e.pointerId);
+
+        // Hide dock
+        document.getElementById('player-dock').classList.add('hidden');
+
+        // Disable CSS transitions for 1:1 finger tracking
+        playerContainer.style.transition = 'none';
+
+        // Calculate offset from pointer to element center
+        const rect = playerContainer.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        offsetX = rect.left + rect.width / 2;
+        offsetY = rect.top + rect.height / 2;
+
+        // Nintendo "lift" pop
+        player.style.transition = 'transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.12s ease';
+        player.style.transform = 'scale(1.1)';
+        player.style.filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))';
+        playerContainer.style.zIndex = '200';
+
+        // Haptic lift
+        if (navigator.vibrate) navigator.vibrate(5);
+      }, { passive: false });
+
+      // Move - 1:1 finger tracking
+      document.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Check if moved past threshold
+        if (!hasMoved && dist > TAP_THRESHOLD) {
+          hasMoved = true;
+          player.style.transition = 'none';
+        }
+
+        if (!hasMoved) return;
+
+        // Direct positioning - player follows finger exactly
+        const newLeft = offsetX + dx;
+        const newTop = offsetY + dy;
+        const newBottom = window.innerHeight - newTop;
+
+        playerContainer.style.left = `${newLeft}px`;
+        playerContainer.style.bottom = `${newBottom}px`;
+        playerContainer.style.transform = 'translateX(-50%) translateY(50%)';
+
+        // Zone feedback - LEFT = NO (pink), RIGHT = YES (cyan)
+        const screenCenter = getScreenCenter();
+        const normalizedX = (newLeft - screenCenter) / screenCenter; // -1 to 1
+
+        if (normalizedX < -ZONE_THRESHOLD) {
+          // NO zone (left side)
+          zoneNo.classList.add('hovering');
+          zoneYes.classList.remove('hovering');
+          const intensity = Math.min(0.4 + Math.abs(normalizedX) * 0.8, 1);
+          zoneNo.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
+          zoneYes.style.setProperty('--spotlight-intensity', '0.3');
+          player.style.filter = `drop-shadow(0 15px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(255, 0, 128, ${intensity * 0.5}))`;
+        } else if (normalizedX > ZONE_THRESHOLD) {
+          // YES zone (right side)
+          zoneYes.classList.add('hovering');
+          zoneNo.classList.remove('hovering');
+          const intensity = Math.min(0.4 + Math.abs(normalizedX) * 0.8, 1);
+          zoneYes.style.setProperty('--spotlight-intensity', intensity.toFixed(2));
+          zoneNo.style.setProperty('--spotlight-intensity', '0.3');
+          player.style.filter = `drop-shadow(0 15px 30px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(0, 245, 255, ${intensity * 0.5}))`;
+        } else {
+          // Center - no commitment
+          zoneNo.classList.remove('hovering');
+          zoneYes.classList.remove('hovering');
+          zoneNo.style.setProperty('--spotlight-intensity', '0.4');
+          zoneYes.style.setProperty('--spotlight-intensity', '0.4');
+          player.style.filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))';
+        }
+      }, { passive: false });
+
+      // Release - determine vote or snap back
+      document.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        player.classList.remove('dragging');
+        playerContainer.style.zIndex = '';
+
+        // Clear zone states
+        zoneNo.classList.remove('hovering');
+        zoneYes.classList.remove('hovering');
+        zoneNo.style.setProperty('--spotlight-intensity', '0.4');
+        zoneYes.style.setProperty('--spotlight-intensity', '0.4');
+
+        // Tap (no movement) - bounce and return
+        if (!hasMoved) {
+          player.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease';
+          player.style.transform = 'scale(1.15)';
+          setTimeout(() => {
+            player.style.transform = '';
+            player.style.filter = '';
+          }, 125);
+          playerContainer.style.transition = '';
+          playerContainer.style.left = '';
+          playerContainer.style.bottom = '';
+          playerContainer.style.transform = '';
+          document.getElementById('player-dock').classList.remove('hidden');
+          if (navigator.vibrate) navigator.vibrate([5, 20, 5]);
+          return;
+        }
+
+        // Get final position
+        const rect = playerContainer.getBoundingClientRect();
+        const finalX = rect.left + rect.width / 2;
+        const screenCenter = getScreenCenter();
+        const normalizedX = (finalX - screenCenter) / screenCenter;
+
+        // Reset player visual
+        player.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease';
+        player.style.transform = '';
+        player.style.filter = '';
+
+        // Determine vote
+        let targetVote = null;
+        if (normalizedX < -ZONE_THRESHOLD) {
+          targetVote = 'no';
+        } else if (normalizedX > ZONE_THRESHOLD) {
+          targetVote = 'yes';
+        }
+
+        if (targetVote) {
+          // Commit vote - smooth settle to team position
+          playerContainer.style.transition = 'left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          vote(targetVote);
+          if (navigator.vibrate) navigator.vibrate([10, 50, 20]);
+        } else {
+          // Snap back to dock
+          playerContainer.style.transition = 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
+          playerContainer.classList.add('at-door');
+          playerContainer.style.left = '';
+          playerContainer.style.bottom = '';
+          playerContainer.style.transform = '';
+          playerTeam = null;
+          player.classList.remove('team-yes', 'team-no');
+          player.classList.add('at-door');
+          document.getElementById('player-dock').classList.remove('hidden');
+          if (navigator.vibrate) navigator.vibrate(10);
+        }
+      });
+
+      // Prevent scroll on touch
+      playerContainer.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) e.preventDefault();
+      }, { passive: false });
+    }
+
+    // Zone interaction is now handled inline in pointermove for simplicity
+    function updateZoneInteraction() {
+      // Kept for compatibility - actual logic is in drag handler
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // START
+    // ═══════════════════════════════════════════════════════════════
+    init();
+  </script>
+</body>
+</html>

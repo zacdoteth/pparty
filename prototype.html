@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>PREDICTION PARTY</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       DESIGN TOKENS — The DNA of our visual language
+    ═══════════════════════════════════════════════════════════════ */
+    :root {
+      /* Colors */
+      --bg-dark: #0f0c29;
+      --bg-mid: #302b63;
+      --bg-light: #24243e;
+      --neon-cyan: #00f5ff;
+      --neon-pink: #ff0080;
+      --neon-red: #ff3366;
+      --neon-green: #39ff14;
+      --metal-dark: #1a1a2e;
+      --metal-mid: #2d2d44;
+      --metal-light: #3d3d5c;
+
+      /* Animation — The heartbeat */
+      --bounce: cubic-bezier(0.25, 1.5, 0.5, 1);
+      --snap: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      --bpm: 128;
+      --beat-duration: calc(60s / var(--bpm));
+
+      /* Spacing */
+      --safe-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESET & BASE — Clean slate
+    ═══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, 'SF Pro Display', 'Segoe UI', sans-serif;
+      background: #000;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE VIEWPORT — Mobile frame for desktop viewing
+    ═══════════════════════════════════════════════════════════════ */
+    .viewport {
+      width: 375px;
+      height: 812px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-light) 100%);
+    }
+
+    @media (max-width: 375px) {
+      .viewport {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE STAGE — Where the magic happens
+    ═══════════════════════════════════════════════════════════════ */
+    .stage {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      perspective: 800px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DJ BOOTH — Market Info at the top
+    ═══════════════════════════════════════════════════════════════ */
+    .dj-booth {
+      padding: 16px 20px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+      z-index: 100;
+    }
+
+    .market-question {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+      margin-bottom: 12px;
+    }
+
+    /* LED Ticker Display */
+    .led-ticker {
+      background: #0a0a0a;
+      border: 2px solid #1a1a1a;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--neon-green);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.8),
+        0 0 10px rgba(57, 255, 20, 0.2);
+    }
+
+    .led-ticker::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,0,0,0.3) 2px,
+        rgba(0,0,0,0.3) 4px
+      );
+      pointer-events: none;
+    }
+
+    .ticker-content {
+      display: flex;
+      animation: ticker-scroll 20s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-content span {
+      padding-right: 60px;
+    }
+
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE FLOOR — Where the crowd lives
+    ═══════════════════════════════════════════════════════════════ */
+    .floor {
+      position: relative;
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    /* Stage floor with perspective */
+    .floor-surface {
+      position: absolute;
+      bottom: 0;
+      left: -50%;
+      right: -50%;
+      height: 70%;
+      background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(15, 12, 41, 0.8) 30%,
+        rgba(15, 12, 41, 0.95) 100%
+      );
+      transform: rotateX(60deg);
+      transform-origin: bottom center;
+    }
+
+    /* Stage lighting */
+    .stage-lights {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .light {
+      position: absolute;
+      width: 200px;
+      height: 400px;
+      filter: blur(60px);
+      opacity: 0.4;
+    }
+
+    .light--red {
+      left: -50px;
+      top: 20%;
+      background: radial-gradient(ellipse, var(--neon-red) 0%, transparent 70%);
+      animation: pulse-light 2s ease-in-out infinite alternate;
+    }
+
+    .light--cyan {
+      right: -50px;
+      top: 15%;
+      background: radial-gradient(ellipse, var(--neon-cyan) 0%, transparent 70%);
+      animation: pulse-light 2s ease-in-out infinite alternate-reverse;
+      opacity: 0.6;
+    }
+
+    .light--center {
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(255,255,255,0.3) 0%, transparent 70%);
+    }
+
+    @keyframes pulse-light {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 0.6; transform: scale(1.1); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE CROWD — The soul of the room
+    ═══════════════════════════════════════════════════════════════ */
+    .crowd {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .crowd-side {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-end;
+      justify-content: center;
+      width: 45%;
+      padding-bottom: 20px;
+      gap: 4px;
+    }
+
+    .crowd-side--no {
+      justify-content: flex-start;
+    }
+
+    .crowd-side--yes {
+      justify-content: flex-end;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       THE AVATAR — Head + Body physics
+    ═══════════════════════════════════════════════════════════════ */
+    .avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: bob var(--beat-duration) var(--bounce) infinite;
+      animation-delay: var(--delay, 0ms);
+    }
+
+    .avatar--you {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) scale(1.3);
+      z-index: 50;
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+    }
+
+    .avatar--you .head {
+      border: 3px solid #fff;
+      box-shadow: 0 0 15px rgba(255,255,255,0.5);
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-6px) scale(1.02); }
+    }
+
+    .head {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      position: relative;
+      z-index: 2;
+    }
+
+    .avatar--you .head {
+      width: 44px;
+      height: 44px;
+    }
+
+    .head img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .body {
+      width: 20px;
+      height: 24px;
+      margin-top: -4px;
+      border-radius: 4px 4px 2px 2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar--you .body {
+      width: 28px;
+      height: 32px;
+    }
+
+    .body--no {
+      background: linear-gradient(180deg, var(--neon-red) 0%, #aa0044 100%);
+      box-shadow: 0 2px 8px rgba(255, 51, 102, 0.5);
+    }
+
+    .body--yes {
+      background: linear-gradient(180deg, var(--neon-cyan) 0%, #0088aa 100%);
+      box-shadow: 0 2px 8px rgba(0, 245, 255, 0.5);
+    }
+
+    .body--neutral {
+      background: linear-gradient(180deg, #666 0%, #444 100%);
+      box-shadow: 0 2px 8px rgba(100, 100, 100, 0.5);
+    }
+
+    /* Arms */
+    .body::before,
+    .body::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 14px;
+      top: 2px;
+      border-radius: 3px;
+      background: inherit;
+    }
+
+    .body::before { left: -7px; transform: rotate(15deg); }
+    .body::after { right: -7px; transform: rotate(-15deg); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CONTROL DECK — The industrial interface
+    ═══════════════════════════════════════════════════════════════ */
+    .control-deck {
+      background: linear-gradient(180deg,
+        var(--metal-dark) 0%,
+        var(--metal-mid) 50%,
+        var(--metal-dark) 100%
+      );
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 16px 16px calc(16px + var(--safe-bottom));
+      position: relative;
+      z-index: 100;
+    }
+
+    /* Brushed metal texture */
+    .control-deck::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 1px,
+        rgba(255,255,255,0.02) 1px,
+        rgba(255,255,255,0.02) 2px
+      );
+      pointer-events: none;
+    }
+
+    .controls-layout {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* Bet buttons */
+    .bet-btn {
+      height: 64px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.1s var(--snap), box-shadow 0.1s ease;
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bet-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .bet-btn:active {
+      transform: scale(0.95);
+    }
+
+    .bet-btn--short {
+      background: linear-gradient(180deg, var(--neon-pink) 0%, #cc0066 100%);
+      color: #fff;
+      box-shadow:
+        0 4px 0 #880044,
+        0 6px 20px rgba(255, 0, 128, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .bet-btn--short:active {
+      box-shadow:
+        0 2px 0 #880044,
+        0 3px 10px rgba(255, 0, 128, 0.4);
+    }
+
+    .bet-btn--long {
+      background: linear-gradient(180deg, var(--neon-cyan) 0%, #0099bb 100%);
+      color: #000;
+      box-shadow:
+        0 4px 0 #006688,
+        0 6px 20px rgba(0, 245, 255, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .bet-btn--long:active {
+      box-shadow:
+        0 2px 0 #006688,
+        0 3px 10px rgba(0, 245, 255, 0.4);
+    }
+
+    /* Jog Wheel — The Teenage Engineering touch */
+    .jog-wheel {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #2a2a3e 0%, #1a1a28 100%);
+      border: 3px solid #3a3a4e;
+      position: relative;
+      cursor: grab;
+      box-shadow:
+        inset 0 4px 8px rgba(0,0,0,0.6),
+        0 2px 4px rgba(0,0,0,0.4),
+        0 0 0 1px rgba(255,255,255,0.05);
+      touch-action: none;
+    }
+
+    .jog-wheel:active {
+      cursor: grabbing;
+    }
+
+    /* Wheel grip lines */
+    .jog-wheel::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(
+          from 0deg,
+          #2a2a3e 0deg 15deg,
+          #222233 15deg 30deg
+        );
+    }
+
+    /* Center indicator */
+    .jog-wheel::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #444 0%, #222 100%);
+      border: 2px solid #555;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .jog-indicator {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 10px;
+      background: var(--neon-cyan);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--neon-cyan);
+      z-index: 10;
+    }
+
+    .bet-amount {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      white-space: nowrap;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CHAT TICKER — Floating messages
+    ═══════════════════════════════════════════════════════════════ */
+    .chat-ticker {
+      position: absolute;
+      right: 10px;
+      bottom: 200px;
+      width: 160px;
+      height: 300px;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 90;
+    }
+
+    .chat-msg {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      color: #fff;
+      white-space: nowrap;
+      animation: float-up 4s ease-out forwards;
+      opacity: 0;
+    }
+
+    .chat-msg .amount {
+      color: var(--neon-green);
+      font-weight: 700;
+    }
+
+    .chat-msg .action--long {
+      color: var(--neon-cyan);
+    }
+
+    .chat-msg .action--short {
+      color: var(--neon-pink);
+    }
+
+    @keyframes float-up {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      10% {
+        opacity: 1;
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-280px);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       STATUS BAR — Pool info
+    ═══════════════════════════════════════════════════════════════ */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-bar .short-pool {
+      color: var(--neon-pink);
+    }
+
+    .status-bar .long-pool {
+      color: var(--neon-cyan);
+    }
+
+    .status-bar .total {
+      color: #888;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GLASSMORPHISM OVERLAY — For modals/tooltips
+    ═══════════════════════════════════════════════════════════════ */
+    .glass {
+      background: rgba(20, 20, 40, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LIVE INDICATOR
+    ═══════════════════════════════════════════════════════════════ */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 51, 102, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--neon-red);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--neon-red);
+      animation: live-pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes live-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Timer */
+    .timer {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="viewport">
+    <div class="stage">
+      <!-- DJ BOOTH — Market Info -->
+      <div class="dj-booth">
+        <div style="display: flex; justify-content: center;">
+          <div class="live-badge">
+            <span class="live-dot"></span>
+            LIVE
+          </div>
+        </div>
+        <div class="market-question">Will BTC hit $100k by EOY?</div>
+        <div class="led-ticker">
+          <div class="ticker-content">
+            <span>BTC $97,842 (+2.4%)</span>
+            <span>ETH $3,421 (+1.8%)</span>
+            <span>SOL $189 (+5.2%)</span>
+            <span>POOL: 42.5 ETH</span>
+            <span>23 TRADERS ACTIVE</span>
+            <span>BTC $97,842 (+2.4%)</span>
+            <span>ETH $3,421 (+1.8%)</span>
+            <span>SOL $189 (+5.2%)</span>
+            <span>POOL: 42.5 ETH</span>
+            <span>23 TRADERS ACTIVE</span>
+          </div>
+        </div>
+        <div class="timer">Closes in 2h 34m 12s</div>
+      </div>
+
+      <!-- THE FLOOR -->
+      <div class="floor">
+        <div class="floor-surface"></div>
+
+        <!-- Stage Lights -->
+        <div class="stage-lights">
+          <div class="light light--red"></div>
+          <div class="light light--cyan"></div>
+          <div class="light light--center"></div>
+        </div>
+
+        <!-- The Crowd -->
+        <div class="crowd">
+          <!-- NO/SHORT side -->
+          <div class="crowd-side crowd-side--no" id="crowd-no"></div>
+
+          <!-- YES/LONG side -->
+          <div class="crowd-side crowd-side--yes" id="crowd-yes"></div>
+        </div>
+
+        <!-- YOU — The main user -->
+        <div class="avatar avatar--you" id="avatar-you">
+          <div class="head">
+            <img src="https://i.pravatar.cc/100?u=you" alt="You">
+          </div>
+          <div class="body body--neutral"></div>
+        </div>
+
+        <!-- Chat Ticker -->
+        <div class="chat-ticker" id="chat-ticker"></div>
+      </div>
+
+      <!-- CONTROL DECK -->
+      <div class="control-deck">
+        <div class="status-bar">
+          <span class="short-pool">SHORT: 18.2 ETH</span>
+          <span class="total">|</span>
+          <span class="long-pool">LONG: 24.3 ETH</span>
+        </div>
+
+        <div class="controls-layout">
+          <button class="bet-btn bet-btn--short" id="btn-short">SHORT</button>
+
+          <div style="position: relative;">
+            <div class="jog-wheel" id="jog-wheel">
+              <div class="jog-indicator" id="jog-indicator"></div>
+            </div>
+            <div class="bet-amount" id="bet-amount">0.1 ETH</div>
+          </div>
+
+          <button class="bet-btn bet-btn--long" id="btn-long">LONG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // THE ENGINE — Bringing life to the party
+    // ═══════════════════════════════════════════════════════════════
+
+    const BPM = 128;
+    const BEAT_MS = (60 / BPM) * 1000;
+
+    // Avatar data for the crowd
+    const CROWD_DATA = {
+      no: [
+        { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 },
+        { id: 6 }, { id: 7 }, { id: 8 }
+      ],
+      yes: [
+        { id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }, { id: 15 },
+        { id: 16 }, { id: 17 }, { id: 18 }, { id: 19 }, { id: 20 },
+        { id: 21 }, { id: 22 }
+      ]
+    };
+
+    // Create avatar element
+    function createAvatar(data, side) {
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+
+      // Random delay for organic feel (0 to 1 beat)
+      const delay = Math.random() * BEAT_MS;
+      avatar.style.setProperty('--delay', `${delay}ms`);
+
+      avatar.innerHTML = `
+        <div class="head">
+          <img src="https://i.pravatar.cc/64?u=user${data.id}" alt="User">
+        </div>
+        <div class="body body--${side}"></div>
+      `;
+
+      return avatar;
+    }
+
+    // Populate the crowd
+    function populateCrowd() {
+      const crowdNo = document.getElementById('crowd-no');
+      const crowdYes = document.getElementById('crowd-yes');
+
+      CROWD_DATA.no.forEach(user => {
+        crowdNo.appendChild(createAvatar(user, 'no'));
+      });
+
+      CROWD_DATA.yes.forEach(user => {
+        crowdYes.appendChild(createAvatar(user, 'yes'));
+      });
+
+      // Set random delay for the main user avatar
+      const youAvatar = document.getElementById('avatar-you');
+      youAvatar.style.setProperty('--delay', `${Math.random() * BEAT_MS}ms`);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // JOG WHEEL — Teenage Engineering inspired
+    // ═══════════════════════════════════════════════════════════════
+
+    const jogWheel = document.getElementById('jog-wheel');
+    const jogIndicator = document.getElementById('jog-indicator');
+    const betAmountEl = document.getElementById('bet-amount');
+
+    let rotation = 0;
+    let betAmount = 0.1;
+    const MIN_BET = 0.01;
+    const MAX_BET = 10;
+    const STEP = 0.01;
+
+    let isDragging = false;
+    let lastAngle = 0;
+
+    function getAngle(e, element) {
+      const rect = element.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+    }
+
+    function updateBetDisplay() {
+      betAmountEl.textContent = `${betAmount.toFixed(2)} ETH`;
+    }
+
+    function handleDragStart(e) {
+      isDragging = true;
+      lastAngle = getAngle(e, jogWheel);
+      jogWheel.style.cursor = 'grabbing';
+    }
+
+    function handleDragMove(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+
+      const currentAngle = getAngle(e, jogWheel);
+      let delta = currentAngle - lastAngle;
+
+      // Handle wrap-around
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+
+      rotation += delta;
+      lastAngle = currentAngle;
+
+      // Update bet amount based on rotation
+      const rotationChange = delta / 10;
+      betAmount = Math.max(MIN_BET, Math.min(MAX_BET, betAmount + rotationChange * STEP * 10));
+
+      // Visual feedback
+      jogIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+      jogWheel.querySelector('.jog-indicator').parentElement.style.transform = `rotate(${rotation}deg)`;
+
+      updateBetDisplay();
+    }
+
+    function handleDragEnd() {
+      isDragging = false;
+      jogWheel.style.cursor = 'grab';
+    }
+
+    // Mouse events
+    jogWheel.addEventListener('mousedown', handleDragStart);
+    document.addEventListener('mousemove', handleDragMove);
+    document.addEventListener('mouseup', handleDragEnd);
+
+    // Touch events
+    jogWheel.addEventListener('touchstart', handleDragStart, { passive: true });
+    document.addEventListener('touchmove', handleDragMove, { passive: false });
+    document.addEventListener('touchend', handleDragEnd);
+
+    // ═══════════════════════════════════════════════════════════════
+    // BUTTONS — Haptic feedback
+    // ═══════════════════════════════════════════════════════════════
+
+    const btnShort = document.getElementById('btn-short');
+    const btnLong = document.getElementById('btn-long');
+    const avatarYou = document.getElementById('avatar-you');
+
+    function placeBet(side) {
+      const body = avatarYou.querySelector('.body');
+      body.className = `body body--${side}`;
+
+      // Trigger haptic if available
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+
+      // Add chat message
+      addChatMessage(betAmount.toFixed(2), side === 'no' ? 'SHORT' : 'LONG');
+    }
+
+    btnShort.addEventListener('click', () => placeBet('no'));
+    btnLong.addEventListener('click', () => placeBet('yes'));
+
+    // ═══════════════════════════════════════════════════════════════
+    // CHAT TICKER — Floating messages
+    // ═══════════════════════════════════════════════════════════════
+
+    const chatTicker = document.getElementById('chat-ticker');
+    const USERNAMES = ['degen_sam', 'whale_watcher', 'moon_boy', 'rekt_steve', 'diamond_hands', 'paper_trader', 'btc_maxi', 'eth_enjoyer'];
+
+    function addChatMessage(amount, action, username = null) {
+      const msg = document.createElement('div');
+      msg.className = 'chat-msg';
+
+      const user = username || USERNAMES[Math.floor(Math.random() * USERNAMES.length)];
+      const actionClass = action === 'LONG' ? 'action--long' : 'action--short';
+
+      msg.innerHTML = `
+        <strong>${user}</strong> went <span class="${actionClass}">${action}</span> <span class="amount">${amount} ETH</span>
+      `;
+
+      chatTicker.appendChild(msg);
+
+      // Remove after animation
+      setTimeout(() => msg.remove(), 4000);
+    }
+
+    // Simulate random chat messages
+    function simulateChat() {
+      const amount = (Math.random() * 2 + 0.05).toFixed(2);
+      const action = Math.random() > 0.4 ? 'LONG' : 'SHORT';
+      addChatMessage(amount, action);
+    }
+
+    // Start chat simulation
+    setInterval(simulateChat, 3000 + Math.random() * 2000);
+
+    // ═══════════════════════════════════════════════════════════════
+    // INITIALIZE
+    // ═══════════════════════════════════════════════════════════════
+
+    populateCrowd();
+    updateBetDisplay();
+
+    // Initial chat messages
+    setTimeout(() => addChatMessage('0.5', 'LONG', 'whale_watcher'), 500);
+    setTimeout(() => addChatMessage('0.25', 'SHORT', 'paper_trader'), 1500);
+  </script>
+</body>
+</html>
