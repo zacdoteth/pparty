@@ -3418,60 +3418,90 @@
     ═══════════════════════════════════════════════════════════════ */
 
     /* ═══════════════════════════════════════════════════════════════
-       2D HUD — Question Display (Outside 3D space)
-       "The question floats above the chaos. Pure 2D. No warping." — Toshiro
+       THE MAIN SIGN — Question Display ABOVE the floor zones
+       "The question hovers above the battlefield. Pure 2D. No warping." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
     .hud-question {
       position: absolute;
-      top: 60px;
+      /* PICTO-PARTY: Sits ABOVE the dance floor, directly in view */
+      top: 8%;
       left: 50%;
       transform: translateX(-50%);
       z-index: 100;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       pointer-events: none;
     }
 
     .hud-question-text {
-      font-size: clamp(18px, 5vw, 28px);
+      font-size: clamp(20px, 6vw, 36px);
       font-weight: 900;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       color: #fff;
       text-shadow:
-        0 0 20px rgba(255, 255, 255, 0.8),
-        0 0 40px rgba(255, 255, 255, 0.4),
-        0 2px 4px rgba(0, 0, 0, 0.8);
+        0 0 30px rgba(255, 255, 255, 0.9),
+        0 0 60px rgba(255, 255, 255, 0.5),
+        0 4px 8px rgba(0, 0, 0, 0.9);
       text-align: center;
-      padding: 12px 24px;
+      padding: 16px 32px;
       background: linear-gradient(180deg,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(0, 0, 0, 0.4) 100%
+        rgba(20, 20, 35, 0.95) 0%,
+        rgba(10, 10, 20, 0.9) 100%
       );
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* Progress bar under the question */
+    .hud-progress-bar {
+      display: flex;
+      width: 100%;
+      max-width: 400px;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .hud-progress-no {
+      height: 100%;
+      background: linear-gradient(90deg, #FF0055, #FF3377);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px #FF0055;
+    }
+
+    .hud-progress-yes {
+      height: 100%;
+      background: linear-gradient(90deg, #00CCFF, #00F0FF);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px #00F0FF;
     }
 
     .hud-live {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12px;
+      gap: 8px;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
       color: #FF3366;
-      text-shadow: 0 0 10px #FF3366;
+      text-shadow: 0 0 15px #FF3366;
     }
 
     .hud-live-dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       background: #FF3366;
       border-radius: 50%;
-      box-shadow: 0 0 8px #FF3366, 0 0 16px #FF3366;
+      box-shadow: 0 0 10px #FF3366, 0 0 20px #FF3366;
       animation: hud-pulse 1s ease-in-out infinite;
     }
 
@@ -3483,27 +3513,119 @@
     /* THE SCENE CONTAINER — Push perspective back to reduce warping */
     .iso-room {
       position: absolute;
-      top: 25%; /* Room fills bottom 75% */
-      bottom: 80px;
+      /* PICTO-PARTY: Fill more of the screen! */
+      top: 15%;
+      bottom: 60px;
       left: 0;
       right: 0;
       width: 100%;
       z-index: 5;
       /* CRITICAL: 1200px perspective reduces sprite warping */
       perspective: 1200px;
-      perspective-origin: 50% 30%;
+      perspective-origin: 50% 40%;
       transform-style: preserve-3d;
       overflow: visible;
     }
 
-    /* THE WORLD DIV — Standard Isometric Rotation */
+    /* ═══════════════════════════════════════════════════════════════
+       VOLUMETRIC LIGHT BEAMS — Pink NO / Cyan YES
+       "The lasers cut through the 3D space like a nightclub" — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
+    .volumetric-lights {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .light-beam {
+      position: absolute;
+      top: -20%;
+      width: 120px;
+      height: 150%;
+      opacity: 0.15;
+      mix-blend-mode: screen;
+      filter: blur(20px);
+      animation: beam-sway 8s ease-in-out infinite;
+    }
+
+    .light-beam.pink {
+      left: 20%;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(255, 0, 85, 0.6) 30%,
+        rgba(255, 0, 85, 0.3) 70%,
+        transparent 100%
+      );
+      transform: rotate(-15deg);
+      animation-delay: 0s;
+    }
+
+    .light-beam.pink-2 {
+      left: 30%;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(255, 0, 85, 0.4) 40%,
+        rgba(255, 0, 85, 0.2) 80%,
+        transparent 100%
+      );
+      transform: rotate(-8deg);
+      animation-delay: -2s;
+      width: 80px;
+    }
+
+    .light-beam.cyan {
+      right: 20%;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 240, 255, 0.6) 30%,
+        rgba(0, 240, 255, 0.3) 70%,
+        transparent 100%
+      );
+      transform: rotate(15deg);
+      animation-delay: -4s;
+    }
+
+    .light-beam.cyan-2 {
+      right: 30%;
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 240, 255, 0.4) 40%,
+        rgba(0, 240, 255, 0.2) 80%,
+        transparent 100%
+      );
+      transform: rotate(8deg);
+      animation-delay: -6s;
+      width: 80px;
+    }
+
+    @keyframes beam-sway {
+      0%, 100% { transform: rotate(var(--beam-angle, 0deg)) translateX(0); }
+      50% { transform: rotate(var(--beam-angle, 0deg)) translateX(30px); }
+    }
+
+    .light-beam.pink { --beam-angle: -15deg; }
+    .light-beam.pink-2 { --beam-angle: -8deg; }
+    .light-beam.cyan { --beam-angle: 15deg; }
+    .light-beam.cyan-2 { --beam-angle: 8deg; }
+
+    /* THE WORLD DIV — STRAIGHT-ON Isometric View (No Z rotation = faces viewer!) */
     .iso-world {
       position: absolute;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
-      /* TRUE ISOMETRIC: rotateX(60deg) rotateZ(45deg) — positive 45 for correct orientation */
-      transform: rotateX(60deg) rotateZ(45deg);
+      /* PICTO-PARTY FIX: rotateX only — faces VIEWER directly like PictoChat/Habbo */
+      /* No rotateZ means NO/YES zones face you straight on! */
+      transform: rotateX(55deg);
       transform-origin: center center;
     }
 
@@ -3516,16 +3638,19 @@
     ═══════════════════════════════════════════════════════════════ */
     .iso-floor {
       position: absolute;
-      width: 360px;
-      height: 260px;
+      /* PICTO-PARTY: BIGGER floor fills viewport! */
+      width: 90vw;
+      max-width: 700px;
+      height: 50vh;
+      max-height: 400px;
       left: 50%;
-      top: 50%;
+      top: 55%;
       transform: translate(-50%, -50%);
       transform-style: preserve-3d;
       display: flex;
       flex-direction: row; /* NO (left) | YES (right) */
-      gap: 4px;
-      /* Dynamic ratios set by JS — with 15% minimum clamp */
+      gap: 6px;
+      /* Dynamic ratios set by JS — with 20% MINIMUM (Minimum Viable Dancefloor!) */
       --yes-ratio: 0.5;
       --no-ratio: 0.5;
     }
@@ -3647,12 +3772,13 @@
       transform-style: preserve-3d;
     }
 
-    /* The Tile Grid within each zone */
+    /* The Tile Grid within each zone — WIDER tiles, fewer rows */
     .iso-tile-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(7, 1fr);
-      gap: 2px;
+      /* PICTO-PARTY: 4x4 grid for WIDER, more realistic tiles */
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 3px;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
@@ -3879,6 +4005,8 @@
 
     /* ═══ THE JUMBOTRON — Wall-Mounted Screen ═══ */
     .iso-jumbotron {
+      /* PICTO-PARTY: HIDDEN — Question moved to HUD above floor */
+      display: none;
       position: absolute;
       width: 200px;
       height: 80px;
@@ -4004,10 +4132,133 @@
     .iso-dj-booth {
       position: absolute;
       left: 50%;
-      top: calc(50% - 100px);
+      /* PICTO-PARTY: Move DJ higher, behind the floor */
+      top: calc(50% - 140px);
       transform: translateX(-50%);
       transform-style: preserve-3d;
       z-index: 60;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DJ PREDICT — Stick Figure with Headphones
+       "He's a stick figure with ATTITUDE. The vibe master." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
+    .stick-dj {
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      transform: translateX(-50%) rotateX(-55deg);
+      transform-style: preserve-3d;
+      width: 50px;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* DJ HEAD — Bigger, with headphones */
+    .stick-dj-head {
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      border: 4px solid #111;
+      border-radius: 50%;
+      position: relative;
+      z-index: 3;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    }
+
+    /* HEADPHONES — The iconic DJ look */
+    .stick-dj-headphones {
+      position: absolute;
+      top: -4px;
+      left: -8px;
+      right: -8px;
+      height: 28px;
+      border: 4px solid #333;
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      z-index: 4;
+    }
+
+    /* Headphone ear cups */
+    .stick-dj-headphones::before,
+    .stick-dj-headphones::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      width: 10px;
+      height: 14px;
+      background: #222;
+      border: 2px solid #444;
+      border-radius: 3px;
+    }
+
+    .stick-dj-headphones::before { left: -4px; }
+    .stick-dj-headphones::after { right: -4px; }
+
+    /* DJ BODY */
+    .stick-dj-body {
+      width: 5px;
+      height: 20px;
+      background: #FFD700;
+      margin-top: -3px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    /* DJ ARMS — Reaching toward turntables */
+    .stick-dj-arms {
+      position: absolute;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 5px;
+      background: #FFD700;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      animation: dj-scratch 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes dj-scratch {
+      0% { transform: translateX(-50%) rotate(-5deg); }
+      100% { transform: translateX(-50%) rotate(5deg); }
+    }
+
+    /* DJ LEGS */
+    .stick-dj-legs {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 25px;
+    }
+
+    .stick-dj-legs::before,
+    .stick-dj-legs::after {
+      content: '';
+      position: absolute;
+      width: 5px;
+      height: 25px;
+      background: #111;
+      top: 0;
+    }
+
+    .stick-dj-legs::before { left: 2px; }
+    .stick-dj-legs::after { right: 2px; }
+
+    /* DJ Label */
+    .stick-dj-label {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%) rotateX(-55deg);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #FFD700;
+      text-shadow: 0 0 10px #FFD700;
+      white-space: nowrap;
     }
 
     /* DJ Booth Base — The 3D console block */
@@ -4154,8 +4405,8 @@
       position: absolute;
       left: 50%;
       bottom: 100%;
-      /* FIXED: Correct counter-rotation rotateZ(-45deg) rotateX(-60deg) */
-      transform: translateX(-50%) rotateZ(-45deg) rotateX(-60deg) translateZ(30px);
+      /* PICTO-PARTY: Counter-rotation now just rotateX(-55deg) since no Z rotation */
+      transform: translateX(-50%) rotateX(-55deg) translateZ(30px);
       transform-style: preserve-3d;
     }
 
@@ -4222,11 +4473,11 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       BILLBOARD AVATARS — The Squircle Fix
-       "The avatar STANDS UP. The shadow LIES DOWN." — Toshiro
+       THE STICK FIGURE ENGINE — Xiao Xiao / Newgrounds Era
+       "A stick figure is not just lines; it is ATTITUDE." — Toshiro
 
-       World rotation: rotateX(60deg) rotateZ(45deg)
-       Counter-rotation: rotateZ(-45deg) rotateX(-60deg) ← EXACT INVERSE
+       World rotation: rotateX(55deg) — STRAIGHT ON VIEW
+       Counter-rotation: rotateX(-55deg) — Sprites face camera
     ═══════════════════════════════════════════════════════════════ */
     .crowd-area {
       position: absolute;
@@ -4240,11 +4491,32 @@
     .iso-avatar {
       position: absolute;
       transform-style: preserve-3d;
-      /* CRITICAL: Exact inverse of world rotation to make sprite face camera 100% */
-      /* World: rotateX(60deg) rotateZ(45deg) → Counter: rotateZ(-45deg) rotateX(-60deg) */
-      transform: rotateZ(-45deg) rotateX(-60deg) translateZ(15px);
+      /* PICTO-PARTY: Just rotateX(-55deg) since no Z rotation in world */
+      transform: rotateX(-55deg) translateZ(15px);
       pointer-events: auto;
       cursor: pointer;
+    }
+
+    /* SKY DROP ANIMATION — Characters fall from sky on spawn */
+    .iso-avatar.sky-drop {
+      animation: sky-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes sky-drop {
+      0% {
+        transform: rotateX(-55deg) translateZ(15px) translateY(-400px);
+        opacity: 0;
+      }
+      60% {
+        transform: rotateX(-55deg) translateZ(15px) translateY(10px);
+        opacity: 1;
+      }
+      80% {
+        transform: rotateX(-55deg) translateZ(15px) translateY(-5px);
+      }
+      100% {
+        transform: rotateX(-55deg) translateZ(15px) translateY(0);
+      }
     }
 
     /* SQUIRCLE SHADOW — Separate element, stays FLAT on floor */
@@ -4262,13 +4534,184 @@
       z-index: -1;
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       STICK FIGURE SPRITE — Pure CSS Xiao Xiao Style
+       "Head: White circle. Body: Thick black lines. ATTITUDE." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
     .iso-avatar-sprite {
-      width: 32px;
-      height: 48px;
+      width: 40px;
+      height: 60px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
+    }
+
+    /* STICK FIGURE HEAD — White circle with thick black outline */
+    .stick-head {
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border: 3px solid #111;
+      border-radius: 50%;
+      position: relative;
+      z-index: 3;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    /* STICK FIGURE BODY — The Torso Line */
+    .stick-body {
+      width: 4px;
+      height: 16px;
+      background: #111;
+      margin-top: -2px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Stick figure shirt color overlay — fills when betting */
+    .stick-body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      transition: background 0.3s ease;
+    }
+
+    /* STICK ARMS — Thick lines */
+    .stick-arms {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 4px;
+      background: #111;
+      z-index: 1;
+    }
+
+    /* STICK LEGS — Two lines */
+    .stick-legs {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 20px;
+    }
+
+    .stick-legs::before,
+    .stick-legs::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 20px;
+      background: #111;
+      top: 0;
+    }
+
+    .stick-legs::before {
+      left: 2px;
+      transform: rotate(-10deg);
+    }
+
+    .stick-legs::after {
+      right: 2px;
+      transform: rotate(10deg);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       STICK FIGURE STATES — Neutral vs Betting
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* NEUTRAL STATE — White/Black, just observing */
+    .iso-avatar.neutral .stick-head {
+      background: #fff;
+      border-color: #111;
+    }
+
+    /* YES BET STATE — Cyan Aura + Shirt Fill */
+    .iso-avatar.bet-yes .stick-head {
+      background: #fff;
+      border-color: #00F0FF;
+      box-shadow: 0 0 12px #00F0FF, 0 0 24px rgba(0, 240, 255, 0.5);
+    }
+
+    .iso-avatar.bet-yes .stick-body {
+      background: #00F0FF;
+      box-shadow: 0 0 8px #00F0FF;
+    }
+
+    .iso-avatar.bet-yes .stick-arms {
+      background: #00F0FF;
+      box-shadow: 0 0 8px #00F0FF;
+    }
+
+    /* NO BET STATE — Pink Aura + Shirt Fill */
+    .iso-avatar.bet-no .stick-head {
+      background: #fff;
+      border-color: #FF0055;
+      box-shadow: 0 0 12px #FF0055, 0 0 24px rgba(255, 0, 85, 0.5);
+    }
+
+    .iso-avatar.bet-no .stick-body {
+      background: #FF0055;
+      box-shadow: 0 0 8px #FF0055;
+    }
+
+    .iso-avatar.bet-no .stick-arms {
+      background: #FF0055;
+      box-shadow: 0 0 8px #FF0055;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       STICK FIGURE DANCE ANIMATION — Xiao Xiao / Newgrounds Style!
+       "They don't just stand there. They DANCE." — Toshiro
+    ═══════════════════════════════════════════════════════════════ */
+    .iso-avatar.dancing .stick-arms {
+      animation: stick-dance-arms 0.4s ease-in-out infinite alternate;
+    }
+
+    .iso-avatar.dancing .stick-legs::before {
+      animation: stick-dance-leg-left 0.4s ease-in-out infinite alternate;
+    }
+
+    .iso-avatar.dancing .stick-legs::after {
+      animation: stick-dance-leg-right 0.4s ease-in-out infinite alternate-reverse;
+    }
+
+    .iso-avatar.dancing .stick-body {
+      animation: stick-dance-body 0.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes stick-dance-arms {
+      0% { transform: translateX(-50%) rotate(-15deg); }
+      100% { transform: translateX(-50%) rotate(15deg); }
+    }
+
+    @keyframes stick-dance-leg-left {
+      0% { transform: rotate(-20deg); }
+      100% { transform: rotate(5deg); }
+    }
+
+    @keyframes stick-dance-leg-right {
+      0% { transform: rotate(20deg); }
+      100% { transform: rotate(-5deg); }
+    }
+
+    @keyframes stick-dance-body {
+      0% { transform: scaleY(0.95); }
+      100% { transform: scaleY(1.05); }
+    }
+
+    /* BOUNCING IDLE — When not dancing, gentle bounce */
+    .iso-avatar.bouncing {
+      animation: stick-bounce 0.5s ease-in-out infinite;
+    }
+
+    @keyframes stick-bounce {
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateY(-8px); }
     }
 
     /* Avatar Head with photo */
@@ -4345,9 +4788,9 @@
     }
 
     @keyframes avatar-bounce {
-      /* FIXED: Use correct counter-rotation rotateZ(-45deg) rotateX(-60deg) */
-      0%, 100% { transform: rotateZ(-45deg) rotateX(-60deg) translateZ(15px) translateY(0); }
-      50% { transform: rotateZ(-45deg) rotateX(-60deg) translateZ(15px) translateY(-5px); }
+      /* PICTO-PARTY: Simple rotateX(-55deg) counter-rotation */
+      0%, 100% { transform: rotateX(-55deg) translateZ(15px) translateY(0); }
+      50% { transform: rotateX(-55deg) translateZ(15px) translateY(-5px); }
     }
 
     /* Zone Labels — REMOVED from 3D space, now in HUD */
@@ -4383,15 +4826,15 @@
 
     /* Player sprite — CORRECT counter-rotation to stand up */
     .iso-player-sprite {
-      /* FIXED: rotateZ(-45deg) rotateX(-60deg) to match world rotation */
-      transform: rotateZ(-45deg) rotateX(-60deg);
+      /* PICTO-PARTY: Simple rotateX(-55deg) counter-rotation */
+      transform: rotateX(-55deg);
       transform-origin: center bottom;
       transition: transform 0.2s ease;
     }
 
     /* Lifted state — Player floats up */
     .iso-player.lifted .iso-player-sprite {
-      transform: rotateZ(-45deg) rotateX(-60deg) translateZ(40px) scale(1.1);
+      transform: rotateX(-55deg) translateZ(40px) scale(1.1);
       filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
     }
 
@@ -7588,40 +8031,42 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       TOSHIRO'S LAYER 2: BREATHING ZONES — Living Room Effect
-       The room is alive and waiting for your bet.
+       PICTO-PARTY: AMBIENT GLASS FLOOR — Slow, Classy Breathing
+       "Not a rave; a lounge. The floor breathes slowly." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
     .floor-zone.yes {
-      animation: zone-breathe-cyan 4s ease-in-out infinite;
+      /* SLOWED: 10s for calm, ambient glow */
+      animation: zone-breathe-cyan 10s ease-in-out infinite;
     }
 
     .floor-zone.no {
-      animation: zone-breathe-pink 4s ease-in-out infinite;
+      /* SLOWED: 10s for calm, ambient glow */
+      animation: zone-breathe-pink 10s ease-in-out infinite;
     }
 
     @keyframes zone-breathe-cyan {
       0%, 100% {
         box-shadow:
-          inset 0 0 30px rgba(77, 166, 255, 0.15),
-          0 0 20px rgba(77, 166, 255, 0.1);
+          inset 0 0 40px rgba(0, 240, 255, 0.1),
+          0 0 30px rgba(0, 240, 255, 0.08);
       }
       50% {
         box-shadow:
-          inset 0 0 50px rgba(77, 166, 255, 0.25),
-          0 0 40px rgba(77, 166, 255, 0.2);
+          inset 0 0 60px rgba(0, 240, 255, 0.18),
+          0 0 50px rgba(0, 240, 255, 0.12);
       }
     }
 
     @keyframes zone-breathe-pink {
       0%, 100% {
         box-shadow:
-          inset 0 0 30px rgba(255, 75, 155, 0.15),
-          0 0 20px rgba(255, 75, 155, 0.1);
+          inset 0 0 40px rgba(255, 0, 85, 0.1),
+          0 0 30px rgba(255, 0, 85, 0.08);
       }
       50% {
         box-shadow:
-          inset 0 0 50px rgba(255, 75, 155, 0.25),
-          0 0 40px rgba(255, 75, 155, 0.2);
+          inset 0 0 60px rgba(255, 0, 85, 0.18),
+          0 0 50px rgba(255, 0, 85, 0.12);
       }
     }
 
@@ -8084,16 +8529,34 @@
              "A User is a Resident. A Page is a Room." — Toshiro
         ═══════════════════════════════════════════════════════════════ -->
         <!-- 2D HUD — Question Overlay (Outside 3D space) -->
+        <!-- ═══════════════════════════════════════════════════════════════
+             THE MAIN SIGN — Question + Progress ABOVE the Floor
+             "The question hovers above the battlefield." — Toshiro
+        ═══════════════════════════════════════════════════════════════ -->
         <div class="hud-question" id="hud-question">
-          <div class="hud-question-text" id="hud-question-text">WILL BTC HIT $100K?</div>
           <div class="hud-live">
             <span class="hud-live-dot"></span>
             <span>LIVE</span>
           </div>
+          <div class="hud-question-text" id="hud-question-text">WILL BTC HIT $100K?</div>
+          <div class="hud-progress-bar">
+            <div class="hud-progress-no" id="hud-progress-no" style="width: 35%"></div>
+            <div class="hud-progress-yes" id="hud-progress-yes" style="width: 65%"></div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             VOLUMETRIC LIGHT BEAMS — Nightclub Atmosphere
+        ═══════════════════════════════════════════════════════════════ -->
+        <div class="volumetric-lights">
+          <div class="light-beam pink"></div>
+          <div class="light-beam pink-2"></div>
+          <div class="light-beam cyan"></div>
+          <div class="light-beam cyan-2"></div>
         </div>
 
         <div class="iso-room" id="iso-room">
-          <!-- THE 3D WORLD — Everything rotates together -->
+          <!-- THE 3D WORLD — STRAIGHT ON VIEW (no Z rotation!) -->
           <div class="iso-world" id="iso-world">
 
             <!-- WALLS ARE NOW CHILDREN OF FLOOR ZONES — See .floor-zone .zone-wall -->
@@ -8128,14 +8591,15 @@
                 <div class="dj-booth-front-left"></div>
                 <div class="dj-booth-front-right"></div>
               </div>
-              <!-- DJ Avatar standing ON the booth -->
-              <div class="dj-avatar">
-                <div class="dj-avatar-head"></div>
-                <div class="dj-avatar-body"></div>
-                <div class="dj-avatar-arms">
-                  <div class="dj-arm left"></div>
-                  <div class="dj-arm right"></div>
+              <!-- PICTO-PARTY: STICK FIGURE DJ with Headphones -->
+              <div class="stick-dj">
+                <div class="stick-dj-head">
+                  <div class="stick-dj-headphones"></div>
                 </div>
+                <div class="stick-dj-body"></div>
+                <div class="stick-dj-arms"></div>
+                <div class="stick-dj-legs"></div>
+                <div class="stick-dj-label">DJ PREDICT</div>
               </div>
             </div>
 
@@ -8149,14 +8613,12 @@
                   <div class="wall-label">NO</div>
                   <div class="wall-odds" id="wall-no-odds">35%</div>
                 </div>
+                <!-- PICTO-PARTY: 4x4 grid for WIDER tiles -->
                 <div class="iso-tile-grid" id="iso-grid-no">
-                  <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
-                  <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
-                  <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
-                  <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
-                  <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
-                  <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
-                  <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
                 </div>
                 <div class="crowd-area" id="crowd-no"></div>
               </div>
@@ -8168,14 +8630,12 @@
                   <div class="wall-label">YES</div>
                   <div class="wall-odds" id="wall-yes-odds">65%</div>
                 </div>
+                <!-- PICTO-PARTY: 4x4 grid for WIDER tiles -->
                 <div class="iso-tile-grid" id="iso-grid-yes">
-                  <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
-                  <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
-                  <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
-                  <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
-                  <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
-                  <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
-                  <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
+                  <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
                 </div>
                 <div class="crowd-area" id="crowd-yes"></div>
               </div>
@@ -8633,11 +9093,12 @@
       const floor = document.getElementById('iso-floor');
       if (!floor) return;
 
-      // THE WIDTH ALGORITHM — 15% minimum clamp
-      // If yesPercentage = 6%, visual = 15%
-      // If yesPercentage = 94%, visual = 85% (so NO gets 15%)
-      const MIN_WIDTH = 0.15; // 15% minimum for either zone
-      const MAX_WIDTH = 1 - MIN_WIDTH; // 85% maximum
+      // THE WIDTH ALGORITHM — 20% MINIMUM (Minimum Viable Dancefloor!)
+      // If yesPercentage = 2%, visual = 20% so dancers have room to dance
+      // If yesPercentage = 98%, visual = 80% (so NO gets 20%)
+      // Note: Display REAL text percentages on walls, but CHEAT the floor visuals for UX
+      const MIN_WIDTH = 0.20; // 20% minimum for either zone — ROOM TO DANCE!
+      const MAX_WIDTH = 1 - MIN_WIDTH; // 80% maximum
 
       let yesRatio = yesPercentage / 100;
       let noRatio = 1 - yesRatio;
@@ -8666,7 +9127,13 @@
       if (wallYesKalshi) wallYesKalshi.textContent = `${yesPercentage}¢`;
       if (wallNoKalshi) wallNoKalshi.textContent = `${100 - yesPercentage}¢`;
 
-      console.log(`[HABBO 2026] Market: ${yesPercentage}% YES → Floor: ${Math.round(yesRatio * 100)}% YES / ${Math.round(noRatio * 100)}% NO`);
+      // PICTO-PARTY: Update HUD progress bar
+      const hudProgressYes = document.getElementById('hud-progress-yes');
+      const hudProgressNo = document.getElementById('hud-progress-no');
+      if (hudProgressYes) hudProgressYes.style.width = `${yesPercentage}%`;
+      if (hudProgressNo) hudProgressNo.style.width = `${100 - yesPercentage}%`;
+
+      console.log(`[PICTO-PARTY] Market: ${yesPercentage}% YES → Floor: ${Math.round(yesRatio * 100)}% YES / ${Math.round(noRatio * 100)}% NO`);
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -8834,18 +9301,18 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // HABBO 2026 — Billboard Avatar Creation with BetSide Outfits
-    // "Your clothes tell your story." — Toshiro
+    // PICTO-PARTY — Stick Figure Creation with Sky Drop!
+    // "A stick figure is not just lines; it is ATTITUDE." — Toshiro
     // ═══════════════════════════════════════════════════════════════
     function createVillager(member, index, team, position) {
       const avatar = document.createElement('div');
-      // Add bet-yes or bet-no class for outfit coloring
+      // Add bet-yes or bet-no class for outfit coloring, sky-drop for entrance, dancing for fun!
       const betClass = team === 'yes' ? 'bet-yes' : 'bet-no';
-      avatar.className = `iso-avatar dancing ${betClass}`;
+      avatar.className = `iso-avatar sky-drop dancing ${betClass}`;
 
-      // Random animation delay for organic crowd
-      const delay = Math.random() * 2;
-      avatar.style.animationDelay = `${delay.toFixed(2)}s`;
+      // Random animation delay for staggered sky drops (0-1s) and dancing (0-2s)
+      const dropDelay = index * 0.1 + Math.random() * 0.3;
+      avatar.style.animationDelay = `${dropDelay.toFixed(2)}s`;
 
       // Position within the crowd area
       const posX = position ? position.x : 50;
@@ -8857,20 +9324,21 @@
       const zIndex = 10 + Math.floor(posY);
       avatar.style.zIndex = zIndex;
 
-      // Party auras — "The Drip"
-      const auras = ['👑', '🔥', '⭐', '💎', '🎮', '🎯', '🚀', '💫'];
-      const aura = auras[Math.floor(Math.random() * auras.length)];
-
-      // HABBO 2026 Billboard Avatar with team-colored outfit
+      // PICTO-PARTY: Pure CSS Stick Figure with Xiao Xiao vibes!
       avatar.innerHTML = `
         <div class="iso-avatar-sprite">
-          <div class="iso-avatar-aura ${team}">${aura}</div>
-          <div class="iso-avatar-head">
-            <div class="iso-avatar-photo" style="background-image: url('${member.photo}')"></div>
-          </div>
-          <div class="iso-avatar-body"></div>
+          <div class="iso-avatar-shadow"></div>
+          <div class="stick-head"></div>
+          <div class="stick-body"></div>
+          <div class="stick-arms"></div>
+          <div class="stick-legs"></div>
         </div>
       `;
+
+      // Remove sky-drop class after animation completes (to allow dancing)
+      setTimeout(() => {
+        avatar.classList.remove('sky-drop');
+      }, 600 + dropDelay * 1000);
 
       return avatar;
     }
