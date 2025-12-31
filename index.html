@@ -7203,6 +7203,8 @@
 
     function startChat() {
       const container = document.getElementById('chat-container');
+      if (!container) return; // Chat container may not exist
+
       container.innerHTML = '';
       chatIndex = 0;
 
