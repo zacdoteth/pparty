@@ -3408,217 +3408,674 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       TOSHIRO'S ISOMETRIC DANCE FLOOR — Habbo Hotel 2.0
-       High-Fidelity 2.5D Grid with "Billie Jean" Lighting
+       HABBO 2026 — THE ISOMETRIC ROOM
+       A full 3D room with floor, walls, and architectural depth
+       "A User is a Resident. A Page is a Room." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
 
-    /* The Stage Container — Houses the isometric floor */
-    .dance-floor {
+    /* THE ROOM CONTAINER — Perspective viewport */
+    .iso-room {
       position: absolute;
-      top: auto;
-      bottom: 90px;
+      top: 60px;
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
-      width: 90%;
-      max-width: 600px;
-      height: 45%;
-      max-height: 400px;
+      width: 95%;
+      max-width: 500px;
       z-index: 5;
-      /* 3D Perspective Container */
-      perspective: 1000px;
-      perspective-origin: 50% 40%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      /* 3D Perspective — Camera looking down at the room */
+      perspective: 800px;
+      perspective-origin: 50% 35%;
+      transform-style: preserve-3d;
     }
 
-    /* The Isometric Grid Wrapper */
-    .iso-grid-wrapper {
-      position: relative;
+    /* THE ROOM WORLD — Everything rotates together */
+    .iso-world {
+      position: absolute;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
-      /* HABBO-STYLE ISOMETRIC TRANSFORM */
+      /* HABBO-STYLE ISOMETRIC: 60° tilt, 45° rotation */
       transform: rotateX(60deg) rotateZ(-45deg);
+      transform-origin: center center;
     }
 
-    /* Zone containers positioned side by side in iso space */
-    .floor-zone {
+    /* ═══ THE FLOOR — Diamond Grid with YES/NO Zones ═══ */
+    .iso-floor {
       position: absolute;
+      width: 280px;
+      height: 280px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transform-style: preserve-3d;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+
+    /* Floor Zone Containers */
+    .floor-zone {
+      position: relative;
       transform-style: preserve-3d;
       transition: all 0.3s var(--smooth);
     }
 
-    .floor-zone.yes {
-      left: 0;
-      top: 0;
-      width: 50%;
-      height: 100%;
-    }
-
-    .floor-zone.no {
-      right: 0;
-      top: 0;
-      width: 50%;
-      height: 100%;
-    }
-
-    /* The 10x10 Tile Grid */
+    /* The Tile Grid within each zone */
     .iso-tile-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(10, 1fr);
+      grid-template-rows: repeat(7, 1fr);
       gap: 2px;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
     }
 
-    /* Individual Isometric Tile */
+    /* Individual Floor Tile — 3D extruded slab */
     .iso-tile {
       position: relative;
       background: #1a1a2a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       transform-style: preserve-3d;
-      /* Smooth "Billie Jean" glow transition */
-      transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-                  box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color 0.15s ease-out,
+                  box-shadow 0.15s ease-out;
     }
 
-    /* Tile Depth Extrusion — The 3D "slab" effect */
+    /* Tile Depth — Front face (bottom edge) */
     .iso-tile::before {
       content: '';
       position: absolute;
-      bottom: -5px;
+      bottom: 0;
       left: 0;
       right: 0;
-      height: 5px;
-      background: #0a0a15;
-      transform: rotateX(-90deg);
-      transform-origin: top;
+      height: 6px;
+      background: #0a0a12;
+      transform: rotateX(-90deg) translateZ(0px);
+      transform-origin: bottom;
     }
 
+    /* Tile Depth — Right face (side edge) */
     .iso-tile::after {
       content: '';
       position: absolute;
       top: 0;
       bottom: 0;
-      right: -5px;
-      width: 5px;
-      background: #12121f;
-      transform: rotateY(90deg);
-      transform-origin: left;
+      right: 0;
+      width: 6px;
+      background: #0f0f1a;
+      transform: rotateY(90deg) translateZ(0px);
+      transform-origin: right;
     }
 
-    /* YES Zone Tiles — Base cyan tint */
+    /* YES Zone Tiles — Cyan/Blue tint */
     .floor-zone.yes .iso-tile {
-      background: linear-gradient(135deg, #1a2a3a 0%, #152535 100%);
-      border-color: rgba(0, 240, 255, 0.15);
+      background: linear-gradient(135deg, #0a1a25 0%, #0f2530 100%);
+      border-color: rgba(0, 240, 255, 0.12);
     }
+    .floor-zone.yes .iso-tile::before { background: #051015; }
+    .floor-zone.yes .iso-tile::after { background: #08181f; }
 
-    .floor-zone.yes .iso-tile::before {
-      background: linear-gradient(90deg, #0a1520, #081018);
-    }
-
-    .floor-zone.yes .iso-tile::after {
-      background: linear-gradient(180deg, #0f1f2a, #0a1520);
-    }
-
-    /* NO Zone Tiles — Base pink tint */
+    /* NO Zone Tiles — Pink/Red tint */
     .floor-zone.no .iso-tile {
-      background: linear-gradient(135deg, #2a1a2a 0%, #251525 100%);
-      border-color: rgba(255, 0, 85, 0.15);
+      background: linear-gradient(135deg, #1a0a15 0%, #250f1a 100%);
+      border-color: rgba(255, 0, 85, 0.12);
     }
+    .floor-zone.no .iso-tile::before { background: #100510; }
+    .floor-zone.no .iso-tile::after { background: #180812; }
 
-    .floor-zone.no .iso-tile::before {
-      background: linear-gradient(90deg, #150a15, #100810);
-    }
-
-    .floor-zone.no .iso-tile::after {
-      background: linear-gradient(180deg, #1f0f1f, #150a15);
+    /* Zone hover glow */
+    .floor-zone.hovering .iso-tile {
+      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
     }
 
     /* "BILLIE JEAN" EFFECT — Tile Flash States */
     .iso-tile.flash-cyan {
       background: #00F0FF !important;
       box-shadow:
-        0 0 20px #00F0FF,
-        0 0 40px rgba(0, 240, 255, 0.6),
-        inset 0 0 15px rgba(255, 255, 255, 0.3);
+        0 0 15px #00F0FF,
+        0 0 30px rgba(0, 240, 255, 0.5),
+        inset 0 0 10px rgba(255, 255, 255, 0.4);
       border-color: #00F0FF;
     }
 
     .iso-tile.flash-pink {
       background: #FF0055 !important;
       box-shadow:
-        0 0 20px #FF0055,
-        0 0 40px rgba(255, 0, 85, 0.6),
-        inset 0 0 15px rgba(255, 255, 255, 0.3);
+        0 0 15px #FF0055,
+        0 0 30px rgba(255, 0, 85, 0.5),
+        inset 0 0 10px rgba(255, 255, 255, 0.4);
       border-color: #FF0055;
     }
 
-    /* Zone Labels — Floating above iso grid */
-    .zone-label {
+    /* ═══ THE WALLS — Vertical planes for depth ═══ */
+    .iso-wall {
       position: absolute;
+      transform-style: preserve-3d;
+      background: linear-gradient(180deg,
+        #0a0a12 0%,
+        #080810 50%,
+        #050508 100%
+      );
+    }
+
+    /* Back Wall (LEFT in iso view — behind YES zone) */
+    .iso-wall.back-left {
+      width: 140px;
+      height: 120px;
+      left: calc(50% - 142px);
+      top: calc(50% - 140px);
+      transform: rotateX(-90deg) translateZ(0px);
+      transform-origin: bottom center;
+      border-left: 2px solid rgba(0, 240, 255, 0.3);
+      box-shadow: inset 0 0 60px rgba(0, 240, 255, 0.1);
+    }
+
+    /* Back Wall (RIGHT in iso view — behind NO zone) */
+    .iso-wall.back-right {
+      width: 140px;
+      height: 120px;
+      right: calc(50% - 142px);
+      top: calc(50% - 140px);
+      transform: rotateX(-90deg) translateZ(0px);
+      transform-origin: bottom center;
+      border-right: 2px solid rgba(255, 0, 85, 0.3);
+      box-shadow: inset 0 0 60px rgba(255, 0, 85, 0.1);
+    }
+
+    /* Side Wall Left */
+    .iso-wall.side-left {
+      width: 120px;
+      height: 140px;
+      left: calc(50% - 260px);
+      top: calc(50% - 70px);
+      transform: rotateY(90deg) rotateZ(0deg);
+      transform-origin: right center;
+      background: linear-gradient(90deg, #050508, #0a0a12);
+    }
+
+    /* Side Wall Right */
+    .iso-wall.side-right {
+      width: 120px;
+      height: 140px;
+      right: calc(50% - 260px);
+      top: calc(50% - 70px);
+      transform: rotateY(-90deg);
+      transform-origin: left center;
+      background: linear-gradient(-90deg, #050508, #0a0a12);
+    }
+
+    /* ═══ THE JUMBOTRON — Wall-Mounted Screen ═══ */
+    .iso-jumbotron {
+      position: absolute;
+      width: 200px;
+      height: 80px;
       left: 50%;
-      top: -40px;
-      transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg);
-      font-size: 14px;
+      top: calc(50% - 120px);
+      transform: translateX(-50%) rotateX(-90deg) translateY(-20px);
+      transform-origin: bottom center;
+      transform-style: preserve-3d;
+      z-index: 100;
+    }
+
+    .iso-jumbotron-frame {
+      position: absolute;
+      inset: -4px;
+      background: linear-gradient(135deg, #333 0%, #1a1a1a 50%, #222 100%);
+      border-radius: 4px;
+      box-shadow:
+        0 0 20px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .iso-jumbotron-screen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, #0a0a15 0%, #05050a 100%);
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    /* Screen glow effect */
+    .iso-jumbotron-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center,
+        rgba(255, 200, 50, 0.15) 0%,
+        transparent 70%
+      );
+      animation: screen-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes screen-pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Scanlines */
+    .iso-jumbotron-screen::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      pointer-events: none;
+    }
+
+    .iso-jumbotron-question {
+      font-size: 11px;
       font-weight: 800;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      text-shadow: 0 0 20px currentColor, 0 2px 4px rgba(0,0,0,0.8);
-      z-index: 100;
-      white-space: nowrap;
+      color: #FFD700;
+      text-align: center;
+      text-shadow: 0 0 10px #FFD700, 0 0 20px rgba(255, 215, 0, 0.5);
+      letter-spacing: 1px;
+      z-index: 1;
+      line-height: 1.2;
     }
 
-    .floor-zone.no .zone-label {
-      color: #FF0055;
+    .iso-jumbotron-bar {
+      display: flex;
+      width: 90%;
+      height: 12px;
+      margin-top: 6px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1;
     }
 
-    .floor-zone.yes .zone-label {
-      color: #00F0FF;
+    .iso-jumbotron-bar-yes {
+      background: linear-gradient(90deg, #00C8FF, #00F0FF);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+      transition: width 0.5s ease;
     }
 
-    /* Team Score Display */
-    .floor-score {
+    .iso-jumbotron-bar-no {
+      background: linear-gradient(90deg, #FF0055, #FF3377);
+      box-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+      transition: width 0.5s ease;
+    }
+
+    /* Volumetric light from jumbotron onto floor */
+    .iso-jumbotron-light {
+      position: absolute;
+      width: 300px;
+      height: 200px;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%) rotateX(90deg);
+      transform-origin: top center;
+      background: radial-gradient(ellipse at 50% 0%,
+        rgba(255, 215, 0, 0.15) 0%,
+        rgba(255, 200, 50, 0.08) 30%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+
+    /* ═══ THE DJ BOOTH — 3D Block Structure ═══ */
+    .iso-dj-booth {
       position: absolute;
       left: 50%;
-      bottom: -30px;
-      transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg);
-      font-size: 28px;
-      font-weight: 900;
-      opacity: 0.7;
-      z-index: 100;
-      text-shadow: 0 0 30px currentColor;
+      top: calc(50% - 80px);
+      transform: translateX(-50%);
+      transform-style: preserve-3d;
+      z-index: 60;
     }
 
-    .floor-zone.no .floor-score {
-      color: #FF0055;
+    /* DJ Booth Base — The console block */
+    .dj-booth-block {
+      position: relative;
+      width: 80px;
+      height: 25px;
+      background: linear-gradient(180deg, #2a2a35 0%, #1a1a22 100%);
+      transform-style: preserve-3d;
     }
 
-    .floor-zone.yes .floor-score {
-      color: #00F0FF;
+    /* Front face of booth */
+    .dj-booth-block::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 30px;
+      bottom: 0;
+      background: linear-gradient(180deg, #1a1a22, #0f0f15);
+      transform: rotateX(-90deg);
+      transform-origin: bottom;
+      border-top: 2px solid rgba(255, 215, 0, 0.3);
     }
 
-    /* Crowd Area — Avatar container with z-index sorting */
+    /* Right face of booth */
+    .dj-booth-block::after {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 100%;
+      right: 0;
+      background: linear-gradient(90deg, #151520, #0a0a10);
+      transform: rotateY(90deg);
+      transform-origin: right;
+    }
+
+    /* DJ Turntables */
+    .dj-turntables {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+    }
+
+    .dj-turntable {
+      width: 18px;
+      height: 18px;
+      background: radial-gradient(circle, #222 0%, #111 70%, #333 100%);
+      border-radius: 50%;
+      border: 2px solid #444;
+      animation: spin-record 3s linear infinite;
+    }
+
+    @keyframes spin-record {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* DJ Avatar (standing on booth) */
+    .dj-avatar {
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      transform: translateX(-50%) translateZ(20px);
+      transform-style: preserve-3d;
+    }
+
+    /* DJ Head */
+    .dj-avatar-head {
+      width: 24px;
+      height: 24px;
+      background: radial-gradient(circle at 30% 30%, #222, #111);
+      border-radius: 50%;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    /* DJ Headphones */
+    .dj-avatar-head::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: -4px;
+      right: -4px;
+      height: 6px;
+      background: linear-gradient(90deg, #FF0055, transparent 20%, transparent 80%, #00F0FF);
+      border-radius: 10px 10px 0 0;
+    }
+
+    /* DJ Body */
+    .dj-avatar-body {
+      width: 20px;
+      height: 28px;
+      background: linear-gradient(180deg, #1a1a25, #0f0f15);
+      margin: 2px auto 0;
+      border-radius: 4px 4px 0 0;
+    }
+
+    /* DJ Arms */
+    .dj-avatar-arms {
+      position: absolute;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .dj-arm {
+      width: 4px;
+      height: 16px;
+      background: #1a1a25;
+      border-radius: 2px;
+      transform-origin: top center;
+      animation: dj-scratch 0.5s ease-in-out infinite alternate;
+    }
+
+    .dj-arm.left { animation-delay: 0s; }
+    .dj-arm.right { animation-delay: 0.25s; }
+
+    @keyframes dj-scratch {
+      0% { transform: rotate(-15deg); }
+      100% { transform: rotate(15deg); }
+    }
+
+    /* ═══ BILLBOARD AVATARS — Always face the camera ═══ */
     .crowd-area {
       position: absolute;
       inset: 0;
       z-index: 50;
-      /* Counter-rotate so avatars appear upright */
-      transform: rotateZ(45deg) rotateX(-60deg);
-      transform-origin: center center;
       pointer-events: none;
+      transform-style: preserve-3d;
     }
 
-    .crowd-area .villager {
+    /* Billboard Sprite — Counter-rotate to face camera */
+    .iso-avatar {
+      position: absolute;
+      transform-style: preserve-3d;
+      /* Counter-rotate: rotateZ(45deg) cancels room's -45deg, rotateX(-60deg) cancels room's 60deg */
+      transform: rotateZ(45deg) rotateX(-60deg) translateZ(20px);
       pointer-events: auto;
+      cursor: pointer;
     }
 
-    /* Hide old floor-tiles, we use iso-tile-grid now */
-    .floor-tiles {
-      display: none;
+    .iso-avatar-sprite {
+      width: 32px;
+      height: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Avatar Head with photo */
+    .iso-avatar-head {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #222;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .iso-avatar-photo {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Avatar Body */
+    .iso-avatar-body {
+      width: 16px;
+      height: 20px;
+      background: linear-gradient(180deg, #2a2a35 0%, #1a1a22 100%);
+      border-radius: 4px 4px 0 0;
+      margin-top: -4px;
+    }
+
+    /* Party Hat / Aura — The "Drip" */
+    .iso-avatar-aura {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+
+    .iso-avatar-aura.yes { color: #00F0FF; }
+    .iso-avatar-aura.no { color: #FF0055; }
+
+    /* Avatar Bounce — Dancing to the beat */
+    .iso-avatar.dancing {
+      animation: avatar-bounce 0.468s ease-in-out infinite;
+    }
+
+    @keyframes avatar-bounce {
+      0%, 100% { transform: rotateZ(45deg) rotateX(-60deg) translateZ(20px) translateY(0); }
+      50% { transform: rotateZ(45deg) rotateX(-60deg) translateZ(20px) translateY(-4px); }
+    }
+
+    /* Zone Labels — Floating in 3D space */
+    .iso-zone-label {
+      position: absolute;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      /* Billboard: face camera */
+      transform: rotateZ(45deg) rotateX(-60deg) translateZ(30px);
+      text-shadow: 0 0 20px currentColor, 0 2px 8px rgba(0, 0, 0, 0.8);
+      z-index: 80;
+    }
+
+    .iso-zone-label.yes {
+      left: 20%;
+      top: 80%;
+      color: #00F0FF;
+    }
+
+    .iso-zone-label.no {
+      right: 20%;
+      top: 80%;
+      color: #FF0055;
+    }
+
+    /* Zone Scores */
+    .iso-zone-score {
+      position: absolute;
+      font-size: 32px;
+      font-weight: 900;
+      opacity: 0.6;
+      transform: rotateZ(45deg) rotateX(-60deg) translateZ(10px);
+      text-shadow: 0 0 30px currentColor;
+      z-index: 70;
+    }
+
+    .iso-zone-score.yes {
+      left: 25%;
+      top: 50%;
+      color: #00F0FF;
+    }
+
+    .iso-zone-score.no {
+      right: 25%;
+      top: 50%;
+      color: #FF0055;
+    }
+
+    /* ═══ PLAYER AVATAR — Liftable with floor shadow ═══ */
+    .iso-player {
+      position: absolute;
+      z-index: 200;
+      transform-style: preserve-3d;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .iso-player:active { cursor: grabbing; }
+
+    /* Player sprite (counter-rotated billboard) */
+    .iso-player-sprite {
+      transform: rotateZ(45deg) rotateX(-60deg);
+      transform-origin: center bottom;
+      transition: transform 0.2s ease;
+    }
+
+    /* Lifted state — Player floats up */
+    .iso-player.lifted .iso-player-sprite {
+      transform: rotateZ(45deg) rotateX(-60deg) translateZ(40px) scale(1.1);
+      filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+    }
+
+    /* Floor Shadow — Stays on ground while player lifts */
+    .iso-player-shadow {
+      position: absolute;
+      width: 30px;
+      height: 10px;
+      background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
+      left: 50%;
+      bottom: -5px;
+      transform: translateX(-50%);
+      transition: all 0.2s ease;
+    }
+
+    .iso-player.lifted .iso-player-shadow {
+      width: 40px;
+      height: 15px;
+      opacity: 0.7;
+      bottom: -20px;
+    }
+
+    /* Player Head */
+    .iso-player-head {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #FFD700;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      margin: 0 auto;
+    }
+
+    .iso-player-photo {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Player Body */
+    .iso-player-body {
+      width: 20px;
+      height: 24px;
+      background: linear-gradient(180deg, #fff 0%, #ddd 100%);
+      border-radius: 6px 6px 0 0;
+      margin: -6px auto 0;
+    }
+
+    /* Player Crown — You're the star */
+    .iso-player-crown {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px;
+      filter: drop-shadow(0 0 8px #FFD700);
+      animation: crown-float 2s ease-in-out infinite;
+    }
+
+    @keyframes crown-float {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-3px); }
+    }
+
+    /* Hide old floor-tiles */
+    .floor-tiles,
+    .dance-floor {
+      display: none !important;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -7236,73 +7693,107 @@
           <div class="totem-glow"></div>
         </div>
 
-        <!-- TOSHIRO'S ISOMETRIC DANCE FLOOR — Habbo Hotel 2.0 -->
-        <div class="dance-floor">
-          <!-- The Isometric Grid Wrapper -->
-          <div class="iso-grid-wrapper">
-            <!-- YES Zone (LEFT in iso view) — Cyan/Blue -->
-            <div class="floor-zone yes" id="zone-yes">
-              <div class="iso-tile-grid" id="iso-grid-yes">
-                <!-- 50 tiles (5x10 grid) - Generated by JS, fallback here -->
-                <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
-                <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
-                <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
-                <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
-                <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
-                <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
-                <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
-                <div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div>
-                <div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div>
-                <div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div>
+        <!-- ═══════════════════════════════════════════════════════════════
+             HABBO 2026 — THE ISOMETRIC ROOM
+             "A User is a Resident. A Page is a Room." — Toshiro
+        ═══════════════════════════════════════════════════════════════ -->
+        <div class="iso-room" id="iso-room">
+          <!-- THE 3D WORLD — Everything rotates together -->
+          <div class="iso-world" id="iso-world">
+
+            <!-- THE WALLS — Vertical planes for depth -->
+            <div class="iso-wall back-left"></div>
+            <div class="iso-wall back-right"></div>
+
+            <!-- THE JUMBOTRON — Wall-mounted screen -->
+            <div class="iso-jumbotron" id="iso-jumbotron">
+              <div class="iso-jumbotron-frame"></div>
+              <div class="iso-jumbotron-screen">
+                <div class="iso-jumbotron-question" id="iso-jumbotron-question">WILL BTC HIT $100K?</div>
+                <div class="iso-jumbotron-bar">
+                  <div class="iso-jumbotron-bar-yes" id="iso-bar-yes" style="width: 65%"></div>
+                  <div class="iso-jumbotron-bar-no" id="iso-bar-no" style="width: 35%"></div>
+                </div>
               </div>
-              <div class="crowd-area" id="crowd-yes"></div>
-              <span class="zone-label">YES</span>
-              <span class="floor-score" id="yes-score">72%</span>
+              <div class="iso-jumbotron-light"></div>
             </div>
 
-            <!-- NO Zone (RIGHT in iso view) — Pink/Red -->
-            <div class="floor-zone no" id="zone-no">
-              <div class="iso-tile-grid" id="iso-grid-no">
-                <!-- 50 tiles (5x10 grid) -->
-                <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
-                <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
-                <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
-                <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
-                <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
-                <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
-                <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
-                <div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div>
-                <div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div>
-                <div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div>
+            <!-- THE DJ BOOTH — 3D block structure -->
+            <div class="iso-dj-booth">
+              <div class="dj-booth-block">
+                <div class="dj-turntables">
+                  <div class="dj-turntable"></div>
+                  <div class="dj-turntable"></div>
+                </div>
               </div>
-              <div class="crowd-area" id="crowd-no"></div>
-              <span class="zone-label">NO</span>
-              <span class="floor-score" id="no-score">28%</span>
+              <div class="dj-avatar">
+                <div class="dj-avatar-head"></div>
+                <div class="dj-avatar-body"></div>
+                <div class="dj-avatar-arms">
+                  <div class="dj-arm left"></div>
+                  <div class="dj-arm right"></div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Player (You) — OUTSIDE dance-floor so it can be dragged freely! -->
-        <div class="player-container at-door" id="player-container">
-          <div class="player at-door" id="player">
+            <!-- THE FLOOR — Diamond grid with YES/NO zones -->
+            <div class="iso-floor" id="iso-floor">
+              <!-- YES Zone (LEFT side) — Cyan/Blue -->
+              <div class="floor-zone yes" id="zone-yes">
+                <div class="iso-tile-grid" id="iso-grid-yes">
+                  <!-- 35 tiles (5x7 grid) -->
+                  <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
+                  <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
+                  <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
+                  <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
+                  <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
+                  <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
+                  <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
+                </div>
+                <div class="crowd-area" id="crowd-yes"></div>
+              </div>
+
+              <!-- NO Zone (RIGHT side) — Pink/Red -->
+              <div class="floor-zone no" id="zone-no">
+                <div class="iso-tile-grid" id="iso-grid-no">
+                  <!-- 35 tiles (5x7 grid) -->
+                  <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
+                  <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
+                  <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
+                  <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
+                  <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
+                  <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
+                  <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
+                </div>
+                <div class="crowd-area" id="crowd-no"></div>
+              </div>
+            </div>
+
+            <!-- Zone Labels (Billboard style) -->
+            <div class="iso-zone-label yes">YES</div>
+            <div class="iso-zone-label no">NO</div>
+            <div class="iso-zone-score yes" id="yes-score">72%</div>
+            <div class="iso-zone-score no" id="no-score">28%</div>
+
+          </div><!-- /iso-world -->
+
+          <!-- THE PLAYER — Outside iso-world for free dragging -->
+          <div class="iso-player" id="iso-player">
+            <div class="iso-player-shadow"></div>
+            <div class="iso-player-sprite" id="iso-player-sprite">
+              <div class="iso-player-crown">👑</div>
+              <div class="iso-player-head">
+                <div class="iso-player-photo" style="background-image: url('/tg/zac.jpg')"></div>
+              </div>
+              <div class="iso-player-body"></div>
+            </div>
             <div class="player-speech" id="player-speech"></div>
-            <div class="villager-avatar">
-              <div class="villager-photo player-photo-head" style="background-image: url('/tg/zac.jpg')"></div>
-              <div class="stick-body player-stick-body">
-                <div class="stick-torso"></div>
-                <div class="stick-arm left"></div>
-                <div class="stick-arm right"></div>
-                <div class="stick-leg left"></div>
-                <div class="stick-leg right"></div>
-              </div>
-            </div>
           </div>
-          <div class="player-label">You</div>
-        </div>
 
-        <!-- Vote Buttons -->
+        </div><!-- /iso-room -->
+
+        <!-- Player Dock / Drag Hint (stays outside room) -->
         <div class="control-deck">
-          <!-- Player Dock - visual home base (drag-only mode) -->
           <div class="player-dock" id="player-dock">
             <div class="drag-hint">← NO &nbsp;|&nbsp; YES →</div>
           </div>
@@ -7515,8 +8006,13 @@
     const screenArena = document.getElementById('screen-arena');
     const marketGrid = document.getElementById('market-grid');
     const tabBar = document.getElementById('tab-bar');
-    const player = document.getElementById('player');
-    const playerContainer = document.getElementById('player-container');
+    // HABBO 2026 — New isometric player elements
+    const isoPlayer = document.getElementById('iso-player');
+    const isoPlayerSprite = document.getElementById('iso-player-sprite');
+    const isoRoom = document.getElementById('iso-room');
+    // Legacy aliases for compatibility
+    const player = isoPlayerSprite;
+    const playerContainer = isoPlayer;
     const slidePanel = document.getElementById('slide-panel');
     const zoneYes = document.getElementById('zone-yes');
     const zoneNo = document.getElementById('zone-no');
@@ -7768,6 +8264,14 @@
       if (jumbotronBarYes) jumbotronBarYes.style.width = `${yesPercent}%`;
       if (jumbotronBarNo) jumbotronBarNo.style.width = `${noPercent}%`;
 
+      // ═══ HABBO 2026 — Update Isometric Jumbotron ═══
+      const isoQuestion = document.getElementById('iso-jumbotron-question');
+      const isoBarYes = document.getElementById('iso-bar-yes');
+      const isoBarNo = document.getElementById('iso-bar-no');
+      if (isoQuestion) isoQuestion.textContent = currentMarket.question.toUpperCase();
+      if (isoBarYes) isoBarYes.style.width = `${yesPercent}%`;
+      if (isoBarNo) isoBarNo.style.width = `${noPercent}%`;
+
       // Update progress bars with percentages
       document.getElementById('kalshi-yes').textContent = `${currentMarket.kalshiYes}%`;
       document.getElementById('kalshi-no').textContent = `${100 - currentMarket.kalshiYes}%`;
@@ -7776,10 +8280,6 @@
       document.getElementById('party-yes').textContent = `${currentMarket.partyYes}%`;
       document.getElementById('party-no').textContent = `${100 - currentMarket.partyYes}%`;
       document.getElementById('party-bar-yes').style.width = `${currentMarket.partyYes}%`;
-
-      // Adjust zone sizes based on party percentage
-      document.getElementById('zone-yes').style.flex = yesPercent;
-      document.getElementById('zone-no').style.flex = 100 - yesPercent;
 
       // Update floor score labels to match market data
       document.getElementById('yes-score').textContent = `${yesPercent}%`;
@@ -7791,20 +8291,18 @@
       // Populate crowds
       populateCrowds();
 
-      // Reset player to door entrance
+      // ═══ HABBO 2026 — Reset isometric player to starting position ═══
       playerTeam = null;
-      player.classList.remove('team-yes', 'team-no');
-      player.classList.add('at-door');
-      playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
-      playerContainer.classList.add('at-door');
-
-      // Clear any grid snapping state from previous market
-      playerContainer.style.left = '';
-      playerContainer.style.bottom = '';
-      playerContainer.style.transform = '';
-      playerContainer.style.zIndex = '';
-      delete playerContainer.dataset.currentRow;
-      delete playerContainer.dataset.currentZone;
+      if (isoPlayer) {
+        isoPlayer.style.left = '50%';
+        isoPlayer.style.bottom = '60px';
+        isoPlayer.style.transform = 'translateX(-50%)';
+        isoPlayer.style.zIndex = '';
+        isoPlayer.classList.remove('lifted');
+        isoPlayer.dataset.zone = '';
+        delete isoPlayer.dataset.currentRow;
+      }
+      document.getElementById('player-dock').classList.remove('hidden');
 
       // Desktop vs Mobile behavior
       if (isDesktop()) {
@@ -7882,63 +8380,43 @@
       });
     }
 
+    // ═══ HABBO 2026 — Billboard Avatar Creation ═══
     function createVillager(member, index, team, position) {
-      const villager = document.createElement('div');
-      villager.className = 'villager';
+      const avatar = document.createElement('div');
+      avatar.className = 'iso-avatar dancing';
 
-      // 8 different Habbo/Animal Crossing dance styles!
-      const danceStyle = Math.floor(Math.random() * 8) + 1;
-      villager.classList.add(`dance-${danceStyle}`);
+      // Random animation delay for organic crowd
+      const delay = Math.random() * 2;
+      avatar.style.animationDelay = `${delay.toFixed(2)}s`;
 
-      // Random animation delay for organic crowd feel
-      const delay = Math.random() * 3;
-      villager.style.setProperty('--delay', `${delay.toFixed(2)}s`);
-
-      // Varied animation speeds (some fast dancers, some slow groovers)
-      const speed = 0.6 + Math.random() * 0.8;
-      villager.style.setProperty('--dance-speed', `${speed.toFixed(2)}s`);
-
-      // Stagger speech bubble timing
-      villager.style.setProperty('--speech-delay', `${index * 2 + Math.random() * 8}s`);
-
-      // Use calculated grid position - no overlaps!
+      // Position within the crowd area
       const posX = position ? position.x : 50;
       const posY = position ? position.y : 50;
+      avatar.style.left = `${posX}%`;
+      avatar.style.top = `${posY}%`;
 
-      villager.style.setProperty('--pos-x', `${posX.toFixed(1)}%`);
-      villager.style.setProperty('--pos-y', `${posY.toFixed(1)}%`);
-
-      // Scale - keep them visible!
-      const scale = 0.85 + Math.random() * 0.1;
-      villager.style.setProperty('--scale', scale.toFixed(2));
-
-      // Z-index based on Y position (lower Y = further back = lower z-index)
+      // Z-index based on Y position (isometric depth)
       const zIndex = 10 + Math.floor(posY);
-      villager.style.zIndex = zIndex;
+      avatar.style.zIndex = zIndex;
 
-      const borderColor = team === 'yes' ? 'var(--neon-cyan)' : 'var(--neon-pink)';
-      const borderGlow = team === 'yes' ? '0 0 12px var(--neon-cyan)' : '0 0 12px var(--neon-pink)';
-      const bodyColor = team === 'yes' ? 'var(--neon-cyan)' : 'var(--neon-pink)';
-      const thoughts = VILLAGER_THOUGHTS[team];
-      const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
+      // Party auras — "The Drip"
+      const auras = ['👑', '🔥', '⭐', '💎', '🎮', '🎯', '🚀', '💫'];
+      const aura = auras[Math.floor(Math.random() * auras.length)];
 
-      // Stick figure with Habbo-style body!
-      villager.innerHTML = `
-        <div class="villager-speech">${thought}</div>
-        <div class="villager-avatar">
-          <div class="villager-photo" style="background-image: url('${member.photo}'); border-color: ${borderColor}; box-shadow: ${borderGlow}"></div>
-          <div class="stick-body" style="--body-color: ${bodyColor}">
-            <div class="stick-torso"></div>
-            <div class="stick-arm left"></div>
-            <div class="stick-arm right"></div>
-            <div class="stick-leg left"></div>
-            <div class="stick-leg right"></div>
+      const borderColor = team === 'yes' ? '#00F0FF' : '#FF0055';
+
+      // HABBO 2026 Billboard Avatar
+      avatar.innerHTML = `
+        <div class="iso-avatar-sprite">
+          <div class="iso-avatar-aura ${team}">${aura}</div>
+          <div class="iso-avatar-head" style="border-color: ${borderColor};">
+            <div class="iso-avatar-photo" style="background-image: url('${member.photo}')"></div>
           </div>
+          <div class="iso-avatar-body"></div>
         </div>
-        <div class="villager-name">${member.name}</div>
       `;
 
-      return villager;
+      return avatar;
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -8092,47 +8570,36 @@
 
     function vote(side) {
       playerTeam = side;
-      player.classList.remove('team-yes', 'team-no', 'at-door');
-      player.classList.add(`team-${side}`);
 
       // Hide the dock when player moves to vote
       document.getElementById('player-dock').classList.add('hidden');
 
-      // Clear any inline styles from dragging
-      playerContainer.style.left = '';
-      playerContainer.style.bottom = '';
-      playerContainer.style.transition = '';
-      playerContainer.style.transform = ''; // Let CSS class handle transform
-
-      // Move player to side using CSS classes - remove at-door
-      playerContainer.classList.remove('on-stage', 'at-door', 'team-yes-pos', 'team-no-pos');
-
-      // ═══ GRID SNAPPING: Place on random tile for button-based voting ═══
+      // ═══ HABBO 2026 — Hop to random tile ═══
       const gridId = side === 'yes' ? 'iso-grid-yes' : 'iso-grid-no';
       const tiles = document.querySelectorAll(`#${gridId} .iso-tile`);
-      if (tiles.length > 0) {
+
+      if (tiles.length > 0 && isoRoom) {
         const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
         const row = parseInt(randomTile.dataset.row) || 0;
         const tileRect = randomTile.getBoundingClientRect();
-        const parentRect = playerContainer.parentElement.getBoundingClientRect();
+        const roomRect = isoRoom.getBoundingClientRect();
 
-        const tileCenterX = tileRect.left + tileRect.width / 2 - parentRect.left;
-        const tileCenterY = parentRect.bottom - (tileRect.top + tileRect.height / 2);
+        const tileCenterX = tileRect.left - roomRect.left + tileRect.width / 2;
+        const tileCenterY = roomRect.bottom - tileRect.top - tileRect.height / 2;
 
-        playerContainer.dataset.currentRow = row;
-        playerContainer.dataset.currentZone = side;
-        playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        playerContainer.style.left = tileCenterX + 'px';
-        playerContainer.style.bottom = tileCenterY + 'px';
-        playerContainer.style.transform = 'translateX(-50%)';
-        playerContainer.style.zIndex = 50 + Math.min(row + 1, 10);
+        isoPlayer.dataset.currentRow = row;
+        isoPlayer.dataset.zone = side;
+        isoPlayer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        isoPlayer.style.left = tileCenterX + 'px';
+        isoPlayer.style.bottom = tileCenterY + 'px';
+        isoPlayer.style.zIndex = 50 + row;
 
         // Flash the tile
         randomTile.classList.add(side === 'yes' ? 'flash-cyan' : 'flash-pink');
-        setTimeout(() => randomTile.classList.remove('flash-cyan', 'flash-pink'), 300);
-      } else {
-        // Fallback to CSS class positioning
-        playerContainer.classList.add(side === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+        setTimeout(() => {
+          randomTile.classList.remove('flash-cyan', 'flash-pink');
+          isoPlayer.style.transition = '';
+        }, 350);
       }
 
       // Show player's reaction speech bubble
@@ -8258,20 +8725,22 @@
     function cancelBet() {
       slidePanel.classList.remove('active');
 
-      // Reset player to door entrance
+      // ═══ HABBO 2026 — Reset isometric player to start ═══
       playerTeam = null;
-      player.classList.remove('team-yes', 'team-no');
-      player.classList.add('at-door');
-      playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
-      playerContainer.classList.add('at-door');
+      if (isoPlayer) {
+        isoPlayer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        isoPlayer.style.left = '50%';
+        isoPlayer.style.bottom = '60px';
+        isoPlayer.style.transform = 'translateX(-50%)';
+        isoPlayer.style.zIndex = '';
+        isoPlayer.classList.remove('lifted');
+        isoPlayer.dataset.zone = '';
+        delete isoPlayer.dataset.currentRow;
 
-      // Clear grid snapping state
-      playerContainer.style.left = '';
-      playerContainer.style.bottom = '';
-      playerContainer.style.transform = '';
-      playerContainer.style.zIndex = '';
-      delete playerContainer.dataset.currentRow;
-      delete playerContainer.dataset.currentZone;
+        setTimeout(() => {
+          isoPlayer.style.transition = '';
+        }, 400);
+      }
 
       // Show the dock again
       document.getElementById('player-dock').classList.remove('hidden');
@@ -8502,23 +8971,20 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // DRAGGING — Native Touch/Pointer Events (BULLETPROOF!)
-    // No libraries, no dependencies, just works.
+    // HABBO 2026 — LIFT-AND-DROP DRAG PHYSICS
+    // Avatar lifts off the isometric grid, shadow stays on floor
     // ═══════════════════════════════════════════════════════════════
     function setupDragging() {
-      console.log('🎮 Setting up BULLETPROOF drag system...');
-      console.log('🎮 Player container:', playerContainer);
-      console.log('🎮 Player container styles:', window.getComputedStyle(playerContainer).pointerEvents);
+      console.log('🎮 Setting up HABBO 2026 drag system...');
 
       let pendingVote = null;
       let isDragging = false;
-      let initialLeft = 0;
-      let initialBottom = 0;
       let startX = 0;
       let startY = 0;
+      let currentX = 0;
+      let currentY = 0;
 
-      const ZONE_THRESHOLD = 0.3;
-      const MAX_ROTATION = 15;
+      const ZONE_THRESHOLD = 0.25;
 
       // Confirmation popup elements
       const dropConfirm = document.getElementById('drop-confirm');
@@ -8526,6 +8992,18 @@
       const dropConfirmQuestion = document.getElementById('drop-confirm-question');
       const dropConfirmCancel = document.getElementById('drop-confirm-cancel');
       const dropConfirmYes = document.getElementById('drop-confirm-yes');
+
+      // Position player at starting position (bottom center of room)
+      function resetPlayerToStart() {
+        isoPlayer.style.left = '50%';
+        isoPlayer.style.bottom = '60px';
+        isoPlayer.style.transform = 'translateX(-50%)';
+        isoPlayer.classList.remove('lifted');
+        isoPlayer.dataset.zone = '';
+      }
+
+      // Initialize player position
+      resetPlayerToStart();
 
       // Get touch/mouse position
       function getEventPos(e) {
@@ -8535,7 +9013,7 @@
         return { x: e.clientX, y: e.clientY };
       }
 
-      // ═══ DRAG START ═══
+      // ═══ DRAG START — Lift the avatar off the grid ═══
       function onDragStart(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -8544,38 +9022,31 @@
         isDragging = true;
 
         const pos = getEventPos(e);
-        const rect = playerContainer.getBoundingClientRect();
-        const parentRect = playerContainer.parentElement.getBoundingClientRect();
-
-        // Store starting touch position
         startX = pos.x;
         startY = pos.y;
 
-        // Convert current visual position to absolute left/top
-        // This accounts for the CSS transform: translateX(-50%)
-        initialLeft = rect.left - parentRect.left;
-        initialBottom = parentRect.bottom - rect.bottom;
+        // Get current position
+        const rect = isoPlayer.getBoundingClientRect();
+        const parentRect = isoRoom.getBoundingClientRect();
+        currentX = rect.left - parentRect.left + rect.width / 2;
+        currentY = parentRect.bottom - rect.bottom;
 
-        // Remove CSS-based positioning and switch to explicit left/bottom
-        playerContainer.classList.remove('at-door', 'team-yes-pos', 'team-no-pos');
-        playerContainer.style.left = initialLeft + 'px';
-        playerContainer.style.bottom = initialBottom + 'px';
-        playerContainer.style.transform = 'none';
+        // LIFT the avatar — shadow stays on floor (CSS handles this)
+        isoPlayer.classList.add('lifted');
+        isoPlayer.style.transition = 'none';
+        isoPlayer.style.left = currentX + 'px';
+        isoPlayer.style.bottom = currentY + 'px';
+        isoPlayer.style.transform = 'translateX(-50%)';
 
-        // Visual feedback
-        playerContainer.classList.add('dragging');
-        player.classList.add('lifted');
-        player.style.transform = 'scale(1.15)';
-        player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
         document.getElementById('player-dock').classList.add('hidden');
 
-        // Haptic
+        // Haptic lift
         if (navigator.vibrate) navigator.vibrate(10);
 
-        console.log('🎮 Drag started! Initial pos:', initialLeft, initialBottom);
+        console.log('🎮 Avatar LIFTED! Ready to drag.');
       }
 
-      // ═══ DRAG MOVE ═══
+      // ═══ DRAG MOVE — Float the avatar ═══
       function onDragMove(e) {
         if (!isDragging) return;
         e.preventDefault();
@@ -8584,41 +9055,32 @@
         const deltaX = pos.x - startX;
         const deltaY = pos.y - startY;
 
-        // Apply position using left/bottom (bottom decreases as we go up)
-        const newLeft = initialLeft + deltaX;
-        const newBottom = initialBottom - deltaY;
+        // Move the lifted avatar
+        const newX = currentX + deltaX;
+        const newY = currentY - deltaY;
 
-        playerContainer.style.left = newLeft + 'px';
-        playerContainer.style.bottom = newBottom + 'px';
-
-        // Calculate velocity-based rotation (tilt when moving)
-        const rotation = Math.max(-MAX_ROTATION, Math.min(MAX_ROTATION, deltaX * 0.05));
-        player.style.transform = `scale(1.15) rotate(${rotation}deg)`;
+        isoPlayer.style.left = newX + 'px';
+        isoPlayer.style.bottom = newY + 'px';
 
         // Zone detection based on screen position
         const screenX = pos.x;
         const screenCenter = window.innerWidth / 2;
         const normalizedX = (screenX - screenCenter) / screenCenter;
 
+        // Highlight zones as player hovers over them
         if (normalizedX < -ZONE_THRESHOLD) {
           zoneNo.classList.add('hovering');
           zoneYes.classList.remove('hovering');
-          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
-          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255, 0, 128, ${intensity * 0.6}))`;
         } else if (normalizedX > ZONE_THRESHOLD) {
           zoneYes.classList.add('hovering');
           zoneNo.classList.remove('hovering');
-          const intensity = Math.min(0.5 + Math.abs(normalizedX) * 0.7, 1);
-          player.style.filter = `drop-shadow(0 20px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(0, 245, 255, ${intensity * 0.6}))`;
         } else {
           zoneNo.classList.remove('hovering');
           zoneYes.classList.remove('hovering');
-          player.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.6))';
         }
       }
 
-      // ═══ GRID SNAPPING — Find Nearest Tile ═══
-      // In isometric view, lower on screen = closer to camera = higher z-index
+      // ═══ FIND NEAREST TILE — For grid snapping ═══
       function findNearestTile(screenX, screenY, zoneSide) {
         const gridId = zoneSide === 'yes' ? 'iso-grid-yes' : 'iso-grid-no';
         const tiles = document.querySelectorAll(`#${gridId} .iso-tile`);
@@ -8631,13 +9093,10 @@
           const rect = tile.getBoundingClientRect();
           const tileCenterX = rect.left + rect.width / 2;
           const tileCenterY = rect.top + rect.height / 2;
-
-          // Calculate distance from drop point to tile center
           const dist = Math.sqrt(
             Math.pow(screenX - tileCenterX, 2) +
             Math.pow(screenY - tileCenterY, 2)
           );
-
           if (dist < nearestDist) {
             nearestDist = dist;
             nearestTile = tile;
@@ -8647,70 +9106,60 @@
         return nearestTile;
       }
 
-      // ═══ Z-INDEX SORTING — Row-based depth sorting ═══
-      // Row 0 (top/far) = z-index 51, Row 9 (bottom/near) = z-index 60
-      function updateAvatarZIndex(row) {
-        const baseZ = 50;
-        const newZ = baseZ + Math.min(row + 1, 10);
-        playerContainer.style.zIndex = newZ;
-        console.log(`🎮 Avatar Z-index updated: row ${row} → z-index ${newZ}`);
-      }
-
-      // ═══ SNAP TO TILE — Position avatar at tile center ═══
-      function snapToTile(tile, zoneSide) {
+      // ═══ HOP TO TILE — Avatar "hops" into place ═══
+      function hopToTile(tile, zoneSide) {
         if (!tile) return;
 
         const row = parseInt(tile.dataset.row) || 0;
         const tileRect = tile.getBoundingClientRect();
-        const parentRect = playerContainer.parentElement.getBoundingClientRect();
+        const roomRect = isoRoom.getBoundingClientRect();
 
-        // Calculate tile center relative to parent
-        const tileCenterX = tileRect.left + tileRect.width / 2 - parentRect.left;
-        const tileCenterY = parentRect.bottom - (tileRect.top + tileRect.height / 2);
+        // Calculate tile center relative to room
+        const tileCenterX = tileRect.left - roomRect.left + tileRect.width / 2;
+        const tileCenterY = roomRect.bottom - tileRect.top - tileRect.height / 2;
 
-        // Store current tile data on player for reference
-        playerContainer.dataset.currentRow = row;
-        playerContainer.dataset.currentZone = zoneSide;
+        // Store tile data
+        isoPlayer.dataset.currentRow = row;
+        isoPlayer.dataset.zone = zoneSide;
 
-        // Animate snap to tile center
-        playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        playerContainer.style.left = tileCenterX + 'px';
-        playerContainer.style.bottom = tileCenterY + 'px';
-        playerContainer.style.transform = 'translateX(-50%)';
+        // DROP animation — player "hops" down onto tile
+        isoPlayer.classList.remove('lifted');
+        isoPlayer.style.transition = 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        isoPlayer.style.left = tileCenterX + 'px';
+        isoPlayer.style.bottom = tileCenterY + 'px';
 
-        // Update z-index based on row (isometric depth sorting)
-        updateAvatarZIndex(row);
+        // Z-index based on row (isometric depth)
+        isoPlayer.style.zIndex = 50 + row;
 
-        // Flash the tile they landed on
+        // Flash the landing tile
         tile.classList.add(zoneSide === 'yes' ? 'flash-cyan' : 'flash-pink');
         setTimeout(() => {
           tile.classList.remove('flash-cyan', 'flash-pink');
-        }, 300);
+          isoPlayer.style.transition = '';
+        }, 350);
 
-        console.log(`🎮 Snapped to tile at row ${row} in ${zoneSide} zone`);
+        console.log(`🎮 Hopped to tile row ${row} in ${zoneSide} zone!`);
       }
 
-      // ═══ DRAG END ═══
+      // ═══ DRAG END — Drop the avatar ═══
       function onDragEnd(e) {
         if (!isDragging) return;
         isDragging = false;
 
         // Get final position for zone detection
-        const rect = playerContainer.getBoundingClientRect();
+        const rect = isoPlayer.getBoundingClientRect();
         const screenX = rect.left + rect.width / 2;
         const screenY = rect.top + rect.height / 2;
         const screenCenter = window.innerWidth / 2;
         const normalizedX = (screenX - screenCenter) / screenCenter;
 
-        console.log('🎮 Drag ended! NormalizedX:', normalizedX);
+        console.log('🎮 DROP! NormalizedX:', normalizedX);
 
-        // Clear dragging state
-        playerContainer.classList.remove('dragging');
-        player.classList.remove('lifted');
+        // Clear zone hover states
         zoneNo.classList.remove('hovering');
         zoneYes.classList.remove('hovering');
 
-        // Determine vote
+        // Determine vote based on drop position
         let targetVote = null;
         if (normalizedX < -ZONE_THRESHOLD) {
           targetVote = 'no';
@@ -8720,72 +9169,37 @@
 
         if (targetVote) {
           pendingVote = targetVote;
-          lastVoteWasYes = (targetVote === 'yes'); // Track for confetti color
+          lastVoteWasYes = (targetVote === 'yes');
 
-          // ═══ GRID SNAPPING: Find nearest tile and snap to it ═══
+          // Find nearest tile and HOP to it
           const nearestTile = findNearestTile(screenX, screenY, targetVote);
-
-          playerContainer.classList.remove('at-door', 'team-yes-pos', 'team-no-pos');
-
           if (nearestTile) {
-            // Snap to tile center with z-index sorting
-            snapToTile(nearestTile, targetVote);
+            hopToTile(nearestTile, targetVote);
           } else {
-            // Fallback: use CSS class positioning
-            playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            playerContainer.style.left = '';
-            playerContainer.style.bottom = '';
-            playerContainer.style.transform = '';
-            playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+            // Fallback — just drop in place
+            isoPlayer.classList.remove('lifted');
           }
 
-          player.classList.add('landing-squash');
-          player.style.transform = '';
-          player.style.filter = '';
-
-          setTimeout(() => {
-            player.classList.remove('landing-squash');
-            playerContainer.style.transition = '';
-          }, 400);
-
-          // Show confirmation
+          // Show confirmation popup
           showDropConfirm(targetVote);
           if (navigator.vibrate) navigator.vibrate([15, 40, 25]);
         } else {
-          // Snap back to dock
-          snapBackToDock();
+          // Not in a zone — snap back to start
+          snapBackToStart();
         }
       }
 
-      // ═══ SNAP BACK ═══
-      function snapBackToDock() {
-        // Clear ALL inline styles and restore CSS class positioning
-        playerContainer.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        playerContainer.style.left = '';
-        playerContainer.style.bottom = '';
-        playerContainer.style.transform = '';
-        playerContainer.style.zIndex = ''; // Reset z-index for dock
-        playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
-        playerContainer.classList.add('at-door');
-
-        // Clear tile tracking data
-        delete playerContainer.dataset.currentRow;
-        delete playerContainer.dataset.currentZone;
-
-        player.style.transition = 'transform 0.4s ease, filter 0.4s ease';
-        player.style.transform = '';
-        player.style.filter = '';
-
-        playerTeam = null;
-        player.classList.remove('team-yes', 'team-no', 'confirmed');
-        player.classList.add('at-door');
-        document.getElementById('player-dock').classList.remove('hidden');
+      // ═══ SNAP BACK TO START ═══
+      function snapBackToStart() {
+        isoPlayer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        resetPlayerToStart();
 
         setTimeout(() => {
-          playerContainer.style.transition = '';
-          player.style.transition = '';
-        }, 500);
+          isoPlayer.style.transition = '';
+        }, 400);
 
+        playerTeam = null;
+        document.getElementById('player-dock').classList.remove('hidden');
         if (navigator.vibrate) navigator.vibrate(12);
       }
 
@@ -8802,15 +9216,13 @@
       dropConfirmCancel.addEventListener('click', () => {
         dropConfirm.classList.remove('active');
         pendingVote = null;
-        snapBackToDock();
+        snapBackToStart();
       });
 
       dropConfirmYes.addEventListener('click', () => {
         dropConfirm.classList.remove('active');
         if (pendingVote) {
           playerTeam = pendingVote;
-          player.classList.remove('at-door', 'team-yes', 'team-no');
-          player.classList.add(`team-${pendingVote}`, 'confirmed');
           showPlayerSpeech(pendingVote);
           showCelebration();
           if (navigator.vibrate) navigator.vibrate([20, 50, 30, 50, 40]);
@@ -8818,19 +9230,17 @@
         pendingVote = null;
       });
 
-      // ═══ EVENT LISTENERS ═══
-      // Touch events
-      playerContainer.addEventListener('touchstart', onDragStart, { passive: false });
+      // ═══ EVENT LISTENERS — Attach to isometric player ═══
+      isoPlayer.addEventListener('touchstart', onDragStart, { passive: false });
       document.addEventListener('touchmove', onDragMove, { passive: false });
       document.addEventListener('touchend', onDragEnd);
       document.addEventListener('touchcancel', onDragEnd);
 
-      // Mouse events
-      playerContainer.addEventListener('mousedown', onDragStart);
+      isoPlayer.addEventListener('mousedown', onDragStart);
       document.addEventListener('mousemove', onDragMove);
       document.addEventListener('mouseup', onDragEnd);
 
-      console.log('🎮 Native drag system ready! Try dragging the player.');
+      console.log('🎮 HABBO 2026 drag system ready! Lift and drop your avatar.');
     }
 
     // ═══════════════════════════════════════════════════════════════
