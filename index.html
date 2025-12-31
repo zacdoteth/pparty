@@ -2887,15 +2887,9 @@
     /* ═══════════════════════════════════════════════════════════════
        DJ BOOTH — The Heart of the Party
     ═══════════════════════════════════════════════════════════════ */
+    /* LEGACY DJ BOOTH — HIDDEN (replaced by .iso-dj-booth in 3D world) */
     .dj-booth-visual {
-      position: absolute;
-      top: 175px; /* Below jumbotron, slight overlap */
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 45; /* Between jumbotron and crowd */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: none !important;
     }
 
     .dj-table {
@@ -3573,8 +3567,8 @@
     ═══════════════════════════════════════════════════════════════ */
     .iso-room {
       position: absolute;
-      /* STRICT LAYERING: 140px clearance for the fixed HUD sign */
-      top: 140px;
+      /* V12: 180px clearance — Sign CLEARLY above DJ head */
+      top: 180px;
       bottom: 40px;
       left: 0;
       right: 0;
@@ -4206,246 +4200,251 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       THE DJ BOOTH — At the VERY BACK of the room (deepest Z-depth)
-       "Raised podium at the back. DJ clearly visible under the sign." — Toshiro
+       THE DJ BOOTH — V12: Redesigned for new perspective
+       "Clean booth at back. DJ CLEARLY visible below sign." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
     .iso-dj-booth {
       position: absolute;
       left: 50%;
-      /* STRICT LAYERING: DJ at the BACK — top of 3D scene = deepest Z */
-      top: 10%;
-      transform: translateX(-50%);
+      /* V12: DJ positioned lower in the scene for clear sign separation */
+      top: 5%;
+      transform: translateX(-50%) scale(0.9);
       transform-style: preserve-3d;
       /* Z-index BEHIND dancers (50) but above floor tiles (10) */
       z-index: 25;
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       DJ PREDICT — 2D Billboard with Perspective Lock
-       "He faces the camera even though he's deep in the scene." — Toshiro
-
-       PERSPECTIVE LOCK: Counter-rotate so billboard faces viewer.
+       DJ PREDICT — V12 Xiao Xiao Style Thin Stick DJ
+       "Same 2px lines as dancers. Golden glow. Iconic headphones." — Toshiro
     ═══════════════════════════════════════════════════════════════ */
     .stick-dj {
       position: absolute;
       left: 50%;
       bottom: 100%;
-      /* PERSPECTIVE LOCK: Counter-rotate the 55deg world tilt to face camera */
+      /* Counter-rotate the 55deg world tilt */
       transform: translateX(-50%) rotateX(-55deg);
       transform-style: preserve-3d;
       width: 50px;
-      height: 80px;
+      height: 70px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      /* Make DJ bigger so he's visible at the back */
-      scale: 1.3;
+      /* V12: Slightly larger but not overwhelming */
+      scale: 1.2;
     }
 
-    /* DJ HEAD — Bigger, with headphones */
+    /* DJ HEAD — Circle with headphones */
     .stick-dj-head {
-      width: 24px;
-      height: 24px;
+      width: 16px;
+      height: 16px;
       background: #fff;
-      border: 4px solid #111;
+      border: 2px solid #FFD700;
       border-radius: 50%;
       position: relative;
       z-index: 3;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
     }
 
-    /* HEADPHONES — The iconic DJ look */
+    /* HEADPHONES — Thin lines */
     .stick-dj-headphones {
       position: absolute;
-      top: -4px;
-      left: -8px;
-      right: -8px;
-      height: 28px;
-      border: 4px solid #333;
+      top: -3px;
+      left: -6px;
+      right: -6px;
+      height: 18px;
+      border: 2px solid #FFD700;
       border-bottom: none;
-      border-radius: 20px 20px 0 0;
+      border-radius: 14px 14px 0 0;
       z-index: 4;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
     }
 
-    /* Headphone ear cups */
+    /* Headphone ear cups - smaller */
     .stick-dj-headphones::before,
     .stick-dj-headphones::after {
       content: '';
       position: absolute;
-      bottom: -6px;
-      width: 10px;
-      height: 14px;
-      background: #222;
-      border: 2px solid #444;
-      border-radius: 3px;
-    }
-
-    .stick-dj-headphones::before { left: -4px; }
-    .stick-dj-headphones::after { right: -4px; }
-
-    /* DJ BODY */
-    .stick-dj-body {
-      width: 5px;
-      height: 20px;
+      bottom: -4px;
+      width: 6px;
+      height: 8px;
       background: #FFD700;
-      margin-top: -3px;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      border-radius: 2px;
+      box-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
     }
 
-    /* DJ ARMS — Reaching toward turntables */
+    .stick-dj-headphones::before { left: -2px; }
+    .stick-dj-headphones::after { right: -2px; }
+
+    /* DJ BODY — 2px thin line like dancers */
+    .stick-dj-body {
+      width: 2px;
+      height: 18px;
+      background: #FFD700;
+      margin-top: -2px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    }
+
+    /* DJ ARMS — 2px thin reaching to decks */
     .stick-dj-arms {
       position: absolute;
-      top: 28px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      width: 50px;
-      height: 5px;
+      width: 40px;
+      height: 2px;
       background: #FFD700;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
       animation: dj-scratch 0.5s ease-in-out infinite alternate;
     }
 
     @keyframes dj-scratch {
-      0% { transform: translateX(-50%) rotate(-5deg); }
-      100% { transform: translateX(-50%) rotate(5deg); }
+      0% { transform: translateX(-50%) rotate(-8deg); }
+      100% { transform: translateX(-50%) rotate(8deg); }
     }
 
-    /* DJ LEGS */
+    /* DJ LEGS — 2px thin */
     .stick-dj-legs {
       position: absolute;
-      bottom: 0;
+      bottom: 5px;
       left: 50%;
       transform: translateX(-50%);
-      width: 24px;
-      height: 25px;
+      width: 20px;
+      height: 20px;
     }
 
     .stick-dj-legs::before,
     .stick-dj-legs::after {
       content: '';
       position: absolute;
-      width: 5px;
-      height: 25px;
-      background: #111;
+      width: 2px;
+      height: 20px;
+      background: #FFD700;
       top: 0;
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
     }
 
-    .stick-dj-legs::before { left: 2px; }
-    .stick-dj-legs::after { right: 2px; }
+    .stick-dj-legs::before { left: 4px; }
+    .stick-dj-legs::after { right: 4px; }
 
-    /* DJ Label */
+    /* DJ Label — ABOVE the DJ */
     .stick-dj-label {
       position: absolute;
-      bottom: -25px;
+      top: -22px;
       left: 50%;
-      transform: translateX(-50%) rotateX(-55deg);
-      font-size: 10px;
+      transform: translateX(-50%);
+      font-size: 9px;
       font-weight: 900;
       letter-spacing: 1px;
       color: #FFD700;
-      text-shadow: 0 0 10px #FFD700;
+      text-shadow: 0 0 10px #FFD700, 0 0 20px rgba(255, 215, 0, 0.5);
       white-space: nowrap;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 2px 6px;
+      border-radius: 8px;
     }
 
-    /* DJ Booth Base — The 3D console block */
+    /* DJ Booth Base — V12 Sleek console block */
     .dj-booth-block {
       position: relative;
-      width: 100px;
-      height: 40px;
+      width: 90px;
+      height: 35px;
       transform-style: preserve-3d;
     }
 
-    /* TOP FACE — The console surface */
+    /* TOP FACE — Clean console surface */
     .dj-booth-top {
       position: absolute;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #2a2a35 0%, #1f1f28 50%, #18181f 100%);
-      border: 2px solid rgba(255, 215, 0, 0.3);
+      background: linear-gradient(135deg, #1a1a25 0%, #12121a 100%);
+      border: 2px solid rgba(255, 215, 0, 0.4);
+      border-radius: 4px;
       box-shadow:
-        inset 0 0 20px rgba(255, 215, 0, 0.1),
-        0 0 15px rgba(0, 0, 0, 0.5);
+        inset 0 0 15px rgba(255, 215, 0, 0.15),
+        0 0 20px rgba(255, 215, 0, 0.2);
     }
 
     /* FRONT-LEFT FACE — Visible in isometric view */
     .dj-booth-front-left {
       position: absolute;
       width: 100%;
-      height: 35px;
+      height: 30px;
       bottom: 0;
-      background: linear-gradient(180deg, #1a1a22 0%, #0f0f15 100%);
+      background: linear-gradient(180deg, #151520 0%, #0a0a10 100%);
       transform: rotateX(-90deg);
       transform-origin: bottom;
-      border-bottom: 2px solid rgba(255, 0, 85, 0.4);
-      box-shadow: inset 0 -10px 30px rgba(255, 0, 85, 0.1);
+      border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+      box-shadow: inset 0 -8px 20px rgba(255, 215, 0, 0.1);
     }
 
     /* LED strip on front face */
     .dj-booth-front-left::before {
       content: '';
       position: absolute;
-      top: 8px;
-      left: 10px;
-      right: 10px;
-      height: 4px;
+      top: 6px;
+      left: 8px;
+      right: 8px;
+      height: 3px;
       background: linear-gradient(90deg, #FF0055, #FFD700, #00F0FF);
       border-radius: 2px;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
       animation: led-pulse 1s ease-in-out infinite alternate;
     }
 
     @keyframes led-pulse {
-      0% { opacity: 0.6; }
+      0% { opacity: 0.7; }
       100% { opacity: 1; }
     }
 
     /* FRONT-RIGHT FACE — Side panel */
     .dj-booth-front-right {
       position: absolute;
-      width: 35px;
+      width: 30px;
       height: 100%;
       right: 0;
-      background: linear-gradient(90deg, #151520 0%, #0a0a10 100%);
+      background: linear-gradient(90deg, #121218 0%, #08080c 100%);
       transform: rotateY(90deg);
       transform-origin: right;
-      border-right: 2px solid rgba(0, 240, 255, 0.4);
-      box-shadow: inset 10px 0 30px rgba(0, 240, 255, 0.1);
+      border-right: 2px solid rgba(255, 215, 0, 0.3);
+      box-shadow: inset 8px 0 20px rgba(255, 215, 0, 0.1);
     }
 
-    /* DJ Turntables on top face */
+    /* DJ Turntables on top face — V12 smaller */
     .dj-turntables {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: flex;
-      gap: 24px;
+      gap: 20px;
       z-index: 2;
     }
 
     .dj-turntable {
-      width: 22px;
-      height: 22px;
-      background: radial-gradient(circle, #333 0%, #111 60%, #222 100%);
+      width: 18px;
+      height: 18px;
+      background: radial-gradient(circle, #222 0%, #0a0a0a 60%, #181818 100%);
       border-radius: 50%;
-      border: 2px solid #444;
+      border: 1px solid #444;
       box-shadow:
-        inset 0 0 8px rgba(0, 0, 0, 0.8),
-        0 2px 4px rgba(0, 0, 0, 0.5);
-      animation: spin-record 2.5s linear infinite;
+        inset 0 0 6px rgba(0, 0, 0, 0.9),
+        0 0 8px rgba(255, 215, 0, 0.2);
+      animation: spin-record 2s linear infinite;
     }
 
-    /* Record label */
+    /* Record label — golden center */
     .dj-turntable::after {
       content: '';
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       background: radial-gradient(circle, #FFD700, #FF8800);
       border-radius: 50%;
+      box-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
     }
 
     @keyframes spin-record {
@@ -4453,37 +4452,38 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Mixer in center */
+    /* Mixer in center — V12 smaller */
     .dj-mixer {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 20px;
-      height: 30px;
-      background: linear-gradient(180deg, #222, #111);
+      width: 14px;
+      height: 22px;
+      background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
       border-radius: 2px;
-      border: 1px solid #444;
+      border: 1px solid rgba(255, 215, 0, 0.3);
       z-index: 1;
     }
 
     .dj-mixer-slider {
       position: absolute;
-      width: 4px;
-      height: 12px;
-      background: linear-gradient(180deg, #00F0FF, #FF0055);
+      width: 3px;
+      height: 8px;
+      background: linear-gradient(180deg, #FFD700, #FF8800);
       left: 50%;
       transform: translateX(-50%);
-      border-radius: 2px;
+      border-radius: 1px;
+      box-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
       animation: mixer-slide 0.5s ease-in-out infinite alternate;
     }
 
-    .dj-mixer-slider:first-child { top: 4px; }
-    .dj-mixer-slider:last-child { bottom: 4px; animation-delay: 0.25s; }
+    .dj-mixer-slider:first-child { top: 3px; }
+    .dj-mixer-slider:last-child { bottom: 3px; animation-delay: 0.25s; }
 
     @keyframes mixer-slide {
-      0% { transform: translateX(-50%) translateY(-2px); }
-      100% { transform: translateX(-50%) translateY(2px); }
+      0% { transform: translateX(-50%) translateY(-1px); }
+      100% { transform: translateX(-50%) translateY(1px); }
     }
 
     /* DJ Avatar (billboard sprite standing ON booth) */
