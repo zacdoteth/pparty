@@ -1452,9 +1452,14 @@
         min-height: 100%;
       }
 
-      /* Larger arena header */
+      /* DESKTOP: Hide the top header completely - info now in marquee! */
       .arena-header {
-        padding: 16px 24px;
+        display: none !important;
+      }
+
+      /* DESKTOP: Hide scores container - now integrated in marquee sign! */
+      .scores-container {
+        display: none !important;
       }
 
       .nav-btn {
@@ -1517,14 +1522,20 @@
         box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
       }
 
-      /* Marquee sign - bigger on desktop */
+      /* Marquee sign - FLUSH to top, no header above! */
       .marquee-sign {
-        top: 8px;
+        top: 0;
+        transform: translateX(-50%);
+        border-radius: 0 0 20px 20px;
       }
 
-      /* DJ Booth — Below the marquee */
+      .marquee-frame {
+        border-radius: 0 0 16px 16px;
+      }
+
+      /* DJ Booth — Below the marquee sign */
       .dj-booth-visual {
-        top: 95px;
+        top: 110px;
       }
 
       /* Nightclub takes full space */
@@ -1534,8 +1545,8 @@
 
       /* Dance floor - floating stage (below marquee + DJ) */
       .dance-floor {
-        top: 140px;
-        bottom: 130px;
+        top: 170px;
+        bottom: 100px;
         left: 20px;
         right: 20px;
         max-height: 700px;
@@ -2302,52 +2313,78 @@
       font-size: 10px;
     }
 
-    /* Mini Progress Bars in Marquee */
+    /* Stacked Progress Bars in Marquee — Kalshi + Party */
     .marquee-bars {
-      margin-top: 6px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .marquee-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .marquee-bar-label {
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 36px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .marquee-bar-row.kalshi .marquee-bar-label {
+      color: var(--neon-gold);
+    }
+
+    .marquee-bar-row.party .marquee-bar-label {
+      color: var(--neon-cyan);
     }
 
     .marquee-bar-container {
       display: flex;
-      height: 6px;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 3px;
+      flex: 1;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
       overflow: hidden;
       gap: 2px;
     }
 
     .marquee-bar {
       height: 100%;
-      border-radius: 3px;
+      border-radius: 4px;
       transition: width 0.5s ease;
     }
 
     .marquee-bar.no {
       background: linear-gradient(90deg, var(--neon-pink), #ff6090);
-      box-shadow: 0 0 8px var(--neon-pink);
+      box-shadow: 0 0 6px var(--neon-pink);
     }
 
     .marquee-bar.yes {
       background: linear-gradient(90deg, #00d4ff, var(--neon-cyan));
-      box-shadow: 0 0 8px var(--neon-cyan);
+      box-shadow: 0 0 6px var(--neon-cyan);
     }
 
-    .marquee-bar-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 3px;
-      font-size: 8px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .marquee-bar.yes.kalshi {
+      background: linear-gradient(90deg, #c9a227, var(--neon-gold));
+      box-shadow: 0 0 6px var(--neon-gold);
     }
 
-    .bar-label.no {
-      color: var(--neon-pink);
-    }
-
-    .bar-label.yes {
+    .marquee-bar-pct {
+      font-size: 9px;
+      font-weight: 800;
+      width: 28px;
+      text-align: right;
       color: var(--neon-cyan);
+    }
+
+    .marquee-bar-row.kalshi .marquee-bar-pct {
+      color: var(--neon-gold);
     }
 
     /* Desktop: Bigger marquee */
@@ -5969,9 +6006,154 @@
         transform: scale(1.15);
       }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TOSHIRO'S LAYER 1: CRT HARDWARE TEXTURE — Retro-Future Vibe
+       Kills the "flat webpage" look. Phone feels like hardware.
+    ═══════════════════════════════════════════════════════════════ */
+    .crt-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: overlay;
+      opacity: 0.04;
+    }
+
+    .crt-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+      );
+      animation: scanline-flicker 0.1s linear infinite;
+    }
+
+    @keyframes scanline-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.98; }
+    }
+
+    .crt-noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      animation: noise-shift 0.5s steps(10) infinite;
+    }
+
+    @keyframes noise-shift {
+      0% { transform: translate(0, 0); }
+      10% { transform: translate(-1%, -1%); }
+      20% { transform: translate(1%, 1%); }
+      30% { transform: translate(-1%, 1%); }
+      40% { transform: translate(1%, -1%); }
+      50% { transform: translate(0, 0); }
+      60% { transform: translate(-1%, 0); }
+      70% { transform: translate(1%, 1%); }
+      80% { transform: translate(0, -1%); }
+      90% { transform: translate(-1%, 1%); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TOSHIRO'S LAYER 2: BREATHING ZONES — Living Room Effect
+       The room is alive and waiting for your bet.
+    ═══════════════════════════════════════════════════════════════ */
+    .floor-zone.yes {
+      animation: zone-breathe-cyan 4s ease-in-out infinite;
+    }
+
+    .floor-zone.no {
+      animation: zone-breathe-pink 4s ease-in-out infinite;
+    }
+
+    @keyframes zone-breathe-cyan {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 30px rgba(77, 166, 255, 0.15),
+          0 0 20px rgba(77, 166, 255, 0.1);
+      }
+      50% {
+        box-shadow:
+          inset 0 0 50px rgba(77, 166, 255, 0.25),
+          0 0 40px rgba(77, 166, 255, 0.2);
+      }
+    }
+
+    @keyframes zone-breathe-pink {
+      0%, 100% {
+        box-shadow:
+          inset 0 0 30px rgba(255, 75, 155, 0.15),
+          0 0 20px rgba(255, 75, 155, 0.1);
+      }
+      50% {
+        box-shadow:
+          inset 0 0 50px rgba(255, 75, 155, 0.25),
+          0 0 40px rgba(255, 75, 155, 0.2);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TOSHIRO'S LAYER 3: CONFETTI PARTICLES — Vote Celebration!
+    ═══════════════════════════════════════════════════════════════ */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .confetti-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      opacity: 1;
+      border-radius: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TOSHIRO'S LAYER 4: GLASS DOCK UPGRADE — OLED Luxury
+    ═══════════════════════════════════════════════════════════════ */
+    .tab-bar {
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 -4px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Desktop sidebar nav glass effect */
+    .desktop-nav {
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 -2px 20px rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
 <body>
+  <!-- TOSHIRO'S CRT OVERLAY — Retro-Future Hardware Texture -->
+  <div class="crt-overlay">
+    <div class="crt-scanlines"></div>
+    <div class="crt-noise"></div>
+  </div>
+
+  <!-- CONFETTI CONTAINER — For vote celebrations -->
+  <div class="confetti-container" id="confetti-container"></div>
+
   <!-- GLOBAL PARTY LIGHTS — Always visible, never resets! -->
   <div class="global-party-lights" id="global-lights">
     <div class="global-haze"></div>
@@ -6217,15 +6399,25 @@
                 </div>
                 <!-- Market Question -->
                 <div class="marquee-question" id="marquee-question">Will BTC hit $100k by Dec 31?</div>
-                <!-- Mini Progress Bars -->
+                <!-- Stacked Progress Bars: Kalshi + Party -->
                 <div class="marquee-bars">
-                  <div class="marquee-bar-container">
-                    <div class="marquee-bar no" id="marquee-bar-no" style="width: 28%"></div>
-                    <div class="marquee-bar yes" id="marquee-bar-yes" style="width: 72%"></div>
+                  <!-- Kalshi Bar -->
+                  <div class="marquee-bar-row kalshi">
+                    <span class="marquee-bar-label">KALSHI</span>
+                    <div class="marquee-bar-container">
+                      <div class="marquee-bar no" id="marquee-kalshi-no" style="width: 35%"></div>
+                      <div class="marquee-bar yes kalshi" id="marquee-kalshi-yes" style="width: 65%"></div>
+                    </div>
+                    <span class="marquee-bar-pct" id="marquee-kalshi-pct">65%</span>
                   </div>
-                  <div class="marquee-bar-labels">
-                    <span class="bar-label no"><span id="marquee-no-pct">28%</span> NO</span>
-                    <span class="bar-label yes"><span id="marquee-yes-pct">72%</span> YES</span>
+                  <!-- Party Bar -->
+                  <div class="marquee-bar-row party">
+                    <span class="marquee-bar-label">PARTY</span>
+                    <div class="marquee-bar-container">
+                      <div class="marquee-bar no" id="marquee-bar-no" style="width: 28%"></div>
+                      <div class="marquee-bar yes" id="marquee-bar-yes" style="width: 72%"></div>
+                    </div>
+                    <span class="marquee-bar-pct" id="marquee-yes-pct">72%</span>
                   </div>
                 </div>
               </div>
@@ -6807,17 +6999,25 @@
       if (marqueeQuestion) {
         marqueeQuestion.textContent = currentMarket.question;
       }
-      // Update marquee stats + progress bars
+      // Update marquee stats + progress bars (Party)
       const yesPercent = currentMarket.partyYes;
       const noPercent = 100 - yesPercent;
       const marqueeYes = document.getElementById('marquee-yes-pct');
-      const marqueeNo = document.getElementById('marquee-no-pct');
       const marqueeBarYes = document.getElementById('marquee-bar-yes');
       const marqueeBarNo = document.getElementById('marquee-bar-no');
       if (marqueeYes) marqueeYes.textContent = `${yesPercent}%`;
-      if (marqueeNo) marqueeNo.textContent = `${noPercent}%`;
       if (marqueeBarYes) marqueeBarYes.style.width = `${yesPercent}%`;
       if (marqueeBarNo) marqueeBarNo.style.width = `${noPercent}%`;
+
+      // Update marquee Kalshi bar
+      const kalshiYes = currentMarket.kalshiYes;
+      const kalshiNo = 100 - kalshiYes;
+      const marqueeKalshiYes = document.getElementById('marquee-kalshi-yes');
+      const marqueeKalshiNo = document.getElementById('marquee-kalshi-no');
+      const marqueeKalshiPct = document.getElementById('marquee-kalshi-pct');
+      if (marqueeKalshiYes) marqueeKalshiYes.style.width = `${kalshiYes}%`;
+      if (marqueeKalshiNo) marqueeKalshiNo.style.width = `${kalshiNo}%`;
+      if (marqueeKalshiPct) marqueeKalshiPct.textContent = `${kalshiYes}%`;
 
       // Update progress bars with percentages
       document.getElementById('kalshi-yes').textContent = `${currentMarket.kalshiYes}%`;
@@ -7279,9 +7479,18 @@
     // ═══════════════════════════════════════════════════════════════
     // NINTENDO CELEBRATION — The Epic Moment!
     // ═══════════════════════════════════════════════════════════════
+    let lastVoteWasYes = true; // Track which zone for confetti color
+
     function showCelebration() {
       const celebration = document.getElementById('celebration');
       celebration.classList.add('active');
+
+      // TOSHIRO'S CONFETTI — Explode from center of screen!
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      triggerConfetti(centerX, centerY, lastVoteWasYes);
+      // Fire a second burst slightly delayed for extra impact
+      setTimeout(() => triggerConfetti(centerX, centerY, lastVoteWasYes), 150);
 
       // Nintendo-style haptic pattern: short-pause-long-pause-short
       if (navigator.vibrate) navigator.vibrate([30, 50, 100, 50, 30]);
@@ -7290,6 +7499,71 @@
       setTimeout(() => {
         celebration.classList.remove('active');
       }, 2000);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // TOSHIRO'S CONFETTI PARTICLE ENGINE — Vote Celebration!
+    // 30 pixel-art squares explode upward with physics & rotation
+    // ═══════════════════════════════════════════════════════════════
+    function triggerConfetti(x, y, isYes = true) {
+      const container = document.getElementById('confetti-container');
+      if (!container) return;
+
+      // YES = Cyan + White, NO = Hot Pink + Red
+      const colors = isYes
+        ? ['#4da6ff', '#00d4ff', '#ffffff', '#80e0ff']
+        : ['#ff4b9b', '#ff3366', '#ff6090', '#ff0066'];
+
+      const particleCount = 30;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'confetti-particle';
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.width = `${6 + Math.random() * 6}px`;
+        particle.style.height = `${6 + Math.random() * 6}px`;
+
+        container.appendChild(particle);
+
+        // Physics: random velocity, gravity, rotation
+        const vx = (Math.random() - 0.5) * 20;
+        const vy = -15 - Math.random() * 15; // Explode upward
+        const gravity = 0.5;
+        const drag = 0.98;
+        const rotationSpeed = (Math.random() - 0.5) * 20;
+        let rotation = Math.random() * 360;
+        let posX = 0;
+        let posY = 0;
+        let velX = vx;
+        let velY = vy;
+        let opacity = 1;
+
+        function animateParticle() {
+          velX *= drag;
+          velY += gravity;
+          velY *= drag;
+          posX += velX;
+          posY += velY;
+          rotation += rotationSpeed;
+          opacity -= 0.015;
+
+          particle.style.transform = `translate(${posX}px, ${posY}px) rotate(${rotation}deg)`;
+          particle.style.opacity = opacity;
+
+          if (opacity > 0) {
+            requestAnimationFrame(animateParticle);
+          } else {
+            particle.remove();
+          }
+        }
+
+        requestAnimationFrame(animateParticle);
+      }
+
+      // Haptic feedback
+      if (navigator.vibrate) navigator.vibrate(20);
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -7476,6 +7750,7 @@
 
         if (targetVote) {
           pendingVote = targetVote;
+          lastVoteWasYes = (targetVote === 'yes'); // Track for confetti color
 
           // Snap to team position using CSS classes
           playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
