@@ -7294,8 +7294,11 @@
     // VOTING
     // ═══════════════════════════════════════════════════════════════
     function setupVoting() {
-      document.getElementById('vote-yes').addEventListener('click', () => vote('yes'));
-      document.getElementById('vote-no').addEventListener('click', () => vote('no'));
+      // Vote buttons may not exist (drag-and-drop is primary voting method now)
+      const voteYes = document.getElementById('vote-yes');
+      const voteNo = document.getElementById('vote-no');
+      if (voteYes) voteYes.addEventListener('click', () => vote('yes'));
+      if (voteNo) voteNo.addEventListener('click', () => vote('no'));
     }
 
     // Player speech reactions
