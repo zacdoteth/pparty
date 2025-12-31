@@ -4716,16 +4716,16 @@
       position: relative;
     }
 
-    /* STICK FIGURE HEAD — White circle with thick black outline */
+    /* STICK FIGURE HEAD — Larger for TG photos to be visible! */
     .stick-head {
-      width: 18px;
-      height: 18px;
+      width: 28px;
+      height: 28px;
       background: #fff;
       border: 3px solid #111;
       border-radius: 50%;
       position: relative;
       z-index: 3;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -4738,6 +4738,35 @@
       height: 100%;
       object-fit: cover;
       border-radius: 50%;
+    }
+
+    /* TG NAME TAG — Member's name displayed below the avatar */
+    .avatar-name {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow:
+        0 0 4px rgba(0, 0, 0, 0.9),
+        0 1px 2px rgba(0, 0, 0, 0.8),
+        0 0 8px currentColor;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* YES team names glow cyan */
+    .iso-avatar.bet-yes .avatar-name {
+      color: #00F0FF;
+    }
+
+    /* NO team names glow pink */
+    .iso-avatar.bet-no .avatar-name {
+      color: #FF4B9B;
     }
 
     /* STICK FIGURE BODY — The Torso Line */
@@ -9559,10 +9588,10 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // AVATAR ENGINE — Robust Image Loading with Stick Figure Fallback
-    // "Try image first. If it fails, GRACEFUL degradation to stick figures." — Toshiro
+    // AVATAR ENGINE — TG Group Members with Real Photos + Names
+    // "This is a TG group prediction party! Show the REAL faces!" — Toshiro
     //
-    // CRITICAL: onerror fallback ensures no broken image icons ever appear.
+    // Uses member.photo from MEMBERS array, with stick figure fallback.
     // ═══════════════════════════════════════════════════════════════
     function createVillager(member, index, team, position) {
       const avatar = document.createElement('div');
@@ -9594,19 +9623,19 @@
       const faces = ['happy', 'cool', 'angry', 'surprised', 'wink', 'smirk'];
       const randomFace = faces[Math.floor(Math.random() * faces.length)];
 
-      // Generate unique avatar ID for image path
-      const avatarId = member?.id || (index + 1);
-      const imagePath = `./tg/user_${avatarId}.jpg`;
+      // TG GROUP: Use member's real photo and name!
+      const memberName = member?.name || `User ${index + 1}`;
+      const memberPhoto = member?.photo || `/tg/user_${index + 1}.jpg`;
 
-      // AVATAR ENGINE: Try to load image, fallback to stick figure face
+      // TG PARTY: Real photos with names displayed!
       avatar.innerHTML = `
         <div class="iso-avatar-sprite">
           <div class="iso-avatar-shadow"></div>
           <div class="stick-head">
-            <!-- CRITICAL: Image with onerror fallback -->
+            <!-- TG Avatar Photo with onerror fallback -->
             <img
-              src="${imagePath}"
-              alt=""
+              src="${memberPhoto}"
+              alt="${memberName}"
               class="avatar-photo"
               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
             />
@@ -9616,6 +9645,8 @@
           <div class="stick-body"></div>
           <div class="stick-arms"></div>
           <div class="stick-legs"></div>
+          <!-- TG NAME TAG — Shows the member's name! -->
+          <div class="avatar-name">${memberName}</div>
         </div>
       `;
 
