@@ -1599,31 +1599,33 @@
         flex: 1;
       }
 
-      /* Dance floor (Crowd) - RIGHT UP TO THE DJ! Real club vibe */
+      /* ISOMETRIC DANCE FLOOR — Desktop Sizing */
       .dance-floor {
-        top: 280px; /* Directly below DJ booth */
-        bottom: 20px;
-        left: 20px;
-        right: 20px;
+        top: 260px; /* Below DJ booth */
+        bottom: 40px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 85%;
+        max-width: 700px;
         height: auto;
         max-height: none;
-        border-radius: 24px;
-        padding: 16px;
+        padding: 0;
       }
 
-      /* Larger floor zones */
-      .floor-zone {
-        border-radius: 16px;
+      .iso-grid-wrapper {
+        transform: rotateX(55deg) rotateZ(-45deg);
       }
 
+      /* Larger zone labels */
       .zone-label {
-        font-size: 32px;
+        font-size: 18px;
+        top: -50px;
       }
 
       .floor-score {
-        font-size: 22px;
-        padding: 10px 20px;
-        border-radius: 20px;
+        font-size: 32px;
+        bottom: -40px;
       }
 
       /* Bigger crowd avatars! */
@@ -3406,146 +3408,388 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       THE DANCE FLOOR (CROWD) — Bottom 40% of Screen!
+       TOSHIRO'S ISOMETRIC DANCE FLOOR — Habbo Hotel 2.0
+       High-Fidelity 2.5D Grid with "Billie Jean" Lighting
     ═══════════════════════════════════════════════════════════════ */
+
+    /* The Stage Container — Houses the isometric floor */
     .dance-floor {
       position: absolute;
-      top: auto; /* Let height determine position from bottom */
-      bottom: 90px; /* Above tab bar on mobile */
-      left: 12px;
-      right: 12px;
-      height: 38%; /* Bottom ~40% for the crowd */
-      max-height: 350px; /* Cap on mobile */
-      display: flex;
-      flex-direction: row-reverse; /* LEFT/RIGHT SPLIT: YES (blue) on LEFT, NO (pink) on RIGHT — matches sidebar! */
-      gap: 6px;
+      top: auto;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 600px;
+      height: 45%;
+      max-height: 400px;
       z-index: 5;
-      padding: 12px;
-      /* FLOATING GLASS CONTAINER */
-      background: rgba(10, 8, 20, 0.6);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.4),
-        0 0 80px rgba(77, 166, 255, 0.05),
-        0 0 80px rgba(255, 0, 128, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      /* Animated edge glow */
-      animation: floor-glow 6s ease-in-out infinite;
+      /* 3D Perspective Container */
+      perspective: 1000px;
+      perspective-origin: 50% 40%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    @keyframes floor-glow {
-      0%, 100% {
-        box-shadow:
-          0 8px 32px rgba(0, 0, 0, 0.4),
-          0 0 60px rgba(77, 166, 255, 0.08),
-          0 0 60px rgba(255, 0, 128, 0.06),
-          inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      }
-      50% {
-        box-shadow:
-          0 8px 32px rgba(0, 0, 0, 0.4),
-          0 0 100px rgba(77, 166, 255, 0.12),
-          0 0 100px rgba(255, 0, 128, 0.1),
-          inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      }
-    }
-
-    .floor-zone {
-      flex: 1;
+    /* The Isometric Grid Wrapper */
+    .iso-grid-wrapper {
       position: relative;
-      border-radius: 12px;
-      overflow: visible; /* Allow speech bubbles to overflow! */
-      transition: flex 0.5s var(--smooth);
-      /* More transparent so lights shine through */
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      /* HABBO-STYLE ISOMETRIC TRANSFORM */
+      transform: rotateX(60deg) rotateZ(-45deg);
     }
 
-    /* Tiled Floor Pattern - Vertical layout for horizontal zone split (2 cols x 4 rows) */
-    .floor-tiles {
+    /* Zone containers positioned side by side in iso space */
+    .floor-zone {
       position: absolute;
-      inset: 0;
+      transform-style: preserve-3d;
+      transition: all 0.3s var(--smooth);
+    }
+
+    .floor-zone.yes {
+      left: 0;
+      top: 0;
+      width: 50%;
+      height: 100%;
+    }
+
+    .floor-zone.no {
+      right: 0;
+      top: 0;
+      width: 50%;
+      height: 100%;
+    }
+
+    /* The 10x10 Tile Grid */
+    .iso-tile-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      gap: 4px;
-      padding: 8px;
-      border-radius: 12px;
-      overflow: hidden; /* Clip tiles only, not speech bubbles */
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+      gap: 2px;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
     }
 
-    .floor-tile {
-      border-radius: 4px;
-      transition: all 0.3s ease;
+    /* Individual Isometric Tile */
+    .iso-tile {
+      position: relative;
+      background: #1a1a2a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform-style: preserve-3d;
+      /* Smooth "Billie Jean" glow transition */
+      transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* NO Zone - Pink/Red Tiles - Semi-transparent */
-    .floor-zone.no .floor-tile {
-      background: linear-gradient(135deg, rgba(255, 0, 128, 0.25), rgba(200, 0, 100, 0.15));
-      box-shadow: inset 0 0 10px rgba(255, 0, 128, 0.1);
+    /* Tile Depth Extrusion — The 3D "slab" effect */
+    .iso-tile::before {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: #0a0a15;
+      transform: rotateX(-90deg);
+      transform-origin: top;
     }
 
-    .floor-zone.no .floor-tile:nth-child(odd) {
-      background: linear-gradient(135deg, rgba(255, 0, 128, 0.3), rgba(220, 0, 110, 0.2));
+    .iso-tile::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: -5px;
+      width: 5px;
+      background: #12121f;
+      transform: rotateY(90deg);
+      transform-origin: left;
     }
 
-    /* YES Zone - Cyan/Blue Tiles - Semi-transparent */
-    .floor-zone.yes .floor-tile {
-      background: linear-gradient(135deg, rgba(0, 245, 255, 0.25), rgba(0, 200, 220, 0.15));
-      box-shadow: inset 0 0 10px rgba(0, 245, 255, 0.1);
+    /* YES Zone Tiles — Base cyan tint */
+    .floor-zone.yes .iso-tile {
+      background: linear-gradient(135deg, #1a2a3a 0%, #152535 100%);
+      border-color: rgba(0, 240, 255, 0.15);
     }
 
-    .floor-zone.yes .floor-tile:nth-child(odd) {
-      background: linear-gradient(135deg, rgba(0, 245, 255, 0.3), rgba(0, 180, 200, 0.2));
+    .floor-zone.yes .iso-tile::before {
+      background: linear-gradient(90deg, #0a1520, #081018);
     }
 
-    /* Glow effect on tiles */
-    .floor-zone.no .floor-tile:hover,
-    .floor-zone.no.hovering .floor-tile {
-      box-shadow: 0 0 15px rgba(255, 0, 128, 0.6), inset 0 0 10px rgba(255, 0, 128, 0.3);
+    .floor-zone.yes .iso-tile::after {
+      background: linear-gradient(180deg, #0f1f2a, #0a1520);
     }
 
-    .floor-zone.yes .floor-tile:hover,
-    .floor-zone.yes.hovering .floor-tile {
-      box-shadow: 0 0 15px rgba(0, 245, 255, 0.6), inset 0 0 10px rgba(0, 245, 255, 0.3);
+    /* NO Zone Tiles — Base pink tint */
+    .floor-zone.no .iso-tile {
+      background: linear-gradient(135deg, #2a1a2a 0%, #251525 100%);
+      border-color: rgba(255, 0, 85, 0.15);
     }
 
-    /* Zone Labels - Top Center for Horizontal Split */
+    .floor-zone.no .iso-tile::before {
+      background: linear-gradient(90deg, #150a15, #100810);
+    }
+
+    .floor-zone.no .iso-tile::after {
+      background: linear-gradient(180deg, #1f0f1f, #150a15);
+    }
+
+    /* "BILLIE JEAN" EFFECT — Tile Flash States */
+    .iso-tile.flash-cyan {
+      background: #00F0FF !important;
+      box-shadow:
+        0 0 20px #00F0FF,
+        0 0 40px rgba(0, 240, 255, 0.6),
+        inset 0 0 15px rgba(255, 255, 255, 0.3);
+      border-color: #00F0FF;
+    }
+
+    .iso-tile.flash-pink {
+      background: #FF0055 !important;
+      box-shadow:
+        0 0 20px #FF0055,
+        0 0 40px rgba(255, 0, 85, 0.6),
+        inset 0 0 15px rgba(255, 255, 255, 0.3);
+      border-color: #FF0055;
+    }
+
+    /* Zone Labels — Floating above iso grid */
     .zone-label {
       position: absolute;
       left: 50%;
-      top: 12px;
-      transform: translateX(-50%);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 3px;
+      top: -40px;
+      transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 4px;
       text-transform: uppercase;
-      text-shadow: 0 0 10px currentColor;
-      z-index: 10;
-      opacity: 0.8;
+      text-shadow: 0 0 20px currentColor, 0 2px 4px rgba(0,0,0,0.8);
+      z-index: 100;
+      white-space: nowrap;
     }
 
     .floor-zone.no .zone-label {
-      color: var(--neon-pink);
+      color: #FF0055;
     }
 
     .floor-zone.yes .zone-label {
-      color: var(--neon-cyan);
+      color: #00F0FF;
     }
 
-    /* Team Score Display - Bottom Center */
+    /* Team Score Display */
     .floor-score {
       position: absolute;
       left: 50%;
-      bottom: 10px;
+      bottom: -30px;
+      transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg);
+      font-size: 28px;
+      font-weight: 900;
+      opacity: 0.7;
+      z-index: 100;
+      text-shadow: 0 0 30px currentColor;
+    }
+
+    .floor-zone.no .floor-score {
+      color: #FF0055;
+    }
+
+    .floor-zone.yes .floor-score {
+      color: #00F0FF;
+    }
+
+    /* Crowd Area — Avatar container with z-index sorting */
+    .crowd-area {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      /* Counter-rotate so avatars appear upright */
+      transform: rotateZ(45deg) rotateX(-60deg);
+      transform-origin: center center;
+      pointer-events: none;
+    }
+
+    .crowd-area .villager {
+      pointer-events: auto;
+    }
+
+    /* Hide old floor-tiles, we use iso-tile-grid now */
+    .floor-tiles {
+      display: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       DISCO BALL — "After Effects" Light Sweep Shimmer
+       Static ball with dynamic light reflections
+    ═══════════════════════════════════════════════════════════════ */
+    .disco-ball {
+      position: absolute;
+      top: 8px;
+      left: 50%;
       transform: translateX(-50%);
-      font-size: 24px;
-      font-weight: 800;
-      opacity: 0.5;
-      z-index: 1;
+      z-index: 30;
+    }
+
+    .disco-ball-top {
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+      margin: 0 auto;
+      border-radius: 1px;
+    }
+
+    .disco-ball-sphere {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      /* Metallic base */
+      background: radial-gradient(ellipse at 30% 30%,
+        #888 0%,
+        #555 30%,
+        #333 60%,
+        #222 100%
+      );
+      box-shadow:
+        0 4px 20px rgba(0,0,0,0.6),
+        inset 0 -10px 20px rgba(0,0,0,0.4),
+        inset 0 5px 10px rgba(255,255,255,0.2);
+    }
+
+    /* Mirror Facet Grid Pattern */
+    .disco-ball-sphere::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 50%;
+      background-image:
+        linear-gradient(0deg, transparent 48%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 52%),
+        linear-gradient(90deg, transparent 48%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 52%),
+        linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, transparent 52%),
+        linear-gradient(-45deg, transparent 48%, rgba(255,255,255,0.2) 49%, rgba(255,255,255,0.2) 51%, transparent 52%);
+      background-size: 6px 6px;
+      opacity: 0.8;
+    }
+
+    /* THE LIGHT SWEEP — Shimmer Effect (No Rotation!) */
+    .disco-ball-sphere::after {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background: radial-gradient(ellipse 30% 50% at 50% 50%,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.4) 30%,
+        transparent 70%
+      );
+      animation: disco-light-sweep 0.9375s ease-in-out infinite; /* 128 BPM = 2 beats */
+      pointer-events: none;
+    }
+
+    @keyframes disco-light-sweep {
+      0% {
+        transform: translate(-80%, -80%) scale(0.5);
+        opacity: 0.3;
+      }
+      25% {
+        opacity: 1;
+      }
+      50% {
+        transform: translate(80%, 80%) scale(0.8);
+        opacity: 0.5;
+      }
+      75% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translate(-80%, -80%) scale(0.5);
+        opacity: 0.3;
+      }
+    }
+
+    /* Sparkle Points on the ball */
+    .disco-facet {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #fff;
+      border-radius: 50%;
+      animation: facet-sparkle 0.46875s ease-in-out infinite; /* 128 BPM */
+    }
+
+    .disco-facet:nth-child(1) { top: 20%; left: 25%; animation-delay: 0s; }
+    .disco-facet:nth-child(2) { top: 35%; left: 65%; animation-delay: -0.117s; }
+    .disco-facet:nth-child(3) { top: 55%; left: 30%; animation-delay: -0.234s; }
+    .disco-facet:nth-child(4) { top: 70%; left: 60%; animation-delay: -0.351s; }
+
+    @keyframes facet-sparkle {
+      0%, 100% {
+        opacity: 0.2;
+        transform: scale(0.5);
+        box-shadow: 0 0 2px #fff;
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.5);
+        box-shadow: 0 0 10px #fff, 0 0 20px rgba(255,255,255,0.5);
+      }
+    }
+
+    /* Reflection Scatter — Light dots on the room */
+    .disco-ball-reflection {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 100px;
+      pointer-events: none;
+    }
+
+    .disco-ball-reflection::before,
+    .disco-ball-reflection::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      animation: scatter-dot 2s ease-in-out infinite;
+    }
+
+    .disco-ball-reflection::before {
+      top: 20px;
+      left: 30%;
+      box-shadow:
+        40px 10px 0 #00F0FF,
+        -20px 30px 0 #FF0055,
+        60px 40px 0 #fff,
+        -40px 15px 0 #FFD700;
+      animation-delay: -0.5s;
+    }
+
+    .disco-ball-reflection::after {
+      top: 35px;
+      left: 60%;
+      box-shadow:
+        -30px 5px 0 #00F0FF,
+        20px 25px 0 #FF0055,
+        -10px 40px 0 #fff;
+      animation-delay: -1s;
+    }
+
+    @keyframes scatter-dot {
+      0%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.2);
+      }
     }
 
     .floor-zone.no .floor-score {
@@ -6992,42 +7236,49 @@
           <div class="totem-glow"></div>
         </div>
 
-        <!-- Dance Floor with Tiles — HORIZONTAL SPLIT: YES on top, NO on bottom -->
+        <!-- TOSHIRO'S ISOMETRIC DANCE FLOOR — Habbo Hotel 2.0 -->
         <div class="dance-floor">
-          <!-- Grungy Techno Filter Overlay -->
-          <div class="grunge-overlay">
-            <div class="grunge-grain"></div>
-            <div class="grunge-scanlines"></div>
-            <div class="grunge-vignette"></div>
-            <div class="grunge-color-grade"></div>
-            <div class="grunge-aberration"></div>
-            <div class="grunge-flicker"></div>
-            <div class="grunge-bloom"></div>
-          </div>
-          <!-- NO Zone (LEFT) — Pink/Red -->
-          <div class="floor-zone no" id="zone-no">
-            <div class="floor-tiles">
-              <div class="floor-tile"></div><div class="floor-tile"></div>
-              <div class="floor-tile"></div><div class="floor-tile"></div>
-              <div class="floor-tile"></div><div class="floor-tile"></div>
-              <div class="floor-tile"></div><div class="floor-tile"></div>
+          <!-- The Isometric Grid Wrapper -->
+          <div class="iso-grid-wrapper">
+            <!-- YES Zone (LEFT in iso view) — Cyan/Blue -->
+            <div class="floor-zone yes" id="zone-yes">
+              <div class="iso-tile-grid" id="iso-grid-yes">
+                <!-- 50 tiles (5x10 grid) - Generated by JS, fallback here -->
+                <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
+                <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
+                <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
+                <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
+                <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
+                <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
+                <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
+                <div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div>
+                <div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div>
+                <div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div>
+              </div>
+              <div class="crowd-area" id="crowd-yes"></div>
+              <span class="zone-label">YES</span>
+              <span class="floor-score" id="yes-score">72%</span>
             </div>
-            <div class="crowd-area" id="crowd-no"></div>
-            <span class="zone-label">NO</span>
-            <span class="floor-score" id="no-score">28%</span>
-          </div>
 
-          <!-- YES Zone (RIGHT) — Cyan/Blue -->
-          <div class="floor-zone yes" id="zone-yes">
-            <div class="floor-tiles">
-              <div class="floor-tile"></div><div class="floor-tile"></div>
-              <div class="floor-tile"></div><div class="floor-tile"></div>
-              <div class="floor-tile"></div><div class="floor-tile"></div>
-              <div class="floor-tile"></div><div class="floor-tile"></div>
+            <!-- NO Zone (RIGHT in iso view) — Pink/Red -->
+            <div class="floor-zone no" id="zone-no">
+              <div class="iso-tile-grid" id="iso-grid-no">
+                <!-- 50 tiles (5x10 grid) -->
+                <div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div><div class="iso-tile" data-row="0"></div>
+                <div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div><div class="iso-tile" data-row="1"></div>
+                <div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div><div class="iso-tile" data-row="2"></div>
+                <div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div><div class="iso-tile" data-row="3"></div>
+                <div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div><div class="iso-tile" data-row="4"></div>
+                <div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div><div class="iso-tile" data-row="5"></div>
+                <div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div><div class="iso-tile" data-row="6"></div>
+                <div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div><div class="iso-tile" data-row="7"></div>
+                <div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div><div class="iso-tile" data-row="8"></div>
+                <div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div><div class="iso-tile" data-row="9"></div>
+              </div>
+              <div class="crowd-area" id="crowd-no"></div>
+              <span class="zone-label">NO</span>
+              <span class="floor-score" id="no-score">28%</span>
             </div>
-            <div class="crowd-area" id="crowd-yes"></div>
-            <span class="zone-label">YES</span>
-            <span class="floor-score" id="yes-score">72%</span>
           </div>
         </div>
 
@@ -7547,6 +7798,14 @@
       playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
       playerContainer.classList.add('at-door');
 
+      // Clear any grid snapping state from previous market
+      playerContainer.style.left = '';
+      playerContainer.style.bottom = '';
+      playerContainer.style.transform = '';
+      playerContainer.style.zIndex = '';
+      delete playerContainer.dataset.currentRow;
+      delete playerContainer.dataset.currentZone;
+
       // Desktop vs Mobile behavior
       if (isDesktop()) {
         // Desktop: Keep sidebar visible, highlight selected market
@@ -7560,9 +7819,10 @@
         tabBar.style.display = 'none';
       }
 
-      // Start chat and disco
+      // Start chat, disco, and BILLIE JEAN LIGHTING!
       startChat();
       startDiscoReflections();
+      startBillieJeanLighting();
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -7846,7 +8106,34 @@
 
       // Move player to side using CSS classes - remove at-door
       playerContainer.classList.remove('on-stage', 'at-door', 'team-yes-pos', 'team-no-pos');
-      playerContainer.classList.add(side === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+
+      // ═══ GRID SNAPPING: Place on random tile for button-based voting ═══
+      const gridId = side === 'yes' ? 'iso-grid-yes' : 'iso-grid-no';
+      const tiles = document.querySelectorAll(`#${gridId} .iso-tile`);
+      if (tiles.length > 0) {
+        const randomTile = tiles[Math.floor(Math.random() * tiles.length)];
+        const row = parseInt(randomTile.dataset.row) || 0;
+        const tileRect = randomTile.getBoundingClientRect();
+        const parentRect = playerContainer.parentElement.getBoundingClientRect();
+
+        const tileCenterX = tileRect.left + tileRect.width / 2 - parentRect.left;
+        const tileCenterY = parentRect.bottom - (tileRect.top + tileRect.height / 2);
+
+        playerContainer.dataset.currentRow = row;
+        playerContainer.dataset.currentZone = side;
+        playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        playerContainer.style.left = tileCenterX + 'px';
+        playerContainer.style.bottom = tileCenterY + 'px';
+        playerContainer.style.transform = 'translateX(-50%)';
+        playerContainer.style.zIndex = 50 + Math.min(row + 1, 10);
+
+        // Flash the tile
+        randomTile.classList.add(side === 'yes' ? 'flash-cyan' : 'flash-pink');
+        setTimeout(() => randomTile.classList.remove('flash-cyan', 'flash-pink'), 300);
+      } else {
+        // Fallback to CSS class positioning
+        playerContainer.classList.add(side === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+      }
 
       // Show player's reaction speech bubble
       showPlayerSpeech(side);
@@ -7977,6 +8264,14 @@
       player.classList.add('at-door');
       playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
       playerContainer.classList.add('at-door');
+
+      // Clear grid snapping state
+      playerContainer.style.left = '';
+      playerContainer.style.bottom = '';
+      playerContainer.style.transform = '';
+      playerContainer.style.zIndex = '';
+      delete playerContainer.dataset.currentRow;
+      delete playerContainer.dataset.currentZone;
 
       // Show the dock again
       document.getElementById('player-dock').classList.remove('hidden');
@@ -8151,6 +8446,62 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // TOSHIRO'S "BILLIE JEAN" TILE LIGHTING ENGINE
+    // Random tiles flash at 128 BPM — Pure disco energy!
+    // ═══════════════════════════════════════════════════════════════
+    let billieJeanInterval = null;
+
+    function startBillieJeanLighting() {
+      // Already running?
+      if (billieJeanInterval) return;
+
+      const yesTiles = document.querySelectorAll('#iso-grid-yes .iso-tile');
+      const noTiles = document.querySelectorAll('#iso-grid-no .iso-tile');
+
+      if (yesTiles.length === 0 && noTiles.length === 0) return;
+
+      // 128 BPM = 468.75ms per beat, flash every beat
+      const beatMs = 60000 / 128;
+
+      billieJeanInterval = setInterval(() => {
+        // Flash 2-4 random tiles in YES zone (cyan)
+        const yesFlashCount = 2 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < yesFlashCount; i++) {
+          const randomTile = yesTiles[Math.floor(Math.random() * yesTiles.length)];
+          if (randomTile && !randomTile.classList.contains('flash-cyan')) {
+            randomTile.classList.add('flash-cyan');
+            // Remove flash after transition
+            setTimeout(() => randomTile.classList.remove('flash-cyan'), 200);
+          }
+        }
+
+        // Flash 2-4 random tiles in NO zone (pink)
+        const noFlashCount = 2 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < noFlashCount; i++) {
+          const randomTile = noTiles[Math.floor(Math.random() * noTiles.length)];
+          if (randomTile && !randomTile.classList.contains('flash-pink')) {
+            randomTile.classList.add('flash-pink');
+            // Remove flash after transition
+            setTimeout(() => randomTile.classList.remove('flash-pink'), 200);
+          }
+        }
+      }, beatMs);
+
+      console.log('🪩 Billie Jean lighting ACTIVATED at 128 BPM!');
+    }
+
+    function stopBillieJeanLighting() {
+      if (billieJeanInterval) {
+        clearInterval(billieJeanInterval);
+        billieJeanInterval = null;
+        // Clear all flashing tiles
+        document.querySelectorAll('.iso-tile.flash-cyan, .iso-tile.flash-pink').forEach(tile => {
+          tile.classList.remove('flash-cyan', 'flash-pink');
+        });
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // DRAGGING — Native Touch/Pointer Events (BULLETPROOF!)
     // No libraries, no dependencies, just works.
     // ═══════════════════════════════════════════════════════════════
@@ -8266,6 +8617,79 @@
         }
       }
 
+      // ═══ GRID SNAPPING — Find Nearest Tile ═══
+      // In isometric view, lower on screen = closer to camera = higher z-index
+      function findNearestTile(screenX, screenY, zoneSide) {
+        const gridId = zoneSide === 'yes' ? 'iso-grid-yes' : 'iso-grid-no';
+        const tiles = document.querySelectorAll(`#${gridId} .iso-tile`);
+        if (!tiles.length) return null;
+
+        let nearestTile = null;
+        let nearestDist = Infinity;
+
+        tiles.forEach(tile => {
+          const rect = tile.getBoundingClientRect();
+          const tileCenterX = rect.left + rect.width / 2;
+          const tileCenterY = rect.top + rect.height / 2;
+
+          // Calculate distance from drop point to tile center
+          const dist = Math.sqrt(
+            Math.pow(screenX - tileCenterX, 2) +
+            Math.pow(screenY - tileCenterY, 2)
+          );
+
+          if (dist < nearestDist) {
+            nearestDist = dist;
+            nearestTile = tile;
+          }
+        });
+
+        return nearestTile;
+      }
+
+      // ═══ Z-INDEX SORTING — Row-based depth sorting ═══
+      // Row 0 (top/far) = z-index 51, Row 9 (bottom/near) = z-index 60
+      function updateAvatarZIndex(row) {
+        const baseZ = 50;
+        const newZ = baseZ + Math.min(row + 1, 10);
+        playerContainer.style.zIndex = newZ;
+        console.log(`🎮 Avatar Z-index updated: row ${row} → z-index ${newZ}`);
+      }
+
+      // ═══ SNAP TO TILE — Position avatar at tile center ═══
+      function snapToTile(tile, zoneSide) {
+        if (!tile) return;
+
+        const row = parseInt(tile.dataset.row) || 0;
+        const tileRect = tile.getBoundingClientRect();
+        const parentRect = playerContainer.parentElement.getBoundingClientRect();
+
+        // Calculate tile center relative to parent
+        const tileCenterX = tileRect.left + tileRect.width / 2 - parentRect.left;
+        const tileCenterY = parentRect.bottom - (tileRect.top + tileRect.height / 2);
+
+        // Store current tile data on player for reference
+        playerContainer.dataset.currentRow = row;
+        playerContainer.dataset.currentZone = zoneSide;
+
+        // Animate snap to tile center
+        playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        playerContainer.style.left = tileCenterX + 'px';
+        playerContainer.style.bottom = tileCenterY + 'px';
+        playerContainer.style.transform = 'translateX(-50%)';
+
+        // Update z-index based on row (isometric depth sorting)
+        updateAvatarZIndex(row);
+
+        // Flash the tile they landed on
+        tile.classList.add(zoneSide === 'yes' ? 'flash-cyan' : 'flash-pink');
+        setTimeout(() => {
+          tile.classList.remove('flash-cyan', 'flash-pink');
+        }, 300);
+
+        console.log(`🎮 Snapped to tile at row ${row} in ${zoneSide} zone`);
+      }
+
       // ═══ DRAG END ═══
       function onDragEnd(e) {
         if (!isDragging) return;
@@ -8274,6 +8698,7 @@
         // Get final position for zone detection
         const rect = playerContainer.getBoundingClientRect();
         const screenX = rect.left + rect.width / 2;
+        const screenY = rect.top + rect.height / 2;
         const screenCenter = window.innerWidth / 2;
         const normalizedX = (screenX - screenCenter) / screenCenter;
 
@@ -8297,12 +8722,22 @@
           pendingVote = targetVote;
           lastVoteWasYes = (targetVote === 'yes'); // Track for confetti color
 
-          // Snap to team position using CSS classes
-          playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-          playerContainer.style.left = '';
-          playerContainer.style.bottom = '';
-          playerContainer.style.transform = '';
-          playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+          // ═══ GRID SNAPPING: Find nearest tile and snap to it ═══
+          const nearestTile = findNearestTile(screenX, screenY, targetVote);
+
+          playerContainer.classList.remove('at-door', 'team-yes-pos', 'team-no-pos');
+
+          if (nearestTile) {
+            // Snap to tile center with z-index sorting
+            snapToTile(nearestTile, targetVote);
+          } else {
+            // Fallback: use CSS class positioning
+            playerContainer.style.transition = 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            playerContainer.style.left = '';
+            playerContainer.style.bottom = '';
+            playerContainer.style.transform = '';
+            playerContainer.classList.add(targetVote === 'yes' ? 'team-yes-pos' : 'team-no-pos');
+          }
 
           player.classList.add('landing-squash');
           player.style.transform = '';
@@ -8329,8 +8764,13 @@
         playerContainer.style.left = '';
         playerContainer.style.bottom = '';
         playerContainer.style.transform = '';
+        playerContainer.style.zIndex = ''; // Reset z-index for dock
         playerContainer.classList.remove('team-yes-pos', 'team-no-pos');
         playerContainer.classList.add('at-door');
+
+        // Clear tile tracking data
+        delete playerContainer.dataset.currentRow;
+        delete playerContainer.dataset.currentZone;
 
         player.style.transition = 'transform 0.4s ease, filter 0.4s ease';
         player.style.transform = '';
