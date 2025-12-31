@@ -1522,10 +1522,9 @@
         box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
       }
 
-      /* Marquee sign - FLUSH to top, no header above! */
+      /* Marquee sign - HIDDEN on desktop (replaced by Jumbotron!) */
       .marquee-sign {
-        top: 0;
-        transform: translateX(-50%);
+        display: none !important;
       }
 
       .marquee-frame {
@@ -1537,9 +1536,9 @@
         padding: 6px 16px;
       }
 
-      /* DJ Booth — BELOW the marquee sign (not overlapping!) */
+      /* DJ Booth — Below Jumbotron with overlap for depth */
       .dj-booth-visual {
-        top: 135px;
+        top: 215px; /* Positioned to overlap jumbotron bottom edge */
       }
 
       /* Nightclub takes full space */
@@ -1547,13 +1546,14 @@
         flex: 1;
       }
 
-      /* Dance floor - floating stage (below marquee + DJ) */
+      /* Dance floor (Crowd) - Bottom 40% of screen */
       .dance-floor {
-        top: 195px;
-        bottom: 100px;
+        top: auto;
+        bottom: 20px;
         left: 20px;
         right: 20px;
-        max-height: 700px;
+        height: 40%;
+        max-height: 400px;
         border-radius: 24px;
         padding: 16px;
       }
@@ -2451,14 +2451,385 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
+       STAGE ARCHITECTURE — Toshiro's Nightclub Vision
+       Roof → Jumbotron → DJ Booth → Crowd
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* === THE ROOF === Compact Global Nav (60px) */
+    .stage-roof {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 5, 20, 0.9) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .roof-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--bounce);
+    }
+
+    .roof-back:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .roof-back-arrow {
+      font-size: 18px;
+    }
+
+    .roof-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255, 0, 80, 0.25);
+      border: 2px solid rgba(255, 0, 80, 0.5);
+      border-radius: 100px;
+      animation: live-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes live-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 80, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 0, 80, 0.6); }
+    }
+
+    .roof-live-dot {
+      width: 8px;
+      height: 8px;
+      background: #ff3366;
+      border-radius: 50%;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    .roof-live-text {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ff3366;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .roof-spacer {
+      width: 100px; /* Balance the layout */
+    }
+
+    /* === THE JUMBOTRON === Massive LED Matrix Screen */
+    .jumbotron {
+      position: absolute;
+      top: 60px; /* Below the roof */
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 600px;
+      z-index: 50;
+      perspective: 1200px;
+    }
+
+    .jumbotron-screen {
+      background: linear-gradient(180deg, #0a0515 0%, #050210 100%);
+      border: 4px solid #1a1525;
+      border-radius: 8px;
+      padding: 16px 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 60px rgba(77, 166, 255, 0.15),
+        0 0 100px rgba(255, 0, 128, 0.1),
+        inset 0 0 40px rgba(0, 0, 0, 0.5),
+        0 20px 60px rgba(0, 0, 0, 0.8);
+      transform: rotateX(5deg);
+      transform-origin: center bottom;
+    }
+
+    /* LED Matrix Pixel Grid Overlay */
+    .jumbotron-pixels {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+      background-size: 4px 4px;
+      pointer-events: none;
+      z-index: 10;
+      mix-blend-mode: overlay;
+    }
+
+    /* Scanline effect */
+    .jumbotron-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      pointer-events: none;
+      z-index: 11;
+      animation: scanline-scroll 8s linear infinite;
+    }
+
+    @keyframes scanline-scroll {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 100px; }
+    }
+
+    /* LED Edge Glow */
+    .jumbotron-glow {
+      position: absolute;
+      inset: -4px;
+      border-radius: 12px;
+      background: linear-gradient(90deg,
+        var(--neon-pink) 0%,
+        var(--neon-cyan) 50%,
+        var(--neon-pink) 100%
+      );
+      opacity: 0.3;
+      filter: blur(8px);
+      z-index: -1;
+      animation: jumbotron-edge-glow 4s ease-in-out infinite;
+    }
+
+    @keyframes jumbotron-edge-glow {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Market Question - Giant Pixel Font */
+    .jumbotron-question {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      line-height: 1.3;
+      text-shadow:
+        0 0 10px var(--neon-cyan),
+        0 0 20px var(--neon-cyan),
+        0 0 40px rgba(77, 166, 255, 0.5);
+      position: relative;
+      z-index: 5;
+      /* Pixel font feel */
+      font-family: 'Space Grotesk', monospace;
+      /* Clamp lines */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Stats Row */
+    .jumbotron-stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-top: 12px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .jumbotron-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .jumbotron-stat-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.6;
+    }
+
+    .jumbotron-stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      text-shadow: 0 0 15px currentColor;
+    }
+
+    .jumbotron-stat.no .jumbotron-stat-value {
+      color: var(--neon-pink);
+    }
+
+    .jumbotron-stat.yes .jumbotron-stat-value {
+      color: var(--neon-cyan);
+    }
+
+    .jumbotron-divider {
+      width: 2px;
+      height: 40px;
+      background: linear-gradient(180deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+
+    /* Progress Bar in Jumbotron */
+    .jumbotron-bar {
+      margin-top: 12px;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      position: relative;
+      z-index: 5;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .jumbotron-bar-fill {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .jumbotron-bar-fill.no {
+      background: linear-gradient(90deg, #ff0066, var(--neon-pink));
+      box-shadow: 0 0 15px var(--neon-pink);
+    }
+
+    .jumbotron-bar-fill.yes {
+      background: linear-gradient(90deg, var(--neon-cyan), #00d4ff);
+      box-shadow: 0 0 15px var(--neon-cyan);
+    }
+
+    /* BET FLASH EFFECT */
+    .jumbotron-flash {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 20;
+      border-radius: 8px;
+    }
+
+    .jumbotron-flash.yes {
+      background: radial-gradient(ellipse at center, var(--neon-cyan), transparent 70%);
+    }
+
+    .jumbotron-flash.no {
+      background: radial-gradient(ellipse at center, var(--neon-pink), transparent 70%);
+    }
+
+    .jumbotron-flash.active {
+      animation: jumbotron-flash-anim 0.6s ease-out;
+    }
+
+    @keyframes jumbotron-flash-anim {
+      0% { opacity: 0.8; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.1); }
+    }
+
+    /* === SPOTLIGHT CONE === From Jumbotron to DJ */
+    .stage-spotlight-cone {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 120px;
+      height: 80px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.05) 40%,
+        transparent 100%
+      );
+      clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+      pointer-events: none;
+      z-index: 40;
+      animation: spotlight-flicker 3s ease-in-out infinite;
+    }
+
+    @keyframes spotlight-flicker {
+      0%, 100% { opacity: 0.6; }
+      25% { opacity: 0.8; }
+      50% { opacity: 0.5; }
+      75% { opacity: 0.9; }
+    }
+
+    /* Desktop: Bigger Jumbotron */
+    @media (min-width: 769px) {
+      .stage-roof {
+        padding: 0 24px;
+      }
+
+      .jumbotron {
+        max-width: 700px;
+      }
+
+      .jumbotron-screen {
+        padding: 24px 32px;
+        border-radius: 12px;
+      }
+
+      .jumbotron-question {
+        font-size: 26px;
+        letter-spacing: 3px;
+      }
+
+      .jumbotron-stat-value {
+        font-size: 32px;
+      }
+
+      .jumbotron-bar {
+        height: 16px;
+        border-radius: 8px;
+      }
+
+      .stage-spotlight-cone {
+        width: 180px;
+        height: 100px;
+      }
+    }
+
+    /* Ultra-wide: Maximum Impact */
+    @media (min-width: 1200px) {
+      .jumbotron {
+        max-width: 800px;
+      }
+
+      .jumbotron-question {
+        font-size: 32px;
+      }
+
+      .jumbotron-stat-value {
+        font-size: 40px;
+      }
+
+      .stage-spotlight-cone {
+        width: 220px;
+        height: 120px;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
        DJ BOOTH — The Heart of the Party
     ═══════════════════════════════════════════════════════════════ */
     .dj-booth-visual {
       position: absolute;
-      top: 85px; /* Pushed down to make room for marquee */
+      top: 175px; /* Below jumbotron, slight overlap */
       left: 50%;
       transform: translateX(-50%);
-      z-index: 20;
+      z-index: 45; /* Between jumbotron and crowd */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -2973,16 +3344,16 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       THE DANCE FLOOR — Floating Stage with Lights Behind!
+       THE DANCE FLOOR (CROWD) — Bottom 40% of Screen!
     ═══════════════════════════════════════════════════════════════ */
     .dance-floor {
       position: absolute;
-      top: 115px;
-      bottom: 120px;
+      top: auto; /* Let height determine position from bottom */
+      bottom: 90px; /* Above tab bar on mobile */
       left: 12px;
       right: 12px;
-      max-height: 600px; /* Height limit! */
-      margin: auto 0; /* Center vertically if smaller than space */
+      height: 38%; /* Bottom ~40% for the crowd */
+      max-height: 350px; /* Cap on mobile */
       display: flex;
       flex-direction: row; /* LEFT/RIGHT SPLIT: NO on left, YES on right */
       gap: 6px;
@@ -6291,7 +6662,48 @@
         <div class="arena-strobe"></div>
       </div>
 
-      <!-- Nintendo-Style Header Bar -->
+      <!-- === STAGE ROOF === Compact Global Nav -->
+      <div class="stage-roof">
+        <button class="roof-back" id="roof-back-btn">
+          <span class="roof-back-arrow">←</span>
+          <span>Back</span>
+        </button>
+        <div class="roof-live">
+          <span class="roof-live-dot"></span>
+          <span class="roof-live-text">LIVE</span>
+        </div>
+        <div class="roof-spacer"></div>
+      </div>
+
+      <!-- === THE JUMBOTRON === Massive LED Matrix Screen -->
+      <div class="jumbotron">
+        <div class="jumbotron-glow"></div>
+        <div class="jumbotron-screen">
+          <div class="jumbotron-pixels"></div>
+          <div class="jumbotron-scanlines"></div>
+          <div class="jumbotron-flash yes" id="jumbotron-flash-yes"></div>
+          <div class="jumbotron-flash no" id="jumbotron-flash-no"></div>
+          <div class="jumbotron-question" id="jumbotron-question">WILL BTC HIT $100K?</div>
+          <div class="jumbotron-stats">
+            <div class="jumbotron-stat no">
+              <span class="jumbotron-stat-label">NO</span>
+              <span class="jumbotron-stat-value" id="jumbotron-no-pct">35%</span>
+            </div>
+            <div class="jumbotron-divider"></div>
+            <div class="jumbotron-stat yes">
+              <span class="jumbotron-stat-label">YES</span>
+              <span class="jumbotron-stat-value" id="jumbotron-yes-pct">65%</span>
+            </div>
+          </div>
+          <div class="jumbotron-bar">
+            <div class="jumbotron-bar-fill no" id="jumbotron-bar-no" style="width: 35%"></div>
+            <div class="jumbotron-bar-fill yes" id="jumbotron-bar-yes" style="width: 65%"></div>
+          </div>
+        </div>
+        <div class="stage-spotlight-cone"></div>
+      </div>
+
+      <!-- Nintendo-Style Header Bar (Hidden on desktop - replaced by Roof) -->
       <div class="arena-header">
         <button class="nav-btn" id="back-btn">
           <span class="nav-icon">←</span>
@@ -7031,6 +7443,18 @@
       if (marqueeKalshiNo) marqueeKalshiNo.style.width = `${kalshiNo}%`;
       if (marqueeKalshiPct) marqueeKalshiPct.textContent = `${kalshiYes}%`;
 
+      // Update the JUMBOTRON (Toshiro's Stage Architecture!)
+      const jumbotronQuestion = document.getElementById('jumbotron-question');
+      const jumbotronYesPct = document.getElementById('jumbotron-yes-pct');
+      const jumbotronNoPct = document.getElementById('jumbotron-no-pct');
+      const jumbotronBarYes = document.getElementById('jumbotron-bar-yes');
+      const jumbotronBarNo = document.getElementById('jumbotron-bar-no');
+      if (jumbotronQuestion) jumbotronQuestion.textContent = currentMarket.question.toUpperCase();
+      if (jumbotronYesPct) jumbotronYesPct.textContent = `${yesPercent}%`;
+      if (jumbotronNoPct) jumbotronNoPct.textContent = `${noPercent}%`;
+      if (jumbotronBarYes) jumbotronBarYes.style.width = `${yesPercent}%`;
+      if (jumbotronBarNo) jumbotronBarNo.style.width = `${noPercent}%`;
+
       // Update progress bars with percentages
       document.getElementById('kalshi-yes').textContent = `${currentMarket.kalshiYes}%`;
       document.getElementById('kalshi-no').textContent = `${100 - currentMarket.kalshiYes}%`;
@@ -7255,7 +7679,7 @@
         });
       });
 
-      // Back button
+      // Back button (original header)
       document.getElementById('back-btn').addEventListener('click', () => {
         if (isDesktop()) {
           // Desktop: Just clear selection (arena stays visible)
@@ -7272,6 +7696,27 @@
         stopCountdown();
         if (navigator.vibrate) navigator.vibrate(5);
       });
+
+      // Roof back button (Toshiro's Stage Architecture)
+      const roofBackBtn = document.getElementById('roof-back-btn');
+      if (roofBackBtn) {
+        roofBackBtn.addEventListener('click', () => {
+          if (isDesktop()) {
+            // Desktop: Just clear selection (arena stays visible)
+            document.querySelectorAll('.market-card').forEach(card => {
+              card.classList.remove('active');
+            });
+          } else {
+            // Mobile: Go back to home screen
+            screenArena.classList.remove('active');
+            screenHome.classList.add('active');
+            tabBar.style.display = 'flex';
+          }
+          stopChat();
+          stopCountdown();
+          if (navigator.vibrate) navigator.vibrate(5);
+        });
+      }
 
       // Markets button (same as back for now - goes to home)
       document.getElementById('markets-btn').addEventListener('click', () => {
@@ -7502,6 +7947,9 @@
       const celebration = document.getElementById('celebration');
       celebration.classList.add('active');
 
+      // TOSHIRO'S JUMBOTRON FLASH — The screen lights up!
+      flashJumbotron(lastVoteWasYes);
+
       // TOSHIRO'S CONFETTI — Explode from center of screen!
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
@@ -7581,6 +8029,24 @@
 
       // Haptic feedback
       if (navigator.vibrate) navigator.vibrate(20);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // JUMBOTRON FLASH — Bet Drop Celebration!
+    // ═══════════════════════════════════════════════════════════════
+    function flashJumbotron(isYes = true) {
+      const flashEl = isYes
+        ? document.getElementById('jumbotron-flash-yes')
+        : document.getElementById('jumbotron-flash-no');
+      if (!flashEl) return;
+
+      // Remove and re-add class to restart animation
+      flashEl.classList.remove('active');
+      void flashEl.offsetWidth; // Force reflow
+      flashEl.classList.add('active');
+
+      // Clean up after animation
+      setTimeout(() => flashEl.classList.remove('active'), 600);
     }
 
     // ═══════════════════════════════════════════════════════════════
