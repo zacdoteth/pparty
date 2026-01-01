@@ -4660,77 +4660,68 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       SPEECH BUBBLE — Shows their VOTE! (YES! / NO!)
-       "Way cooler than names. They're SHOUTING their votes!" — User Feedback
+       SPEECH BUBBLE — White Miiverse-style bubbles that POP!
+       "The OG style with crypto slang. Clean white bubbles." — User
     ═══════════════════════════════════════════════════════════════ */
     .vote-bubble {
       position: absolute;
-      top: -32px;
+      bottom: 100%;
       left: 50%;
       transform: translateX(-50%);
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
       font-size: 11px;
-      font-weight: 900;
+      font-weight: 600;
+      color: #333;
       white-space: nowrap;
-      letter-spacing: 1px;
       z-index: 200;
       pointer-events: none;
-      padding: 4px 10px;
-      border-radius: 12px;
-      animation: bubble-bounce 2s ease-in-out infinite;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      /* Pop in and out animation */
+      opacity: 0;
+      animation: speech-pop 4s ease-in-out infinite;
+      animation-delay: var(--speech-delay, 0s);
     }
 
-    /* Speech bubble tail pointing down */
+    /* Speech bubble tail pointing down — WHITE */
     .vote-bubble::after {
       content: '';
       position: absolute;
-      bottom: -6px;
+      top: 100%;
       left: 50%;
       transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
+      border: 6px solid transparent;
+      border-top-color: rgba(255, 255, 255, 0.95);
     }
 
-    @keyframes bubble-bounce {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50% { transform: translateX(-50%) translateY(-3px); }
+    /* Pop animation — appears, stays, disappears */
+    @keyframes speech-pop {
+      0%, 70%, 100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(5px) scale(0.8);
+      }
+      10%, 60% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
     }
 
-    /* YES BUBBLE — Cyan with glow */
-    .iso-avatar.bet-yes .vote-bubble {
-      background: linear-gradient(135deg, #00F0FF, #00C8FF);
-      color: #000;
-      text-shadow: none;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-    .iso-avatar.bet-yes .vote-bubble::after {
-      border-top: 8px solid #00F0FF;
-    }
-
-    /* NO BUBBLE — Pink with glow */
-    .iso-avatar.bet-no .vote-bubble {
-      background: linear-gradient(135deg, #FF0055, #FF4B9B);
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-      box-shadow: 0 0 15px rgba(255, 0, 85, 0.6), 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-    .iso-avatar.bet-no .vote-bubble::after {
-      border-top: 8px solid #FF0055;
-    }
-
-    /* Small name under the bubble */
+    /* Small name floats above */
     .vote-name {
       position: absolute;
-      top: -44px;
+      bottom: 100%;
       left: 50%;
       transform: translateX(-50%);
+      margin-bottom: 32px;
       font-size: 8px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.8);
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
       white-space: nowrap;
       z-index: 199;
       pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -9887,26 +9878,29 @@
       const memberName = member?.name || `User ${index + 1}`;
       const memberPhoto = member?.photo || `/tg/user_${index + 1}.jpg`;
 
-      // SPEECH BUBBLES: Funny vote messages! Way more personality!
+      // OG SPEECH BUBBLES: Crypto slang that pops in and out!
       const yesPhrases = [
-        'YES!', 'YAAAS!', 'LFG!', '🚀', 'WAGMI!', 'BET!',
-        'SEND IT!', '100%!', 'MOON!', 'BULLISH!', 'LETS GO!',
-        'FOR SURE!', 'OBVIOUSLY!', 'EASY!', 'LOCK IT!', 'BASED!'
+        'LFG! 🚀', 'WAGMI', 'bullish!', '📈📈', 'ez money',
+        'to the moon', 'we got this', '100%', 'stack it', 'lfgggg',
+        'send it!', 'no doubt', 'locked in', 'based', 'lets gooo'
       ];
       const noPhrases = [
-        'NO!', 'NOPE!', 'NAH!', '💀', 'NGMI!', 'CAP!',
-        'DOUBT!', 'BEARISH!', 'RIP!', 'FADE!', 'NO WAY!',
-        'NEVER!', 'NOOOO!', 'PASS!', 'SELL!', 'REKT!'
+        'ngmi', 'ded 💀', 'rekt soon', '📉📉', 'nah fam',
+        'its over', 'sell sell', 'dump it', 'RIP', 'bearish',
+        'cope', 'down bad', 'rugged', 'guh', 'not gonna make it'
       ];
       const phrases = team === 'yes' ? yesPhrases : noPhrases;
       const voteText = phrases[Math.floor(Math.random() * phrases.length)];
 
+      // Stagger speech bubble timing so they pop at different times
+      const speechDelay = index * 2 + Math.random() * 8;
+
       avatar.innerHTML = `
         <div class="iso-avatar-sprite">
           <div class="iso-avatar-shadow"></div>
-          <!-- SPEECH BUBBLE — Shows their vote! -->
+          <!-- SPEECH BUBBLE — Pops in and out with crypto slang! -->
           <div class="vote-name">${memberName}</div>
-          <div class="vote-bubble">${voteText}</div>
+          <div class="vote-bubble" style="--speech-delay: ${speechDelay.toFixed(2)}s">${voteText}</div>
           <div class="stick-head">
             <!-- TG Avatar Photo with onerror fallback -->
             <img
