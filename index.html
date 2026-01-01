@@ -3417,6 +3417,7 @@
        "Strictly separate 2D HUD from 3D World. No overlap glitches." — Toshiro
 
        This is a FIXED 2D neon panel. It never intersects the 3D world.
+       MOBILE ONLY — Hidden on desktop (sidebar shows market cards instead)
     ═══════════════════════════════════════════════════════════════ */
     .ceiling-sign {
       position: fixed;
@@ -3428,6 +3429,13 @@
       flex-direction: column;
       align-items: center;
       pointer-events: none;
+    }
+
+    /* DESKTOP: Hide ceiling-sign — sidebar shows market cards instead */
+    @media (min-width: 769px) {
+      .ceiling-sign {
+        display: none !important;
+      }
     }
 
     /* The Chains — Hanging cables from ceiling */
