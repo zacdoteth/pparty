@@ -83,10 +83,10 @@ const DESKTOP_GRID = {
   cols: 24,
   rows: 12,
   camera: {
-    // STADIUM VIEW — High angle that fits the ENTIRE stage on Frame 1!
-    // No jump, no auto-zoom. User can zoom in if they want.
-    position: [0, 30, 45] as [number, number, number],
-    fov: 50,
+    // PERFECT FRAME — Close enough to see the action, wide enough to see the party!
+    // Y=15 (elevation), Z=25 (distance) — fills ~80% of viewport
+    position: [0, 15, 25] as [number, number, number],
+    fov: 50,  // Standard "human eye" lens
   },
 } as const
 
