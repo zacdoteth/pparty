@@ -6,17 +6,21 @@ import ArenaDemo from './ArenaDemo'
 import ThreeDemo from './ThreeDemo'
 import './index.css'
 
-// Check URL for demo mode: ?demo=board or ?demo=arena or ?demo=three
+// ═══════════════════════════════════════════════════════════════════════════
+// ROUTE CONFIG — Three.js is the MAIN experience!
+// Fallbacks: ?demo=css (old), ?demo=arena (isometric), ?demo=board (board)
+// ═══════════════════════════════════════════════════════════════════════════
 const params = new URLSearchParams(window.location.search)
 const demoMode = params.get('demo')
 
 const DEMOS = {
-  board: BoardDemo,
-  arena: ArenaDemo,
-  three: ThreeDemo,
+  css: App,           // Legacy CSS version — fallback
+  board: BoardDemo,   // Board game prototype
+  arena: ArenaDemo,   // Isometric CSS arena
 }
 
-const RootComponent = DEMOS[demoMode] || App
+// THREE.JS IS NOW THE DEFAULT!
+const RootComponent = DEMOS[demoMode] || ThreeDemo
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

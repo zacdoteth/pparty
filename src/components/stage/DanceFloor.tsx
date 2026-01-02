@@ -1819,20 +1819,7 @@ function SkyText3D({ question, icon, isMobile = false }: SkyText3DProps) {
 
   return (
     <group ref={groupRef} position={[0, 10, -5]}>
-      {/* ═══ PREMOJI ICON — Large emoji floating above title! ═══ */}
-      {icon && (
-        <Text
-          fontSize={iconSize}
-          anchorX="center"
-          anchorY="middle"
-          position={[0, titleSize * 1.8, 0]}
-        >
-          {icon}
-          <meshBasicMaterial toneMapped={false} />
-        </Text>
-      )}
-
-      {/* ═══ GOLD OUTER GLOW — Polymarket signature! ═══ */}
+      {/* ═══ GOLD OUTER GLOW — Polymarket signature aesthetic! ═══ */}
       <Text
         font={fontUrl}
         fontSize={titleSize * 1.04}

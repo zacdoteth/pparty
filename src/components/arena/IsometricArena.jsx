@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useCallback, useMemo } from 'react'
 import { motion, useMotionValue, useSpring } from 'framer-motion'
+import BettingModal from '../ui/BettingModal'
 import './IsometricArena.css'
 
 // ═══════════════════════════════════════════════════════════════
@@ -198,6 +199,13 @@ export default function IsometricArena({
   const [lockedZoneId, setLockedZoneId] = useState(null)
   const [activeMarketId, setActiveMarketId] = useState(2)
   const [userBalance] = useState(250)
+  const [isBettingModalOpen, setIsBettingModalOpen] = useState(false)
+
+  // Handle bet from modal
+  const handleModalBet = useCallback((optionId) => {
+    setLockedZoneId(optionId)
+    onZoneDrop?.(optionId)
+  }, [onZoneDrop])
 
   const zonePeople = useMemo(() => {
     if (outcomes.length === 2) return { [outcomes[0].id]: people.filter(p => p.side === 'yes'), [outcomes[1].id]: people.filter(p => p.side === 'no') }
@@ -245,7 +253,7 @@ export default function IsometricArena({
         <div className="marquee">
           <div className="marquee-bulbs">{[...Array(24)].map((_, i) => <span key={i} className="bulb" style={{ '--i': i }} />)}</div>
           <div className="marquee-content">
-            <button className="vote-btn no">✕</button>
+            <button className="vote-btn no" onClick={() => !lockedZoneId && setIsBettingModalOpen(true)}>✕</button>
             <div className="marquee-center">
               <div className="marquee-status"><span className="live-dot" /> LIVE <span className="time">⏱ 2h 15m</span></div>
               <h1>{marketQuestion}</h1>
@@ -257,7 +265,7 @@ export default function IsometricArena({
                 <div className="mbar"><span>PARTY</span><div className="mbar-track"><div className="mbar-fill yes" style={{ width: `${activeMarket.party}%` }} /><div className="mbar-fill no" style={{ width: `${100 - activeMarket.party}%` }} /></div><span>{activeMarket.party}%</span></div>
               </div>
             </div>
-            <button className="vote-btn yes">✓</button>
+            <button className="vote-btn yes" onClick={() => !lockedZoneId && setIsBettingModalOpen(true)}>✓</button>
           </div>
           <div className="marquee-bulbs">{[...Array(24)].map((_, i) => <span key={i} className="bulb" style={{ '--i': i }} />)}</div>
         </div>
@@ -328,7 +336,34 @@ export default function IsometricArena({
 
         {/* Mobile balance */}
         <div className="mobile-balance"><span>YOUR BALANCE</span><span>${userBalance}</span></div>
+
+        {/* Floating BET button — Mobile primary action */}
+        {!lockedZoneId && (
+          <button
+            className="floating-bet-btn"
+            onClick={() => setIsBettingModalOpen(true)}
+          >
+            <span className="bet-icon">🎯</span>
+            <span>MAKE PREDICTION</span>
+          </button>
+        )}
       </main>
+
+      {/* Betting Modal */}
+      <BettingModal
+        isOpen={isBettingModalOpen}
+        onClose={() => setIsBettingModalOpen(false)}
+        onBet={handleModalBet}
+        options={outcomes.map(o => ({
+          id: o.id,
+          label: o.label,
+          pct: o.pct,
+          color: o.color,
+          price: `${o.pct}¢`
+        }))}
+        userAvatar={currentUser.avatar}
+        userName={currentUser.username}
+      />
     </div>
   )
 }

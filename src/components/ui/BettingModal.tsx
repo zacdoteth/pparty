@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react'
+import { playPickup, playHoverTick, playLand, playLockInSound, playChaChing } from '../../utils/sounds'
 import './BettingModal.css'
 
 interface Option {
@@ -52,6 +53,7 @@ export default function BettingModal({
   const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault()
     setIsDragging(true)
+    playPickup()
   }
 
   const handleDragMove = (e: MouseEvent | TouchEvent) => {
@@ -79,11 +81,18 @@ export default function BettingModal({
         foundOption = optionId
       }
     })
+    // Play sound when entering a new option
+    if (foundOption && foundOption !== hoveredOption) {
+      playHoverTick(foundOption === 'yes' ? 880 : 660, 0.1)
+    }
     setHoveredOption(foundOption)
   }
 
   const handleDragEnd = () => {
     if (isDragging && hoveredOption) {
+      // Success sounds!
+      playLand()
+      playLockInSound()
       setSelectedOption(hoveredOption)
       setHasPlacedBet(true)
       onBet(hoveredOption)
@@ -191,7 +200,7 @@ export default function BettingModal({
 
         {/* Confirm Button */}
         {hasPlacedBet && (
-          <button className="confirm-bet-btn" onClick={onClose}>
+          <button className="confirm-bet-btn" onClick={() => { playChaChing(); onClose(); }}>
             Confirm Prediction
           </button>
         )}
