@@ -1,11 +1,39 @@
 /**
  * CombinedSidebar Styles
- * Desktop: fixed right sidebar (Spotify vibes)
- * Mobile: swipe-up bottom sheet
+ * ╔══════════════════════════════════════════════════════════════════════════╗
+ * ║  SMASH BROS / N64 INSPIRED UI                                            ║
+ * ║  "Choose your fighter!" — Every 90s kid                                  ║
+ * ╚══════════════════════════════════════════════════════════════════════════╝
  */
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DESKTOP SIDEBAR
+   SMASH BROS VARIABLES — The N64 Palette!
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Panel colors */
+  --smash-panel-bg: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+  --smash-panel-border: #3a3a5a;
+  --smash-panel-glow: rgba(100, 100, 255, 0.15);
+
+  /* Accent colors */
+  --smash-red: #ff3355;
+  --smash-blue: #3366ff;
+  --smash-yellow: #ffcc00;
+  --smash-green: #33ff88;
+  --smash-purple: #9944ff;
+
+  /* Metallic gradients */
+  --smash-gold: linear-gradient(180deg, #ffd700 0%, #b8860b 50%, #ffd700 100%);
+  --smash-silver: linear-gradient(180deg, #e8e8e8 0%, #888888 50%, #e8e8e8 100%);
+  --smash-bronze: linear-gradient(180deg, #cd7f32 0%, #8b4513 50%, #cd7f32 100%);
+
+  /* Hard shadow (comic book style) */
+  --smash-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+  --smash-shadow-lg: 6px 6px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESKTOP SIDEBAR — The Arena!
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sidebar-desktop {
@@ -13,15 +41,22 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 300px;
-  background: rgba(10, 8, 20, 0.85);
+  width: 320px;
+  background: linear-gradient(180deg,
+    rgba(15, 15, 30, 0.95) 0%,
+    rgba(10, 10, 20, 0.98) 100%
+  );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--smash-panel-border);
   display: flex;
   flex-direction: column;
   z-index: 1000;
   overflow: hidden;
+  /* Subtle inner glow */
+  box-shadow:
+    inset 2px 0 20px rgba(100, 100, 255, 0.1),
+    -5px 0 30px rgba(0, 0, 0, 0.5);
 }
 
 /* ═══ GHOST MODE — Everything fades except chip & locked indicator! ═══ */
@@ -67,29 +102,63 @@
   height: 100%;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   HEADER — Smash Bros Title Bar!
+   ═══════════════════════════════════════════════════════════════════════════ */
 .sidebar-header {
-  padding: 20px 16px;
+  padding: 12px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg,
+    rgba(60, 60, 100, 0.4) 0%,
+    rgba(30, 30, 60, 0.3) 100%
+  );
+  border-bottom: 3px solid var(--smash-panel-border);
+  position: relative;
+}
+
+/* Metallic shine line */
+.sidebar-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
 }
 
 .sidebar-header h2 {
   margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #888;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(100, 100, 255, 0.3);
+  text-transform: uppercase;
 }
 
+/* ═══ BALANCE — Coin counter style! ═══ */
 .sidebar-balance {
   font-size: 14px;
-  font-weight: 700;
-  color: #ffd700;
-  background: rgba(255, 215, 0, 0.1);
-  padding: 6px 12px;
-  border-radius: 20px;
+  font-weight: 900;
+  color: #1a1a2e;
+  background: var(--smash-gold);
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 2px solid #b8860b;
+  box-shadow:
+    var(--smash-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: rotate(-1deg);
 }
 
 .sidebar-market-list {
@@ -101,80 +170,177 @@
   gap: 10px;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   DIVIDER — Explosive VS Style!
+   ═══════════════════════════════════════════════════════════════════════════ */
 .sidebar-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  margin: 8px 16px;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--smash-panel-border) 20%,
+    rgba(150, 150, 200, 0.5) 50%,
+    var(--smash-panel-border) 80%,
+    transparent 100%
+  );
+  margin: 10px 12px;
+  position: relative;
+}
+
+/* Diamond accent in center */
+.sidebar-divider::before {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8px;
+  color: rgba(150, 150, 200, 0.6);
+  background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+  padding: 0 8px;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MARKET CARD
+   MARKET CARD — Fighter Selection Style!
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .market-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
+  background: linear-gradient(180deg,
+    rgba(40, 40, 70, 0.6) 0%,
+    rgba(25, 25, 45, 0.8) 100%
+  );
+  border: 2px solid var(--smash-panel-border);
+  border-radius: 6px;
   padding: 10px 12px;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  position: relative;
+  /* Chunky shadow */
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
+/* Hover lift effect */
 .market-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg,
+    rgba(60, 60, 100, 0.7) 0%,
+    rgba(35, 35, 65, 0.9) 100%
+  );
+  border-color: rgba(150, 150, 200, 0.5);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
 }
 
+/* Selected — Electric glow! */
 .market-card.selected {
-  background: rgba(136, 68, 255, 0.15);
-  border-color: rgba(136, 68, 255, 0.4);
+  background: linear-gradient(180deg,
+    rgba(100, 60, 180, 0.5) 0%,
+    rgba(60, 30, 120, 0.7) 100%
+  );
+  border-color: var(--smash-purple);
+  box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(153, 68, 255, 0.4),
+    inset 0 0 20px rgba(153, 68, 255, 0.1);
+}
+
+/* Selection indicator */
+.market-card.selected::before {
+  content: '▶';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--smash-purple);
+  font-size: 10px;
+  text-shadow: 0 0 10px var(--smash-purple);
+  animation: pulse-arrow 1s ease-in-out infinite;
+}
+
+@keyframes pulse-arrow {
+  0%, 100% { opacity: 1; transform: translateY(-50%) translateX(0); }
+  50% { opacity: 0.7; transform: translateY(-50%) translateX(2px); }
 }
 
 .market-card-title {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: #fff;
   line-height: 1.3;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .market-card-volume {
-  font-size: 10px;
-  color: #666;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--smash-yellow);
   white-space: nowrap;
   flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   BETTING SECTION — CASINO ROULETTE STYLE!
-   "Where fortunes are made" — Vegas Architecture
+   BETTING SECTION — N64 Arena Style!
+   "Choose your fighter!" — Smash Bros Announcer
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .betting-section.casino-style {
   padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 8px;
+  background: linear-gradient(180deg,
+    rgba(30, 30, 50, 0.8) 0%,
+    rgba(20, 20, 35, 0.9) 100%
+  );
+  border: 2px solid var(--smash-panel-border);
+  border-radius: 8px;
+  box-shadow:
+    var(--smash-shadow-lg),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
 }
 
-/* ═══ MARKET QUESTION — High density title ═══ */
+/* Floating panel effect */
+.betting-section.casino-style::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  border-radius: 8px 8px 0 0;
+}
+
+/* ═══ MARKET QUESTION — Announcer style! ═══ */
 .betting-question {
   font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: 800;
+  color: #fff;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   line-height: 1.3;
-  padding: 0 4px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 /* ═══ LIGHTBOX OVERLAY — Focus on popup! ═══ */
@@ -194,11 +360,11 @@
   to { opacity: 1; }
 }
 
-/* ═══ BET ZONES — Roulette table layout ═══ */
+/* ═══ BET ZONES — Character Select Boxes! ═══ */
 .bet-zones {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -214,82 +380,104 @@
 
 .bet-zone {
   position: relative;
-  background: linear-gradient(180deg, rgba(20, 18, 30, 0.9) 0%, rgba(10, 8, 20, 0.95) 100%);
-  border: 2px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 12px 8px;
+  background: linear-gradient(180deg,
+    rgba(30, 28, 45, 0.95) 0%,
+    rgba(15, 13, 25, 0.98) 100%
+  );
+  border: 3px solid var(--smash-panel-border);
+  border-radius: 6px;
+  padding: 10px 6px;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  min-height: 80px;
+  min-height: 70px;
   overflow: hidden;
+  /* N64 chunky shadow */
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Glow effect on border */
+/* Metallic top edge */
 .bet-zone::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--zone-color), transparent 60%);
-  opacity: 0.15;
-  z-index: -1;
-  transition: opacity 0.3s ease;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--zone-color) 50%, #fff) 50%,
+    transparent 100%
+  );
 }
 
+/* Hover — Lift and glow! */
 .bet-zone:hover {
   border-color: var(--zone-color);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--zone-color) 30%, transparent);
+  transform: translate(-2px, -2px);
+  box-shadow:
+    5px 5px 0 rgba(0, 0, 0, 0.5),
+    0 0 20px color-mix(in srgb, var(--zone-color) 30%, transparent);
 }
 
-.bet-zone:hover::before {
-  opacity: 0.3;
-}
-
+/* Chip hovering over — READY! */
 .bet-zone.hovered {
   border-color: var(--zone-color);
-  transform: scale(1.05);
+  transform: translate(-2px, -2px) scale(1.02);
   box-shadow:
-    0 0 20px color-mix(in srgb, var(--zone-color) 50%, transparent),
-    inset 0 0 30px color-mix(in srgb, var(--zone-color) 15%, transparent);
+    5px 5px 0 rgba(0, 0, 0, 0.5),
+    0 0 25px color-mix(in srgb, var(--zone-color) 50%, transparent),
+    inset 0 0 30px color-mix(in srgb, var(--zone-color) 20%, transparent);
+  animation: zone-ready 0.5s ease-in-out infinite;
 }
 
+@keyframes zone-ready {
+  0%, 100% { box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.5), 0 0 25px color-mix(in srgb, var(--zone-color) 50%, transparent); }
+  50% { box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.5), 0 0 35px color-mix(in srgb, var(--zone-color) 70%, transparent); }
+}
+
+/* Selected — LOCKED IN! */
 .bet-zone.selected {
   border-color: var(--zone-color);
   background: linear-gradient(180deg,
-    color-mix(in srgb, var(--zone-color) 15%, rgba(20, 18, 30, 0.9)) 0%,
-    color-mix(in srgb, var(--zone-color) 8%, rgba(10, 8, 20, 0.95)) 100%
+    color-mix(in srgb, var(--zone-color) 20%, rgba(30, 28, 45, 0.95)) 0%,
+    color-mix(in srgb, var(--zone-color) 10%, rgba(15, 13, 25, 0.98)) 100%
   );
   box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.4),
     0 0 20px color-mix(in srgb, var(--zone-color) 40%, transparent),
-    inset 0 0 20px color-mix(in srgb, var(--zone-color) 10%, transparent);
+    inset 0 0 15px color-mix(in srgb, var(--zone-color) 15%, transparent);
 }
 
 .zone-label {
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 900;
   letter-spacing: 1px;
   color: var(--zone-color);
-  text-shadow: 0 0 20px var(--zone-color);
-  opacity: 0.9;
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.5),
+    0 0 15px var(--zone-color);
+  text-transform: uppercase;
 }
 
 .zone-price {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 900;
-  color: var(--zone-color);
-  text-shadow: 0 0 15px var(--zone-color);
+  color: #fff;
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.6),
+    0 0 10px var(--zone-color);
 }
 
 .zone-chance {
-  font-size: 9px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 8px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 /* Chip placed in zone */
@@ -307,27 +495,33 @@
   box-shadow: 0 0 10px var(--zone-color);
 }
 
-/* ═══ CHIP DOCK — Centered, always at bottom of betting section ═══ */
+/* ═══ CHIP DOCK — Player Token Area! ═══ */
 .chip-dock {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   padding: 12px 0;
   position: relative;
   z-index: 150;
 }
 
 .betting-chip {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #0a0a15 100%);
-  border: 3px solid #ffd700;
+  background: linear-gradient(180deg,
+    #2a2a45 0%,
+    #1a1a2e 50%,
+    #0a0a15 100%
+  );
+  border: 4px solid;
+  border-color: #ffd700 #b8860b #b8860b #ffd700;
   box-shadow:
-    0 4px 20px rgba(255, 215, 0, 0.4),
-    0 0 0 2px rgba(255, 215, 0, 0.2),
-    inset 0 2px 10px rgba(255, 255, 255, 0.1);
+    4px 4px 0 rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 215, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3);
   cursor: grab;
   display: flex;
   align-items: center;
@@ -335,33 +529,37 @@
   user-select: none;
   touch-action: none;
   z-index: 100;
-  /* No transition here - controlled by inline style */
   will-change: transform;
 }
 
 .betting-chip:hover {
+  border-color: #ffe44d #d4a40a #d4a40a #ffe44d;
   box-shadow:
-    0 6px 30px rgba(255, 215, 0, 0.6),
-    0 0 0 3px rgba(255, 215, 0, 0.3),
-    inset 0 2px 10px rgba(255, 255, 255, 0.15);
+    5px 5px 0 rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(255, 215, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  transform: translate(-1px, -1px);
 }
 
 .betting-chip:active,
 .betting-chip.dragging {
   cursor: grabbing;
+  border-color: #ffe44d #d4a40a #d4a40a #ffe44d;
   box-shadow:
-    0 12px 40px rgba(255, 215, 0, 0.7),
-    0 0 0 4px rgba(255, 215, 0, 0.4),
-    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    6px 6px 0 rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(255, 215, 0, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
   z-index: 9999;
 }
 
 .chip-avatar {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   object-fit: cover;
   pointer-events: none;
+  border: 2px solid rgba(255, 215, 0, 0.3);
 }
 
 .chip-wrapper {
@@ -369,10 +567,12 @@
 }
 
 .chip-label {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 900;
   letter-spacing: 2px;
-  color: #ffd700;
+  color: var(--smash-yellow);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
 }
 
 /* ═══ DRAG ME BUBBLE — Playful tooltip! ═══ */
@@ -727,60 +927,88 @@
   transform: scale(0.98);
 }
 
-/* ═══ BET LOCKED INDICATOR — Centered inline ═══ */
+/* ═══ BET LOCKED INDICATOR — Victory Screen! ═══ */
 .bet-locked-indicator {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 12px 16px;
-  background: linear-gradient(180deg, rgba(0, 255, 136, 0.12) 0%, rgba(0, 200, 100, 0.08) 100%);
-  border: 1px solid rgba(0, 255, 136, 0.3);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.2);
+  gap: 6px;
+  padding: 14px 18px;
+  background: linear-gradient(180deg,
+    rgba(0, 200, 100, 0.2) 0%,
+    rgba(0, 150, 75, 0.3) 100%
+  );
+  border: 3px solid var(--smash-green);
+  border-radius: 8px;
+  box-shadow:
+    var(--smash-shadow-lg),
+    0 0 20px rgba(51, 255, 136, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .locked-text {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #00ff88;
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.5),
+    0 0 15px var(--smash-green);
+  text-transform: uppercase;
 }
 
 .locked-option {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-shadow: 0 0 15px currentColor;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.5),
+    0 0 15px currentColor;
+  text-transform: uppercase;
 }
 
 .locked-amount {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 900;
-  color: #ffd700;
-  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  color: #1a1a2e;
+  background: var(--smash-gold);
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 2px solid #b8860b;
+  box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .unlock-bet-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  background: linear-gradient(180deg,
+    rgba(80, 80, 100, 0.8) 0%,
+    rgba(50, 50, 70, 0.9) 100%
+  );
+  border: 2px solid var(--smash-panel-border);
+  border-radius: 5px;
   padding: 8px 16px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #fff;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   margin-top: 4px;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
 }
 
 .unlock-bet-btn:hover {
-  background: rgba(255, 180, 0, 0.15);
-  border-color: rgba(255, 180, 0, 0.3);
-  color: #ffb400;
-  transform: scale(1.02);
+  background: linear-gradient(180deg,
+    rgba(180, 100, 50, 0.9) 0%,
+    rgba(140, 70, 30, 0.95) 100%
+  );
+  border-color: var(--smash-yellow);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -882,22 +1110,36 @@
    YOUR BETS SECTION — Portfolio of active bets!
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   YOUR BETS — Trophy Case Panel!
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .your-bets-section {
-  padding: 0 12px;
+  margin: 0 8px;
+  padding: 10px;
+  background: linear-gradient(180deg,
+    rgba(60, 50, 100, 0.3) 0%,
+    rgba(40, 30, 80, 0.4) 100%
+  );
+  border: 2px solid rgba(153, 68, 255, 0.3);
+  border-radius: 8px;
+  box-shadow: var(--smash-shadow);
 }
 
 .your-bets-title {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: #666;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--smash-purple);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
 }
 
 .your-bets-list {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .your-bet-item {
@@ -905,167 +1147,254 @@
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 6px;
+  background: linear-gradient(180deg,
+    rgba(40, 40, 60, 0.6) 0%,
+    rgba(25, 25, 40, 0.7) 100%
+  );
+  border: 2px solid transparent;
+  border-radius: 5px;
   text-align: left;
   cursor: pointer;
   transition: all 0.15s ease;
   width: 100%;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .your-bet-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg,
+    rgba(50, 50, 80, 0.7) 0%,
+    rgba(35, 35, 55, 0.8) 100%
+  );
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .your-bet-item.active {
-  background: rgba(136, 68, 255, 0.12);
-  border: 1px solid rgba(136, 68, 255, 0.3);
+  background: linear-gradient(180deg,
+    rgba(100, 60, 180, 0.4) 0%,
+    rgba(70, 40, 140, 0.5) 100%
+  );
+  border-color: var(--smash-purple);
+  box-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.3),
+    0 0 10px rgba(153, 68, 255, 0.3);
 }
 
 .your-bet-market {
   flex: 1;
   font-size: 10px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .your-bet-details {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .your-bet-option {
   font-size: 10px;
-  font-weight: 700;
-  text-shadow: 0 0 8px currentColor;
+  font-weight: 800;
+  text-shadow:
+    1px 1px 0 rgba(0, 0, 0, 0.5),
+    0 0 8px currentColor;
+  text-transform: uppercase;
 }
 
 .your-bet-amount {
   font-size: 10px;
-  font-weight: 800;
-  color: #ffd700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+  font-weight: 900;
+  color: #1a1a2e;
+  background: var(--smash-gold);
+  padding: 2px 6px;
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LIVE BETTORS — Leaderboard of active bets!
+   LIVE BETTORS — Smash Bros Results Screen!
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .live-bettors {
-  padding: 0 12px 8px;
+  margin: 8px;
+  padding: 10px;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(180deg,
+    rgba(25, 25, 45, 0.8) 0%,
+    rgba(15, 15, 30, 0.9) 100%
+  );
+  border: 2px solid var(--smash-panel-border);
+  border-radius: 8px;
+  box-shadow: var(--smash-shadow-lg);
 }
 
 .live-bettors-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .live-dot {
-  width: 6px;
-  height: 6px;
-  background: #ff4444;
+  width: 8px;
+  height: 8px;
+  background: var(--smash-red);
   border-radius: 50%;
-  animation: live-pulse 1.5s ease-in-out infinite;
-  box-shadow: 0 0 6px rgba(255, 68, 68, 0.6);
+  animation: live-pulse 1s ease-in-out infinite;
+  box-shadow:
+    0 0 8px var(--smash-red),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 @keyframes live-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--smash-red); }
+  50% { opacity: 0.7; transform: scale(0.9); box-shadow: 0 0 15px var(--smash-red); }
 }
 
 .live-bettors-title {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: #666;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
 }
 
 .live-bettors-count {
-  font-size: 9px;
-  font-weight: 600;
-  color: #555;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1px 5px;
-  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #1a1a2e;
+  background: var(--smash-yellow);
+  padding: 2px 8px;
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  margin-left: auto;
 }
 
 .live-bettors-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
 }
 
-/* ═══ HIGH DENSITY BETTOR ROWS ═══ */
+/* ═══ BETTOR ROWS — Fighter Results Style! ═══ */
 .bettor-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 6px;
+  gap: 8px;
+  padding: 6px 8px;
+  background: linear-gradient(180deg,
+    rgba(40, 40, 60, 0.5) 0%,
+    rgba(25, 25, 40, 0.6) 100%
+  );
+  border: 2px solid transparent;
+  border-radius: 5px;
   transition: all 0.15s ease;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .bettor-row:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg,
+    rgba(50, 50, 80, 0.6) 0%,
+    rgba(35, 35, 55, 0.7) 100%
+  );
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* ═══ YOUR BET — Pinned at top, highlighted! ═══ */
+/* ═══ YOUR BET — Player 1 highlight! ═══ */
 .bettor-row.you {
-  background: linear-gradient(135deg, rgba(136, 68, 255, 0.15) 0%, rgba(100, 50, 200, 0.1) 100%);
-  border: 1px solid rgba(136, 68, 255, 0.3);
-  padding: 5px 8px;
-  margin-bottom: 4px;
+  background: linear-gradient(180deg,
+    rgba(100, 60, 180, 0.4) 0%,
+    rgba(70, 40, 140, 0.5) 100%
+  );
+  border: 2px solid var(--smash-purple);
+  box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(153, 68, 255, 0.3);
+  margin-bottom: 6px;
 }
 
 .bettor-row.you .bettor-name {
-  color: #a78bfa;
-  font-weight: 700;
+  color: #fff;
+  font-weight: 800;
+  text-shadow: 0 0 10px var(--smash-purple);
 }
 
 .bettor-row.you .bettor-avatar {
-  border-color: rgba(136, 68, 255, 0.5);
-  box-shadow: 0 0 8px rgba(136, 68, 255, 0.3);
+  border-color: var(--smash-purple);
+  box-shadow: 0 0 10px rgba(153, 68, 255, 0.5);
 }
 
+/* ═══ RANK — Trophy icons for top 3! ═══ */
 .bettor-rank {
-  font-size: 9px;
-  font-weight: 700;
-  color: #555;
-  min-width: 18px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #666;
+  min-width: 22px;
+  text-align: center;
 }
 
-/* Top 3 medals — only for non-user rows */
-.bettor-row:not(.you):nth-child(1) .bettor-rank,
-.bettor-row:not(.you):nth-child(2):not(:first-child) .bettor-rank { color: #FFD700; }
+/* Gold medal */
+.bettor-row:not(.you):first-child .bettor-rank,
+.bettor-row.you + .bettor-row .bettor-rank {
+  color: transparent;
+  background: var(--smash-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: none;
+}
+.bettor-row:not(.you):first-child .bettor-rank::before,
+.bettor-row.you + .bettor-row .bettor-rank::before {
+  content: '🥇';
+  font-size: 12px;
+}
+
+/* Silver medal */
 .bettor-row:not(.you):nth-child(2) .bettor-rank,
-.bettor-row:not(.you):nth-child(3):not(:first-child) .bettor-rank { color: #C0C0C0; }
+.bettor-row.you + .bettor-row + .bettor-row .bettor-rank {
+  color: transparent;
+}
+.bettor-row:not(.you):nth-child(2) .bettor-rank::before,
+.bettor-row.you + .bettor-row + .bettor-row .bettor-rank::before {
+  content: '🥈';
+  font-size: 12px;
+}
+
+/* Bronze medal */
 .bettor-row:not(.you):nth-child(3) .bettor-rank,
-.bettor-row:not(.you):nth-child(4):not(:first-child) .bettor-rank { color: #CD7F32; }
+.bettor-row.you + .bettor-row + .bettor-row + .bettor-row .bettor-rank {
+  color: transparent;
+}
+.bettor-row:not(.you):nth-child(3) .bettor-rank::before,
+.bettor-row.you + .bettor-row + .bettor-row + .bettor-row .bettor-rank::before {
+  content: '🥉';
+  font-size: 12px;
+}
 
 .bettor-avatar {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
   object-fit: cover;
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .bettor-info {
@@ -1077,74 +1406,97 @@
 }
 
 .bettor-name {
-  font-size: 10px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .bettor-pick {
   font-size: 9px;
-  font-weight: 700;
-  text-shadow: 0 0 6px currentColor;
+  font-weight: 800;
+  text-shadow:
+    1px 1px 0 rgba(0, 0, 0, 0.5),
+    0 0 8px currentColor;
   white-space: nowrap;
+  text-transform: uppercase;
 }
 
 .bettor-amount {
-  font-size: 10px;
-  font-weight: 800;
-  color: #ffd700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--smash-yellow);
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(255, 204, 0, 0.4);
 }
 
-/* ═══ P&L INDICATOR — Green profits, red losses! ═══ */
+/* ═══ P&L INDICATOR — Victory/Defeat style! ═══ */
 .bettor-pnl {
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
+  padding: 2px 6px;
+  border-radius: 3px;
+  min-width: 45px;
+  text-align: right;
 }
 
 .bettor-pnl.profit {
-  color: #00ff88;
-  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+  color: #000;
+  background: linear-gradient(180deg, #33ff88 0%, #00cc55 100%);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .bettor-pnl.loss {
-  color: #ff4466;
-  text-shadow: 0 0 8px rgba(255, 68, 102, 0.4);
+  color: #fff;
+  background: linear-gradient(180deg, #ff4466 0%, #cc2244 100%);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* ═══ LEADERBOARD SCROLLBAR — Subtle dark theme! ═══ */
+/* ═══ LEADERBOARD SCROLLBAR — Chunky N64 style! ═══ */
 .live-bettors-list::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 .live-bettors-list::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
 
 .live-bettors-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  background: linear-gradient(180deg, #4a4a6a 0%, #3a3a5a 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .live-bettors-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(180deg, #5a5a7a 0%, #4a4a6a 100%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SIDEBAR FOOTER
+   SIDEBAR FOOTER — Game Credits Style!
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .sidebar-footer {
-  padding: 16px;
+  padding: 12px 16px;
   text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 11px;
-  color: #444;
-  letter-spacing: 1px;
+  background: linear-gradient(180deg,
+    rgba(20, 20, 35, 0.5) 0%,
+    rgba(10, 10, 20, 0.8) 100%
+  );
+  border-top: 2px solid var(--smash-panel-border);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
