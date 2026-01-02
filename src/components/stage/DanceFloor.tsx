@@ -430,8 +430,8 @@ function JellyTile({ position, color, col, row, optionId, onTileClick, isMobile,
             clearcoat={1.0}                 // THE CANDY SHELL!
             clearcoatRoughness={0.1}
             emissive={emissiveColor}
-            // Light show = subtle glow (0.8), Hover/tap = full blast (2.5), Default = ambient (0.35)
-            emissiveIntensity={isHighlighted ? 2.5 : isLit ? 0.9 : 0.35}
+            // Priority: Hover/tap (2.5) > Zone selected (1.5) > Light show (0.9) > Default (0.35)
+            emissiveIntensity={isHighlighted ? 2.5 : isZoneSelected ? 1.5 : isLit ? 0.9 : 0.35}
             envMapIntensity={1.2}
             metalness={0}
             toneMapped={false}
@@ -621,10 +621,10 @@ interface InstancedFloorProps {
   gridRows: number
   isMobile: boolean
   onTileClick?: (optionId: string, col: number, row: number) => void
-  userZone?: string  // Which zone the user selected — for highlighting!
+  selectedZone?: string  // Zone selected in sidebar — ILLUMINATE!
 }
 
-function InstancedTileFloor({ tiles, gridCols, gridRows, isMobile, onTileClick, userZone }: InstancedFloorProps) {
+function InstancedTileFloor({ tiles, gridCols, gridRows, isMobile, onTileClick, selectedZone }: InstancedFloorProps) {
   // ARCADE LIGHT SHOW!
   const litTiles = useLightShow(gridCols, gridRows, true)
 
@@ -641,6 +641,7 @@ function InstancedTileFloor({ tiles, gridCols, gridRows, isMobile, onTileClick, 
           onTileClick={onTileClick}
           isMobile={isMobile}
           lightShowActive={litTiles.has(`${tile.col}-${tile.row}`)}
+          zoneSelected={tile.optionId === selectedZone}
         />
       ))}
     </group>
@@ -2026,6 +2027,7 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
         gridRows={gridRows}
         isMobile={isMobile}
         onTileClick={onTileClick}
+        selectedZone={selectedZone}
       />
 
       {/* ═══ FLOATING ISLAND — FINAL DESTINATION BASE! ═══ */}
@@ -2147,6 +2149,7 @@ export default function DanceFloor({
   dancersPerZone = 0,
   userPrediction,
   marketQuestion,
+  selectedZone,
   children,
   className = '',
   style = {},
