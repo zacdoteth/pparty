@@ -73,6 +73,7 @@ export default function ThreeDemo() {
   const [balance, setBalance] = useState(250)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedBetOption, setSelectedBetOption] = useState(null)
+  const [previewZone, setPreviewZone] = useState(null)  // Preview when chip hovers/placed!
 
   // ═══ LOADING & INTRO STATE ═══
   const [loadProgress, setLoadProgress] = useState(0)
@@ -82,6 +83,9 @@ export default function ThreeDemo() {
 
   const selectedMarket = MARKETS.find(m => m.id === selectedMarketId) || MARKETS[0]
 
+  // ═══ ACTIVE ZONE — Preview OR locked-in bet ═══
+  const activeZone = previewZone || selectedBetOption
+
   const handleTileClick = useCallback((optionId, col, row) => {
     console.log(`Clicked: ${optionId} at (${col}, ${row})`)
   }, [])
@@ -89,12 +93,17 @@ export default function ThreeDemo() {
   const handleMarketSelect = useCallback((marketId) => {
     setSelectedMarketId(marketId)
     setSelectedBetOption(null)  // Reset bet selection when changing markets
+    setPreviewZone(null)        // Reset preview too!
   }, [])
 
   const handleBet = useCallback((optionId, amount) => {
     console.log(`Bet: $${amount} on ${optionId}`)
     // Demo: just reduce balance
     setBalance(prev => Math.max(0, prev - amount))
+  }, [])
+
+  const handlePreviewZone = useCallback((zoneId) => {
+    setPreviewZone(zoneId)
   }, [])
 
   // Sidebar width constant — single source of truth
@@ -134,10 +143,10 @@ export default function ThreeDemo() {
           dancersPerZone={7}
           marketQuestion={selectedMarket.name}
           marketIcon={selectedMarket.icon}
-          selectedZone={selectedBetOption}
-          // ═══ USER'S AVATAR — Appears when they select a zone! ═══
-          userPrediction={selectedBetOption ? {
-            zoneId: selectedBetOption,
+          selectedZone={activeZone}  // Preview OR locked-in!
+          // ═══ USER'S AVATAR — Appears when they preview or lock in! ═══
+          userPrediction={activeZone ? {
+            zoneId: activeZone,
             avatar: '/tg/zac.jpg',  // User's avatar
           } : undefined}
           // ═══ INTRO ANIMATION ═══
@@ -169,6 +178,7 @@ export default function ThreeDemo() {
           onToggle={setSidebarOpen}
           selectedBetOption={selectedBetOption}
           onBetOptionSelect={setSelectedBetOption}
+          onPreviewZone={handlePreviewZone}  // Dance floor preview!
           isFlexLayout={true}  // Tell sidebar it's in flex layout!
         />
       </div>

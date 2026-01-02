@@ -42,7 +42,7 @@ function MarketCard({ market, isSelected, onSelect }) {
 // BETTING SECTION — Casino Roulette Style!
 // "Drag your chip to place your bet, then lock it in!" — Vegas Baby!
 // ═══════════════════════════════════════════════════════════════════════════
-function BettingSection({ market, onBet, balance = 250, selectedOption, onOptionSelect, userAvatar = '/tg/zac.jpg' }) {
+function BettingSection({ market, onBet, balance = 250, selectedOption, onOptionSelect, onPreviewZone, userAvatar = '/tg/zac.jpg' }) {
   const [amount, setAmount] = useState(10)
   const [isDragging, setIsDragging] = useState(false)
   const [chipPos, setChipPos] = useState({ x: 0, y: 0 })
@@ -52,6 +52,13 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
   const containerRef = useRef(null)
   const dragStartCursor = useRef({ x: 0, y: 0 })
   const dragStartChipPos = useRef({ x: 0, y: 0 })
+
+  // ═══ PREVIEW MODE — Tell parent about chip hover/placement! ═══
+  useEffect(() => {
+    // Priority: hovered zone (during drag) > pending zone (after drop)
+    const previewZone = hoveredZone || pendingZone
+    onPreviewZone?.(previewZone)
+  }, [hoveredZone, pendingZone, onPreviewZone])
 
   if (!market) return null
 
@@ -192,6 +199,25 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
       {!selectedOption && (
         <div className="chip-dock">
           <div className="chip-wrapper">
+            {/* ═══ COMPACT POPUP — Pops out top of chip when placed! ═══ */}
+            {pendingZone && !isDragging && (
+              <div className="chip-popup" style={{ '--zone-color': pendingOption?.color || '#ffd700' }}>
+                <div className="popup-row">
+                  <button className="popup-amount-btn" onClick={() => setAmount(Math.max(1, amount - 5))}>−</button>
+                  <span className="popup-amount">${amount}</span>
+                  <button className="popup-amount-btn" onClick={() => setAmount(Math.min(balance, amount + 5))}>+</button>
+                  <span className="popup-divider">→</span>
+                  <span className="popup-win">${Math.round(amount * (100 / pendingOption.pct))}</span>
+                </div>
+                <button
+                  className="popup-lock-btn"
+                  style={{ background: pendingOption?.color || '#ffd700' }}
+                  onClick={handleLockIn}
+                >
+                  🔒 LOCK IN {pendingOption.label?.split(' ')[0]?.toUpperCase()}
+                </button>
+              </div>
+            )}
             <div
               ref={chipRef}
               className={`betting-chip ${isDragging ? 'dragging' : ''} ${pendingZone ? 'on-zone' : ''}`}
@@ -211,32 +237,6 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
             )}
           </div>
           <span className="chip-label">YOU</span>
-
-          {/* ═══ AMOUNT CONTROLS — Under chip dock ═══ */}
-          <div className="bet-amount-bar">
-            <button className="amount-btn" onClick={() => setAmount(Math.max(1, amount - 5))}>−</button>
-            <span className="amount-value">${amount}</span>
-            <button className="amount-btn" onClick={() => setAmount(Math.min(balance, amount + 5))}>+</button>
-          </div>
-        </div>
-      )}
-
-      {/* ═══ PAYOUT + LOCK IN BUTTON ═══ */}
-      {!selectedOption && (
-        <div className="lock-in-section">
-          {pendingOption && (
-            <div className="payout-preview">
-              Win <span className="payout-value">${Math.round(amount * (100 / pendingOption.pct))}</span>
-            </div>
-          )}
-          <button
-            className={`lock-in-btn ${pendingZone ? 'ready' : ''}`}
-            style={{ '--zone-color': pendingOption?.color || '#666' }}
-            disabled={!pendingZone}
-            onClick={handleLockIn}
-          >
-            {pendingOption ? `🔒 LOCK IN ${pendingOption.label?.split(' ')[0]?.toUpperCase()}` : 'DRAG CHIP TO BET'}
-          </button>
         </div>
       )}
 
@@ -272,6 +272,7 @@ export default function CombinedSidebar({
   onToggle,
   selectedBetOption,      // Which bet option is selected — illuminates zone!
   onBetOptionSelect,      // Callback when option selected
+  onPreviewZone,          // Callback when chip hovers/placed on zone (preview mode!)
   isFlexLayout = false,   // When true, sidebar is part of flex container (not position:fixed)
 }) {
   const [isMobile, setIsMobile] = useState(false)
@@ -371,6 +372,7 @@ export default function CombinedSidebar({
             balance={balance}
             selectedOption={selectedBetOption}
             onOptionSelect={onBetOptionSelect}
+            onPreviewZone={onPreviewZone}
           />
         </div>
 
@@ -413,6 +415,7 @@ export default function CombinedSidebar({
         balance={balance}
         selectedOption={selectedBetOption}
         onOptionSelect={onBetOptionSelect}
+        onPreviewZone={onPreviewZone}
       />
 
       {/* Footer */}

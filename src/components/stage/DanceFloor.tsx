@@ -1076,27 +1076,30 @@ interface ClubLightRigProps {
   depth: number
   colors: string[]
   isMobile?: boolean
+  accentColor?: string  // When set, ALL lights become this color — epic zone focus!
 }
 
-function ClubLightRig({ width, depth, colors, isMobile = false }: ClubLightRigProps) {
+function ClubLightRig({ width, depth, colors, isMobile = false, accentColor }: ClubLightRigProps) {
   const halfW = width / 2
   const halfD = depth / 2
   const lightHeight = 16
 
   // Brand colors — Cyan, Magenta, Gold + Zone colors
-  // Mobile: Fewer colors = fewer lights
-  const lightColors = isMobile ? [
-    '#00F0FF',  // Cyan
-    '#FF00FF',  // Magenta
-    colors[0] || '#00FF88',  // Zone 1
-  ] : [
-    '#00F0FF',  // Cyan
-    '#FF00FF',  // Magenta
-    '#FFD700',  // Gold
-    colors[0] || '#00FF88',  // Zone 1
-    colors[1] || '#4DA6FF',  // Zone 2
-    colors[2] || '#BF00FF',  // Zone 3
-  ]
+  // When accentColor is set, ALL lights become that color for epic focus!
+  const lightColors = accentColor
+    ? Array(6).fill(accentColor)  // All lights = selected zone color!
+    : isMobile ? [
+        '#00F0FF',  // Cyan
+        '#FF00FF',  // Magenta
+        colors[0] || '#00FF88',  // Zone 1
+      ] : [
+        '#00F0FF',  // Cyan
+        '#FF00FF',  // Magenta
+        '#FFD700',  // Gold
+        colors[0] || '#00FF88',  // Zone 1
+        colors[1] || '#4DA6FF',  // Zone 2
+        colors[2] || '#BF00FF',  // Zone 3
+      ]
 
   // Light positions — corners + mid-sides (fewer on mobile)
   const lightConfigs = isMobile ? [
@@ -1194,15 +1197,23 @@ interface SkynetLaserArrayProps {
   depth: number
   colors: string[]
   isMobile?: boolean
+  accentColor?: string  // When set, ALL lasers become this color — epic zone focus!
 }
 
-function SkynetLaserArray({ width, depth, colors, isMobile = false }: SkynetLaserArrayProps) {
+function SkynetLaserArray({ width, depth, colors, isMobile = false, accentColor }: SkynetLaserArrayProps) {
   // Fewer lasers on mobile for performance + less visual clutter
   const numLasers = isMobile ? 6 : 14
   const radius = Math.max(width, depth) * 0.8 + 3  // Ring outside the floor
 
   // Generate HDR colors for lasers — zone colors boosted + RGB cycle
   const laserColors = useMemo(() => {
+    // When accentColor is set, ALL lasers become that color!
+    if (accentColor) {
+      const c = new THREE.Color(accentColor)
+      const hdrColor: [number, number, number] = [c.r * 10, c.g * 10, c.b * 10]  // Extra boost for epic glow!
+      return Array(numLasers).fill(hdrColor)
+    }
+
     const hdrColors: [number, number, number][] = []
 
     // Convert zone colors to HDR
@@ -1222,7 +1233,7 @@ function SkynetLaserArray({ width, depth, colors, isMobile = false }: SkynetLase
     )
 
     return hdrColors
-  }, [colors])
+  }, [colors, accentColor, numLasers])
 
   // Generate laser positions in a ring
   const lasers = useMemo(() => {
@@ -1914,6 +1925,13 @@ interface SceneProps {
 function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion, marketIcon, selectedZone }: SceneProps) {
   const ranges = useMemo(() => calculateColumnRanges(options, gridCols), [options, gridCols])
 
+  // ═══ SELECTED ZONE COLOR — For epic light takeover! ═══
+  const selectedZoneColor = useMemo(() => {
+    if (!selectedZone) return undefined
+    const zone = ranges.find(r => r.optionId === selectedZone)
+    return zone?.color
+  }, [selectedZone, ranges])
+
   // ═══ MARKET TRANSITION — Sweet intro/outro animation! ═══
   const transitionGroupRef = useRef<THREE.Group>(null)
   const prevOptionsRef = useRef<string>('')
@@ -2154,10 +2172,10 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
       </group>
 
       {/* ═══ CLUB LIGHT RIG — Sweeping volumetric god rays! (Desktop only) ═══ */}
-      {!isMobile && <ClubLightRig width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} />}
+      {!isMobile && <ClubLightRig width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} accentColor={selectedZoneColor} />}
 
       {/* ═══ SKYNET LASER ARRAY — Electric Forest 2AM vibes! ═══ */}
-      <SkynetLaserArray width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} />
+      <SkynetLaserArray width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} accentColor={selectedZoneColor} />
 
       {/* ═══ ALIEN FOREST ATMOSPHERE — Fog for laser visibility! ═══ */}
       <fogExp2 attach="fog" args={['#030208', isMobile ? 0.025 : 0.018]} />
