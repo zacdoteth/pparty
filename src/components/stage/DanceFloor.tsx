@@ -56,6 +56,8 @@ export interface DanceFloorProps {
     zoneId: string        // Which zone they selected
     avatar: string        // Path to avatar image
   }
+  marketQuestion?: string // 3D floating title in sky (Smash Bros style!)
+  selectedZone?: string   // Zone to illuminate (from sidebar bet selection!)
   children?: React.ReactNode
   className?: string
   style?: React.CSSProperties
@@ -65,9 +67,9 @@ export interface DanceFloorProps {
 // CONSTANTS — "APPLE CHICLET" GRID SPEC
 // ═══════════════════════════════════════════════════════════════════════════
 const FLOOR = {
-  tileSize: 0.92,      // Tile width/depth — leaves 0.08 gap in a 1.0 grid
-  tileHeight: 0.4,     // Chunky keycap height
-  gridUnit: 1.0,       // Grid step (1.0 spacing creates visible gutters)
+  tileSize: 0.96,      // Tight grid — visible but minimal gaps
+  tileHeight: 0.16,    // Slightly thicker for keycap profile
+  gridUnit: 1.0,       // Grid step
   wallHeight: 0.5,
   wallThickness: 0.12,
 } as const
@@ -231,6 +233,83 @@ function getOptionForRow(row: number, ranges: RowRange[]): RowRange | null {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// CANDY HIGHLIGHT — Static glossy shine (NO per-tile animation = FAST!)
+// "That Apple app icon gleam" — Performance First
+// ═══════════════════════════════════════════════════════════════════════════
+interface CandyHighlightProps {
+  tileWidth: number
+  tileHeight: number
+  tileDepth: number
+  isHighlighted: boolean
+}
+
+function CandyHighlight({ tileWidth, tileHeight, tileDepth, isHighlighted }: CandyHighlightProps) {
+  // Keycap divot dimensions — inset from edges
+  const divotInset = 0.12  // How far in from edges
+  const divotWidth = tileWidth * (1 - divotInset * 2)
+  const divotDepth = tileDepth * (1 - divotInset * 2)
+
+  return (
+    <group position={[0, tileHeight * 0.51, 0]}>
+      {/* ═══ KEYCAP DIVOT — Subtle concave dish effect ═══ */}
+      {/* Dark center creates the illusion of depth */}
+      <mesh
+        position={[0, 0.005, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <planeGeometry args={[divotWidth * 0.7, divotDepth * 0.7]} />
+        <meshBasicMaterial
+          color="#000000"
+          transparent
+          opacity={0.12}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Top edge highlight — light catching the rim */}
+      <mesh
+        position={[0, 0.008, -tileDepth * 0.35]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <planeGeometry args={[divotWidth * 0.8, tileDepth * 0.06]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={isHighlighted ? 0.7 : 0.4}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Main shine streak — top-left corner like app icons */}
+      <mesh
+        position={[tileWidth * -0.22, 0.012, tileDepth * -0.22]}
+        rotation={[-Math.PI / 2, 0, Math.PI / 4]}
+      >
+        <planeGeometry args={[tileWidth * 0.25, tileWidth * 0.06]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={isHighlighted ? 0.85 : 0.55}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Small sparkle dot */}
+      <mesh position={[tileWidth * 0.12, 0.012, tileDepth * -0.22]}>
+        <circleGeometry args={[tileWidth * 0.03, 8]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={isHighlighted ? 0.7 : 0.35}
+          depthWrite={false}
+        />
+      </mesh>
+    </group>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // JELLY GLASS TILE — The expensive wet gummy look!
 // "Glassy, translucent candy that begs to be eaten" — Material Wizard
 // ═══════════════════════════════════════════════════════════════════════════
@@ -242,23 +321,27 @@ interface JellyTileProps {
   optionId: string
   onTileClick?: (optionId: string, col: number, row: number) => void
   isMobile: boolean
+  lightShowActive?: boolean  // Arcade light show highlight!
+  zoneSelected?: boolean     // This tile's zone is selected in sidebar!
 }
 
-function JellyTile({ position, color, col, row, optionId, onTileClick, isMobile }: JellyTileProps) {
+function JellyTile({ position, color, col, row, optionId, onTileClick, isMobile, lightShowActive = false, zoneSelected = false }: JellyTileProps) {
   const meshRef = useRef<THREE.Mesh>(null!)
   const [hovered, setHovered] = useState(false)
   const [tapHighlight, setTapHighlight] = useState(false)  // MOBILE TAP FEEDBACK!
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // ═══ APPLE CHICLET GEOMETRY — "iPhone Button" Curve! ═══
-  // Dimensions leave 0.08 gutter gap in a 1.0 grid step
-  const tileWidth = FLOOR.tileSize      // 0.92 — creates the gap!
-  const tileHeight = FLOOR.tileHeight   // 0.4 — chunky keycap
-  const tileDepth = FLOOR.tileSize      // 0.92 — square chiclet
-  const cornerRadius = 0.05             // Catches light on curved edges!
+  // ═══ JELLY KEYCAP GEOMETRY — All 4 corners rounded like Cherry MX caps! ═══
+  const tileWidth = FLOOR.tileSize      // 0.96 — tight grid
+  const tileHeight = FLOOR.tileHeight   // 0.16 — keycap thickness
+  const tileDepth = FLOOR.tileSize      // 0.96 — square
+  // CRITICAL: cornerRadius must be <= tileHeight/2 for proper 3D rounding!
+  const cornerRadius = 0.07             // Rounded on ALL edges like a keycap
 
-  // Combined highlight state (hover OR tap)
+  // Combined highlight state (hover OR tap OR light show)
   const isHighlighted = hovered || tapHighlight
+  const isLit = lightShowActive  // Separate state for subtler light show effect
+  const isZoneSelected = zoneSelected  // Zone selected in sidebar — EPIC GLOW!
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -340,68 +423,193 @@ function JellyTile({ position, color, col, row, optionId, onTileClick, isMobile 
           radius={cornerRadius}
           smoothness={4}
         >
-          {/* ═══ JELLY GLASS MATERIAL — The magic sauce! ═══ */}
+          {/* ═══ CANDY GLOSS MATERIAL — Fast + beautiful! ═══ */}
           <meshPhysicalMaterial
             color={tileColor}
-            transmission={0.6}              // See-through glass!
-            thickness={1.5}                 // Deep volume for that gummy depth
-            roughness={0.1}                 // Wet/Glossy surface
-            clearcoat={1.0}                 // THE CANDY SHELL LAYER!
-            clearcoatRoughness={0.05}
-            attenuationColor="#ffffff"      // Keep the glass clear
-            attenuationDistance={0.8}
-            ior={1.5}                       // Glass refraction index
+            roughness={0.08}                // Glossy but not mirror
+            clearcoat={1.0}                 // THE CANDY SHELL!
+            clearcoatRoughness={0.1}
             emissive={emissiveColor}
-            emissiveIntensity={isHighlighted ? 3.0 : 0.4}  // BILLIE JEAN: White-hot on hover/tap!
-            envMapIntensity={1.5}
-            metalness={0.0}
-            transparent
-            opacity={0.95}
+            // Light show = subtle glow (0.8), Hover/tap = full blast (2.5), Default = ambient (0.35)
+            emissiveIntensity={isHighlighted ? 2.5 : isLit ? 0.9 : 0.35}
+            envMapIntensity={1.2}
+            metalness={0}
+            toneMapped={false}
           />
         </RoundedBox>
       </mesh>
 
-      {/* ═══ UNDERGLOW — Soft light pool beneath jelly ═══ */}
-      <mesh position={[0, -0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[tileWidth * 0.5, 16]} />
-        <meshBasicMaterial
-          color={emissiveColor}
-          transparent
-          opacity={isHighlighted ? 0.6 : 0.2}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-
-      {/* ═══ TOP SPECULAR HIGHLIGHT — That wet candy shine! ═══ */}
-      <mesh
-        position={[tileWidth * -0.15, tileHeight * 0.52, tileDepth * -0.15]}
-        rotation={[-Math.PI / 2, 0, Math.PI / 4]}
-      >
-        <planeGeometry args={[tileWidth * 0.25, tileWidth * 0.08]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          transparent
-          opacity={isHighlighted ? 0.9 : 0.6}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* ═══ SECONDARY SPARKLE ═══ */}
-      <mesh
-        position={[tileWidth * 0.1, tileHeight * 0.51, tileDepth * -0.2]}
-      >
-        <circleGeometry args={[tileWidth * 0.04, 8]} />
-        <meshBasicMaterial
-          color="#ffffff"
-          transparent
-          opacity={isHighlighted ? 0.85 : 0.45}
-          depthWrite={false}
-        />
-      </mesh>
+      {/* ═══ CANDY GLOSS HIGHLIGHT — Static shine like app icons ═══ */}
+      <CandyHighlight
+        tileWidth={tileWidth}
+        tileHeight={tileHeight}
+        tileDepth={tileDepth}
+        isHighlighted={isHighlighted}
+      />
     </group>
   )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ARCADE LIGHT SHOW — Professional dance floor lighting sequences!
+// Inspired by: DDR stages, Tron Legacy, Saturday Night Fever, Habbo disco
+// "The floor should feel ALIVE" — Legendary Club Lighting Designer
+// ═══════════════════════════════════════════════════════════════════════════
+
+type LightPattern = 'wave' | 'ripple' | 'chase' | 'pulse' | 'sparkle' | 'diagonal' | 'breathe'
+
+interface LightShowState {
+  litTiles: Set<string>  // "col-row" keys
+  pattern: LightPattern
+  phase: number
+}
+
+function useLightShow(gridCols: number, gridRows: number, enabled: boolean = true): Set<string> {
+  const [litTiles, setLitTiles] = useState<Set<string>>(new Set())
+  const patternRef = useRef<LightPattern>('wave')
+  const phaseRef = useRef(0)
+  const patternTimeRef = useRef(0)
+  const lastUpdateRef = useRef(0)
+
+  // Pattern durations (how long before switching)
+  const PATTERN_DURATION = 8000  // 8 seconds per pattern
+  const UPDATE_INTERVAL = 80     // ~12fps for smooth but not crazy updates
+
+  useFrame(({ clock }) => {
+    if (!enabled) return
+
+    const now = clock.elapsedTime * 1000
+    const deltaTime = now - lastUpdateRef.current
+
+    if (deltaTime < UPDATE_INTERVAL) return
+    lastUpdateRef.current = now
+
+    // Advance phase
+    phaseRef.current += 1
+
+    // Switch patterns periodically
+    patternTimeRef.current += deltaTime
+    if (patternTimeRef.current > PATTERN_DURATION) {
+      patternTimeRef.current = 0
+      const patterns: LightPattern[] = ['wave', 'ripple', 'diagonal', 'breathe', 'chase', 'sparkle']
+      const currentIdx = patterns.indexOf(patternRef.current)
+      patternRef.current = patterns[(currentIdx + 1) % patterns.length]
+      phaseRef.current = 0
+    }
+
+    const newLit = new Set<string>()
+    const phase = phaseRef.current
+    const pattern = patternRef.current
+
+    // ═══ PATTERN IMPLEMENTATIONS ═══
+
+    if (pattern === 'wave') {
+      // Horizontal wave sweeping across the floor
+      const waveWidth = 3
+      const wavePos = (phase * 0.5) % (gridCols + waveWidth * 2) - waveWidth
+      for (let row = 0; row < gridRows; row++) {
+        for (let col = 0; col < gridCols; col++) {
+          const dist = Math.abs(col - wavePos)
+          if (dist < waveWidth) {
+            newLit.add(`${col}-${row}`)
+          }
+        }
+      }
+    }
+
+    else if (pattern === 'diagonal') {
+      // Diagonal wave (Saturday Night Fever style)
+      const waveWidth = 4
+      const wavePos = (phase * 0.4) % (gridCols + gridRows + waveWidth * 2) - waveWidth
+      for (let row = 0; row < gridRows; row++) {
+        for (let col = 0; col < gridCols; col++) {
+          const diagPos = col + row
+          const dist = Math.abs(diagPos - wavePos)
+          if (dist < waveWidth) {
+            newLit.add(`${col}-${row}`)
+          }
+        }
+      }
+    }
+
+    else if (pattern === 'ripple') {
+      // Circular ripple from center
+      const centerX = gridCols / 2
+      const centerY = gridRows / 2
+      const rippleRadius = (phase * 0.3) % (Math.max(gridCols, gridRows) * 0.8)
+      const rippleWidth = 2
+
+      for (let row = 0; row < gridRows; row++) {
+        for (let col = 0; col < gridCols; col++) {
+          const dist = Math.sqrt((col - centerX) ** 2 + (row - centerY) ** 2)
+          if (Math.abs(dist - rippleRadius) < rippleWidth) {
+            newLit.add(`${col}-${row}`)
+          }
+        }
+      }
+    }
+
+    else if (pattern === 'chase') {
+      // Light chasing around the perimeter
+      const perimeter = 2 * (gridCols + gridRows - 2)
+      const chaseLength = 8
+      const chasePos = (phase * 0.8) % perimeter
+
+      for (let i = 0; i < chaseLength; i++) {
+        let pos = (chasePos + i) % perimeter
+        let col: number, row: number
+
+        if (pos < gridCols) {
+          col = pos; row = 0
+        } else if (pos < gridCols + gridRows - 1) {
+          col = gridCols - 1; row = pos - gridCols + 1
+        } else if (pos < 2 * gridCols + gridRows - 2) {
+          col = gridCols - 1 - (pos - gridCols - gridRows + 2); row = gridRows - 1
+        } else {
+          col = 0; row = gridRows - 1 - (pos - 2 * gridCols - gridRows + 3)
+        }
+
+        if (col >= 0 && col < gridCols && row >= 0 && row < gridRows) {
+          newLit.add(`${col}-${row}`)
+        }
+      }
+    }
+
+    else if (pattern === 'breathe') {
+      // Pulsing glow from center outward (zone-aware)
+      const intensity = (Math.sin(phase * 0.15) + 1) / 2  // 0 to 1
+      const maxRadius = Math.max(gridCols, gridRows) * 0.6 * intensity
+      const centerX = gridCols / 2
+      const centerY = gridRows / 2
+
+      for (let row = 0; row < gridRows; row++) {
+        for (let col = 0; col < gridCols; col++) {
+          const dist = Math.sqrt((col - centerX) ** 2 + (row - centerY) ** 2)
+          if (dist < maxRadius) {
+            newLit.add(`${col}-${row}`)
+          }
+        }
+      }
+    }
+
+    else if (pattern === 'sparkle') {
+      // Random sparkles (like stars twinkling)
+      const numSparkles = Math.floor(gridCols * gridRows * 0.08)  // 8% of tiles
+      for (let i = 0; i < numSparkles; i++) {
+        // Use deterministic "randomness" based on phase for consistency
+        const seed = (phase * 7 + i * 13) % 1000
+        const col = Math.floor((Math.sin(seed) * 0.5 + 0.5) * gridCols)
+        const row = Math.floor((Math.cos(seed * 1.3) * 0.5 + 0.5) * gridRows)
+        if (col >= 0 && col < gridCols && row >= 0 && row < gridRows) {
+          newLit.add(`${col}-${row}`)
+        }
+      }
+    }
+
+    setLitTiles(newLit)
+  })
+
+  return litTiles
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -417,6 +625,9 @@ interface InstancedFloorProps {
 }
 
 function InstancedTileFloor({ tiles, gridCols, gridRows, isMobile, onTileClick, userZone }: InstancedFloorProps) {
+  // ARCADE LIGHT SHOW!
+  const litTiles = useLightShow(gridCols, gridRows, true)
+
   return (
     <group>
       {tiles.map((tile, i) => (
@@ -429,6 +640,7 @@ function InstancedTileFloor({ tiles, gridCols, gridRows, isMobile, onTileClick, 
           optionId={tile.optionId}
           onTileClick={onTileClick}
           isMobile={isMobile}
+          lightShowActive={litTiles.has(`${tile.col}-${tile.row}`)}
         />
       ))}
     </group>
@@ -1574,6 +1786,66 @@ function Platform({ width, depth }: PlatformProps) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SKY TEXT 3D — Smash Bros Final Destination style floating title!
+// "Epic 3D text that floats above the battlefield" — Nintendo Art Director
+// ═══════════════════════════════════════════════════════════════════════════
+interface SkyText3DProps {
+  question: string
+  isMobile?: boolean
+}
+
+function SkyText3D({ question, isMobile = false }: SkyText3DProps) {
+  const groupRef = useRef<THREE.Group>(null)
+
+  // Subtle floating animation — very gentle bob
+  useFrame(({ clock }) => {
+    if (groupRef.current) {
+      groupRef.current.position.y = 10 + Math.sin(clock.elapsedTime * 0.5) * 0.15
+    }
+  })
+
+  // Use Inter from Google Fonts CDN (drei's default has issues sometimes)
+  const fontUrl = 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff2'
+
+  return (
+    <group ref={groupRef} position={[0, 10, -6]}>
+      {/* Main title — PERFORMANCE OPTIMIZED with meshBasicMaterial */}
+      <Text
+        font={fontUrl}
+        fontSize={isMobile ? 0.9 : 1.4}
+        letterSpacing={0.08}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={isMobile ? 12 : 22}
+        textAlign="center"
+        fontWeight={700}
+      >
+        {question.toUpperCase()}
+        <meshBasicMaterial color="#ffffff" toneMapped={false} />
+      </Text>
+
+      {/* Subtle glow behind text — meshBasicMaterial for performance */}
+      <Text
+        font={fontUrl}
+        fontSize={isMobile ? 0.92 : 1.42}
+        letterSpacing={0.08}
+        color="#8844ff"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={isMobile ? 12 : 22}
+        textAlign="center"
+        fontWeight={700}
+        position={[0, 0, -0.1]}
+      >
+        {question.toUpperCase()}
+        <meshBasicMaterial color="#8844ff" transparent opacity={0.5} toneMapped={false} />
+      </Text>
+    </group>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // DANCE FLOOR SCENE
 // ═══════════════════════════════════════════════════════════════════════════
 interface SceneProps {
@@ -1583,9 +1855,10 @@ interface SceneProps {
   onTileClick?: (optionId: string, col: number, row: number) => void
   dancers?: Dancer[]
   isMobile?: boolean
+  marketQuestion?: string
 }
 
-function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false }: SceneProps) {
+function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion }: SceneProps) {
   const ranges = useMemo(() => calculateColumnRanges(options, gridCols), [options, gridCols])
 
   // ═══ GRID MATH — 1.0 unit step creates 0.08 gutter between 0.92 tiles ═══
@@ -1783,6 +2056,13 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
         <SkyPodium key={optionId} position={position} label={label} pct={pct} color={color} rank={rank} />
       ))}
 
+      {/* ═══ SKY TEXT 3D — Smash Bros style floating market title! ═══ */}
+      {marketQuestion && (
+        <Suspense fallback={null}>
+          <SkyText3D question={marketQuestion} isMobile={isMobile} />
+        </Suspense>
+      )}
+
       {/* ═══ DANCING STICK FIGURES! ═══ */}
       {dancers && dancers.length > 0 && (
         <Suspense fallback={null}>
@@ -1802,23 +2082,34 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CAMERA CONTROLLER — OrbitControls with PRO mobile input handling!
-// "Pinch, Drag, Tap — the holy trinity of mobile UX" — Input Architect
+// RESPONSIVE CAMERA — One epic view that scales to ANY screen!
+// "Desktop layout everywhere, just zoom out on mobile" — Responsive Design
 // ═══════════════════════════════════════════════════════════════════════════
 interface CameraControllerProps {
   isMobile?: boolean
 }
 
 function CameraController({ isMobile = false }: CameraControllerProps) {
-  const { camera } = useThree()
+  const { camera, size } = useThree()
 
   React.useEffect(() => {
-    // Mobile: Pull back further & higher for bird's eye view of the action
-    const pos = isMobile ? MOBILE_GRID.camera.position : DESKTOP_GRID.camera.position
-    camera.position.set(...pos)
+    // Dynamic zoom based on viewport aspect ratio
+    // Narrow screens = pull camera back to fit the whole stage
+    const aspect = size.width / size.height
+
+    // ZOOMED OUT to see the FULL dance floor on load!
+    const baseY = 18       // Higher up
+    const baseZ = 22       // Further back
+
+    // Scale factor: narrower aspect = zoom out more
+    // Desktop (aspect ~1.8) = scale 1.0
+    // Mobile portrait (aspect ~0.5) = scale ~1.6 (zoomed out)
+    const scaleFactor = Math.max(1, 1.6 / Math.max(aspect, 0.5))
+
+    camera.position.set(0, baseY * scaleFactor, baseZ * scaleFactor)
     camera.lookAt(0, 0, 0)
     camera.updateProjectionMatrix()
-  }, [camera, isMobile])
+  }, [camera, size.width, size.height])
 
   return (
     <OrbitControls
@@ -1827,15 +2118,14 @@ function CameraController({ isMobile = false }: CameraControllerProps) {
       dampingFactor={0.08}
       enableZoom={true}
       enableRotate={true}
-      enablePan={false}  // Don't let them lose the stage!
-      minDistance={isMobile ? 8 : 6}
-      maxDistance={isMobile ? 40 : 35}
-      minPolarAngle={Math.PI / 6}  // Don't go under the island
-      maxPolarAngle={Math.PI / 2 - 0.08}  // Horizon lock
-      rotateSpeed={isMobile ? 0.5 : 0.8}  // Slower on mobile for precision
-      zoomSpeed={isMobile ? 0.8 : 1.0}
-      target={[0, 0.5, 0]}  // Look at center of stage, slightly above floor
-      // Touch settings for mobile
+      enablePan={false}
+      minDistance={6}
+      maxDistance={50}
+      minPolarAngle={Math.PI / 6}
+      maxPolarAngle={Math.PI / 2 - 0.08}
+      rotateSpeed={isMobile ? 0.5 : 0.8}
+      zoomSpeed={1.0}
+      target={[0, 0.5, 0]}
       touches={{
         ONE: THREE.TOUCH.ROTATE,
         TWO: THREE.TOUCH.DOLLY_PAN,
@@ -1856,17 +2146,18 @@ export default function DanceFloor({
   dancers: propDancers,
   dancersPerZone = 0,
   userPrediction,
+  marketQuestion,
   children,
   className = '',
   style = {},
 }: DanceFloorProps) {
-  // ═══ MOBILE-FIRST DETECTION ═══
+  // ═══ MOBILE DETECTION (for performance optimizations only) ═══
   const isMobile = useIsMobile()
 
-  // Responsive grid — smaller on mobile for performance & fit
-  const gridCols = propGridCols ?? (isMobile ? MOBILE_GRID.cols : DESKTOP_GRID.cols)
-  const gridRows = propGridRows ?? (isMobile ? MOBILE_GRID.rows : DESKTOP_GRID.rows)
-  const cameraConfig = isMobile ? MOBILE_GRID.camera : DESKTOP_GRID.camera
+  // ALWAYS use desktop grid — camera zooms out on mobile to fit!
+  const gridCols = propGridCols ?? DESKTOP_GRID.cols
+  const gridRows = propGridRows ?? DESKTOP_GRID.rows
+  const cameraConfig = DESKTOP_GRID.camera
 
   if (!options || options.length === 0) {
     console.warn('DanceFloor: No options provided')
@@ -1958,6 +2249,7 @@ export default function DanceFloor({
           onTileClick={handleTileClick}
           dancers={dancers}
           isMobile={isMobile}
+          marketQuestion={marketQuestion}
         />
       </Canvas>
 
