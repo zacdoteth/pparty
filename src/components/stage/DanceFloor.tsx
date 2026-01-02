@@ -57,6 +57,7 @@ export interface DanceFloorProps {
     avatar: string        // Path to avatar image
   }
   marketQuestion?: string // 3D floating title in sky (Smash Bros style!)
+  marketIcon?: string     // PREMOJI icon above title (🏈, 🗳️, etc.)
   selectedZone?: string   // Zone to illuminate (from sidebar bet selection!)
   children?: React.ReactNode
   className?: string
@@ -1787,60 +1788,111 @@ function Platform({ width, depth }: PlatformProps) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SKY TEXT 3D — Smash Bros Final Destination style floating title!
-// "Epic 3D text that floats above the battlefield" — Nintendo Art Director
+// ═══════════════════════════════════════════════════════════════════════════
+// SKY TEXT 3D — PREMOJI STYLE! Polymarket-inspired epic floating title!
+// "Icon above title, gold glow, ultra-wide letter spacing" — Typography Wizard
 // ═══════════════════════════════════════════════════════════════════════════
 interface SkyText3DProps {
   question: string
+  icon?: string  // PREMOJI: emoji above title!
   isMobile?: boolean
 }
 
-function SkyText3D({ question, isMobile = false }: SkyText3DProps) {
+function SkyText3D({ question, icon, isMobile = false }: SkyText3DProps) {
   const groupRef = useRef<THREE.Group>(null)
 
-  // Subtle floating animation — very gentle bob
+  // Subtle floating animation — majestic hover
   useFrame(({ clock }) => {
     if (groupRef.current) {
-      groupRef.current.position.y = 10 + Math.sin(clock.elapsedTime * 0.5) * 0.15
+      groupRef.current.position.y = 10 + Math.sin(clock.elapsedTime * 0.4) * 0.2
     }
   })
 
-  // Use Inter from Google Fonts CDN (drei's default has issues sometimes)
+  // Inter Bold for that Polymarket crispness
   const fontUrl = 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff2'
 
+  // TYPOGRAPHY SPEC — Polymarket style
+  const titleSize = isMobile ? 1.0 : 1.6
+  const iconSize = isMobile ? 1.8 : 2.8
+  const letterSpacing = 0.15  // ULTRA-WIDE like Polymarket!
+  const maxWidth = isMobile ? 14 : 26
+
   return (
-    <group ref={groupRef} position={[0, 10, -6]}>
-      {/* Main title — PERFORMANCE OPTIMIZED with meshBasicMaterial */}
+    <group ref={groupRef} position={[0, 10, -5]}>
+      {/* ═══ PREMOJI ICON — Large emoji floating above title! ═══ */}
+      {icon && (
+        <Text
+          fontSize={iconSize}
+          anchorX="center"
+          anchorY="middle"
+          position={[0, titleSize * 1.8, 0]}
+        >
+          {icon}
+          <meshBasicMaterial toneMapped={false} />
+        </Text>
+      )}
+
+      {/* ═══ GOLD OUTER GLOW — Polymarket signature! ═══ */}
       <Text
         font={fontUrl}
-        fontSize={isMobile ? 0.9 : 1.4}
-        letterSpacing={0.08}
-        color="#ffffff"
+        fontSize={titleSize * 1.04}
+        letterSpacing={letterSpacing}
         anchorX="center"
         anchorY="middle"
-        maxWidth={isMobile ? 12 : 22}
+        maxWidth={maxWidth}
         textAlign="center"
         fontWeight={700}
+        position={[0, 0, -0.15]}
       >
         {question.toUpperCase()}
-        <meshBasicMaterial color="#ffffff" toneMapped={false} />
+        <meshBasicMaterial color="#ffd700" transparent opacity={0.4} toneMapped={false} />
       </Text>
 
-      {/* Subtle glow behind text — meshBasicMaterial for performance */}
+      {/* ═══ DARK STROKE — Crisp edge definition! ═══ */}
       <Text
         font={fontUrl}
-        fontSize={isMobile ? 0.92 : 1.42}
-        letterSpacing={0.08}
-        color="#8844ff"
+        fontSize={titleSize * 1.02}
+        letterSpacing={letterSpacing}
         anchorX="center"
         anchorY="middle"
-        maxWidth={isMobile ? 12 : 22}
+        maxWidth={maxWidth}
         textAlign="center"
         fontWeight={700}
-        position={[0, 0, -0.1]}
+        position={[0, 0, -0.08]}
       >
         {question.toUpperCase()}
-        <meshBasicMaterial color="#8844ff" transparent opacity={0.5} toneMapped={false} />
+        <meshBasicMaterial color="#1a1a2e" toneMapped={false} />
+      </Text>
+
+      {/* ═══ MAIN TITLE — Bright white with gold tint! ═══ */}
+      <Text
+        font={fontUrl}
+        fontSize={titleSize}
+        letterSpacing={letterSpacing}
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={maxWidth}
+        textAlign="center"
+        fontWeight={700}
+      >
+        {question.toUpperCase()}
+        <meshBasicMaterial color="#fffef0" toneMapped={false} />
+      </Text>
+
+      {/* ═══ INNER HIGHLIGHT — Top edge shine! ═══ */}
+      <Text
+        font={fontUrl}
+        fontSize={titleSize * 0.98}
+        letterSpacing={letterSpacing}
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={maxWidth}
+        textAlign="center"
+        fontWeight={700}
+        position={[0, 0.03, 0.02]}
+      >
+        {question.toUpperCase()}
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.6} toneMapped={false} />
       </Text>
     </group>
   )
@@ -1857,9 +1909,10 @@ interface SceneProps {
   dancers?: Dancer[]
   isMobile?: boolean
   marketQuestion?: string
+  marketIcon?: string  // PREMOJI icon!
 }
 
-function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion }: SceneProps) {
+function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion, marketIcon }: SceneProps) {
   const ranges = useMemo(() => calculateColumnRanges(options, gridCols), [options, gridCols])
 
   // ═══ GRID MATH — 1.0 unit step creates 0.08 gutter between 0.92 tiles ═══
@@ -2058,10 +2111,10 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
         <SkyPodium key={optionId} position={position} label={label} pct={pct} color={color} rank={rank} />
       ))}
 
-      {/* ═══ SKY TEXT 3D — Smash Bros style floating market title! ═══ */}
+      {/* ═══ SKY TEXT 3D — PREMOJI STYLE floating market title! ═══ */}
       {marketQuestion && (
         <Suspense fallback={null}>
-          <SkyText3D question={marketQuestion} isMobile={isMobile} />
+          <SkyText3D question={marketQuestion} icon={marketIcon} isMobile={isMobile} />
         </Suspense>
       )}
 
@@ -2149,6 +2202,7 @@ export default function DanceFloor({
   dancersPerZone = 0,
   userPrediction,
   marketQuestion,
+  marketIcon,
   selectedZone,
   children,
   className = '',
@@ -2253,6 +2307,7 @@ export default function DanceFloor({
           dancers={dancers}
           isMobile={isMobile}
           marketQuestion={marketQuestion}
+          marketIcon={marketIcon}
         />
       </Canvas>
 

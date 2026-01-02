@@ -15,6 +15,7 @@ const MARKETS = [
   {
     id: 'president-2028',
     name: 'Who wins 2028 Presidential Election?',
+    icon: '🗳️',  // PREMOJI STYLE!
     volume: '847K',
     options: createMultiOptions([
       { id: 'jd', label: 'J.D. Vance', pct: 38, color: '#00FF00' },
@@ -24,7 +25,8 @@ const MARKETS = [
   },
   {
     id: 'super-bowl',
-    name: 'Super Bowl Champion?',
+    name: 'Super Bowl Champion 2026',
+    icon: '🏈',  // PREMOJI STYLE!
     volume: '234K',
     options: createMultiOptions([
       { id: 'chiefs', label: 'Chiefs', pct: 28, color: '#E31837' },
@@ -37,18 +39,21 @@ const MARKETS = [
   {
     id: 'bitcoin-100k',
     name: 'Bitcoin above $100K by March?',
+    icon: '₿',  // PREMOJI STYLE!
     volume: '156K',
     options: createBinaryOptions(62),
   },
   {
     id: 'ai-agi',
     name: 'AGI announced by 2026?',
+    icon: '🤖',  // PREMOJI STYLE!
     volume: '89K',
     options: createBinaryOptions(35),
   },
   {
     id: 'oscar-best-picture',
     name: 'Oscar Best Picture 2025?',
+    icon: '🏆',  // PREMOJI STYLE!
     volume: '45K',
     options: createMultiOptions([
       { id: 'anora', label: 'Anora', pct: 42, color: '#FFD700' },
@@ -103,6 +108,7 @@ export default function ThreeDemo() {
         onTileClick={handleTileClick}
         dancersPerZone={7}
         marketQuestion={selectedMarket.name}
+        marketIcon={selectedMarket.icon}
         selectedZone={selectedBetOption}
         />
       </div>
