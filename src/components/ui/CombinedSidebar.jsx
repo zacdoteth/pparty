@@ -61,31 +61,14 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
     onPreviewZone?.(previewZone)
   }, [hoveredZone, pendingZone, onPreviewZone])
 
-  // ═══ CLICK OUTSIDE — Dismiss popup when clicking elsewhere! ═══
-  useEffect(() => {
-    if (!pendingZone) return
-
-    const handleClickOutside = (e) => {
-      // Don't dismiss if clicking the popup, chip, or zones
-      const clickedPopup = popupRef.current?.contains(e.target)
-      const clickedChip = chipRef.current?.contains(e.target)
-      const clickedZone = e.target.closest('.bet-zone')
-
-      if (!clickedPopup && !clickedChip && !clickedZone) {
-        setPendingZone(null)
-        setChipPos({ x: 0, y: 0 })
-      }
+  // ═══ CLICK OUTSIDE — Dismiss popup when clicking the overlay! ═══
+  const handleOverlayClick = useCallback((e) => {
+    // Only dismiss if clicking directly on the overlay
+    if (e.target.classList.contains('betting-overlay')) {
+      setPendingZone(null)
+      setChipPos({ x: 0, y: 0 })
     }
-
-    // Use mousedown/touchstart for immediate response
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside)
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('touchstart', handleClickOutside)
-    }
-  }, [pendingZone])
+  }, [])
 
   if (!market) return null
 
@@ -200,8 +183,8 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
 
   return (
     <div className={`betting-section casino-style ${pendingZone && !isDragging ? 'has-pending' : ''}`} ref={containerRef}>
-      {/* ═══ LIGHTBOX OVERLAY — Focus on the popup! ═══ */}
-      {pendingZone && !isDragging && <div className="betting-overlay" />}
+      {/* ═══ LIGHTBOX OVERLAY — Click to dismiss! ═══ */}
+      {pendingZone && !isDragging && <div className="betting-overlay" onClick={handleOverlayClick} />}
 
       {/* ═══ DROP ZONES — Roulette table! ═══ */}
       <div className="bet-zones" title={!pendingZone && !selectedOption ? 'Drag chip here' : undefined}>

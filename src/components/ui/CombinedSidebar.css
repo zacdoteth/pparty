@@ -169,7 +169,8 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  z-index: 150;
+  z-index: 100;
+  cursor: pointer;
   animation: overlay-fade 0.2s ease-out;
 }
 
@@ -299,6 +300,8 @@
   gap: 4px;
   padding: 12px 0;
   margin-bottom: 8px;
+  position: relative;
+  z-index: 150;  /* Above overlay (100) */
 }
 
 .betting-chip {
