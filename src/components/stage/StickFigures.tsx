@@ -702,15 +702,15 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
         {showSpeech && (() => {
           // Single line: "name: message"
           const fullText = `${username}: ${currentSpeech}`
-          const charWidth = 0.058
+          const charWidth = 0.085  // Larger for legibility
           const textWidth = fullText.length * charWidth
-          const bubbleWidth = Math.max(0.8, Math.min(2.8, textWidth + 0.08))  // Tight padding
+          const bubbleWidth = Math.max(1.0, Math.min(3.5, textWidth + 0.12))  // Wider bubble
           const halfWidth = bubbleWidth / 2
-          const bubbleHeight = 0.22  // Single line height
+          const bubbleHeight = 0.32  // Taller for larger text
 
           return (
             <Billboard
-              position={[headSize * 2.0, torsoHeight + headSize * 2.2, 0]}
+              position={[headSize * 2.0, torsoHeight + headSize * 2.4, 0]}
               follow={true}
               lockX={false}
               lockY={false}
@@ -718,12 +718,12 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
             >
               {/* Border — zone colored */}
               <mesh position={[0, 0, -0.035]}>
-                <planeGeometry args={[bubbleWidth + 0.025, bubbleHeight + 0.025]} />
+                <planeGeometry args={[bubbleWidth + 0.03, bubbleHeight + 0.03]} />
                 <meshBasicMaterial color={color} />
               </mesh>
               {/* Subtle glow */}
               <mesh position={[0, 0, -0.04]}>
-                <planeGeometry args={[bubbleWidth + 0.06, bubbleHeight + 0.06]} />
+                <planeGeometry args={[bubbleWidth + 0.08, bubbleHeight + 0.08]} />
                 <meshBasicMaterial color={color} transparent opacity={0.15} />
               </mesh>
               {/* Dark background */}
@@ -734,8 +734,8 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
 
               {/* Single line: "name: message" */}
               <Text
-                position={[-halfWidth + 0.04, 0, 0]}
-                fontSize={0.09}
+                position={[-halfWidth + 0.06, 0, 0]}
+                fontSize={0.14}
                 anchorX="left"
                 anchorY="middle"
               >
@@ -743,8 +743,8 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
                 {username}:
               </Text>
               <Text
-                position={[-halfWidth + 0.04 + (username.length + 1) * 0.052, 0, 0.001]}
-                fontSize={0.09}
+                position={[-halfWidth + 0.06 + (username.length + 1) * 0.078, 0, 0.001]}
+                fontSize={0.14}
                 color="#ffffff"
                 anchorX="left"
                 anchorY="middle"
@@ -753,12 +753,12 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
               </Text>
 
               {/* Tail pointing down */}
-              <mesh position={[-halfWidth + 0.1, -0.16, -0.03]} rotation={[0, 0, Math.PI / 4]}>
-                <planeGeometry args={[0.07, 0.07]} />
+              <mesh position={[-halfWidth + 0.12, -0.22, -0.03]} rotation={[0, 0, Math.PI / 4]}>
+                <planeGeometry args={[0.09, 0.09]} />
                 <meshBasicMaterial color={color} />
               </mesh>
-              <mesh position={[-halfWidth + 0.1, -0.145, -0.02]} rotation={[0, 0, Math.PI / 4]}>
-                <planeGeometry args={[0.045, 0.045]} />
+              <mesh position={[-halfWidth + 0.12, -0.20, -0.02]} rotation={[0, 0, Math.PI / 4]}>
+                <planeGeometry args={[0.06, 0.06]} />
                 <meshBasicMaterial color="#0a0a12" />
               </mesh>
             </Billboard>
