@@ -1896,10 +1896,11 @@ interface SceneProps {
   dancers?: Dancer[]
   isMobile?: boolean
   marketQuestion?: string
-  marketIcon?: string  // PREMOJI icon!
+  marketIcon?: string
+  selectedZone?: string  // Zone to illuminate!
 }
 
-function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion, marketIcon }: SceneProps) {
+function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion, marketIcon, selectedZone }: SceneProps) {
   const ranges = useMemo(() => calculateColumnRanges(options, gridCols), [options, gridCols])
 
   // ═══ GRID MATH — 1.0 unit step creates 0.08 gutter between 0.92 tiles ═══
@@ -2295,6 +2296,7 @@ export default function DanceFloor({
           isMobile={isMobile}
           marketQuestion={marketQuestion}
           marketIcon={marketIcon}
+          selectedZone={selectedZone}
         />
       </Canvas>
 
