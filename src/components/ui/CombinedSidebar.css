@@ -14,14 +14,44 @@
   right: 0;
   bottom: 0;
   width: 300px;
-  background: rgba(10, 8, 20, 0.95);
+  background: rgba(10, 8, 20, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   z-index: 1000;
   overflow: hidden;
+}
+
+/* ═══ GHOST MODE — Everything fades except the chip! ═══ */
+.sidebar-header,
+.sidebar-market-list,
+.sidebar-divider,
+.your-bets-section,
+.betting-question,
+.bet-zones,
+.bet-locked-indicator,
+.sidebar-footer {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+/* Restore full opacity on hover */
+.sidebar-desktop:hover .sidebar-header,
+.sidebar-desktop:hover .sidebar-market-list,
+.sidebar-desktop:hover .sidebar-divider,
+.sidebar-desktop:hover .your-bets-section,
+.sidebar-desktop:hover .betting-question,
+.sidebar-desktop:hover .bet-zones,
+.sidebar-desktop:hover .bet-locked-indicator,
+.sidebar-desktop:hover .sidebar-footer {
+  opacity: 1;
+}
+
+/* Chip dock ALWAYS full opacity — the star! */
+.chip-dock {
+  opacity: 1 !important;
 }
 
 /* ═══ FLEX LAYOUT MODE ═══
@@ -83,18 +113,22 @@
 .market-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: 10px 12px;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .market-card:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
 }
 
 .market-card.selected {
@@ -102,53 +136,22 @@
   border-color: rgba(136, 68, 255, 0.4);
 }
 
-.market-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.market-card-live {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #ff4444;
-  background: rgba(255, 68, 68, 0.15);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.market-card-volume {
-  font-size: 11px;
-  color: #666;
-}
-
 .market-card-title {
-  margin: 0 0 8px 0;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: #fff;
   line-height: 1.3;
-}
-
-.market-card-options {
-  display: flex;
-  gap: 6px;
-  flex-wrap: nowrap;
-  overflow: hidden;
-}
-
-.market-card-option {
-  font-size: 10px;
-  font-weight: 600;
+  flex: 1;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.market-card-more {
+.market-card-volume {
   font-size: 10px;
   color: #666;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -752,6 +755,13 @@
   text-shadow: 0 0 15px currentColor;
 }
 
+.locked-amount {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
 .unlock-bet-btn {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -872,6 +882,78 @@
     padding: 10px 20px;
     font-size: 11px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   YOUR BETS SECTION — Portfolio of active bets!
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.your-bets-section {
+  padding: 0 12px;
+}
+
+.your-bets-title {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #888;
+}
+
+.your-bets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.your-bet-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.your-bet-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.your-bet-item.active {
+  background: rgba(136, 68, 255, 0.12);
+  border-color: rgba(136, 68, 255, 0.35);
+}
+
+.your-bet-market {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.2;
+}
+
+.your-bet-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.your-bet-option {
+  font-size: 13px;
+  font-weight: 700;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.your-bet-amount {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

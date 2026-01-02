@@ -72,7 +72,7 @@ export default function ThreeDemo() {
   const [selectedMarketId, setSelectedMarketId] = useState(MARKETS[0].id)
   const [balance, setBalance] = useState(250)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [selectedBetOption, setSelectedBetOption] = useState(null)
+  const [bets, setBets] = useState({})  // { [marketId]: { optionId, amount } }
   const [previewZone, setPreviewZone] = useState(null)  // Preview when chip hovers/placed!
 
   // ═══ LOADING & INTRO STATE ═══
@@ -83,6 +83,10 @@ export default function ThreeDemo() {
 
   const selectedMarket = MARKETS.find(m => m.id === selectedMarketId) || MARKETS[0]
 
+  // Current market's bet
+  const currentBet = bets[selectedMarketId]
+  const selectedBetOption = currentBet?.optionId || null
+
   // ═══ ACTIVE ZONE — Preview OR locked-in bet ═══
   const activeZone = previewZone || selectedBetOption
 
@@ -92,15 +96,34 @@ export default function ThreeDemo() {
 
   const handleMarketSelect = useCallback((marketId) => {
     setSelectedMarketId(marketId)
-    setSelectedBetOption(null)  // Reset bet selection when changing markets
-    setPreviewZone(null)        // Reset preview too!
+    setPreviewZone(null)  // Reset preview when switching markets
   }, [])
 
   const handleBet = useCallback((optionId, amount) => {
-    console.log(`Bet: $${amount} on ${optionId}`)
-    // Demo: just reduce balance
+    console.log(`Bet: $${amount} on ${optionId} for market ${selectedMarketId}`)
+    // Save bet for this market
+    setBets(prev => ({
+      ...prev,
+      [selectedMarketId]: { optionId, amount }
+    }))
+    // Reduce balance
     setBalance(prev => Math.max(0, prev - amount))
-  }, [])
+  }, [selectedMarketId])
+
+  const handleBetOptionSelect = useCallback((optionId) => {
+    if (optionId === null) {
+      // Unlock bet — refund and remove
+      const existingBet = bets[selectedMarketId]
+      if (existingBet) {
+        setBalance(prev => prev + existingBet.amount)
+        setBets(prev => {
+          const newBets = { ...prev }
+          delete newBets[selectedMarketId]
+          return newBets
+        })
+      }
+    }
+  }, [selectedMarketId, bets])
 
   const handlePreviewZone = useCallback((zoneId) => {
     setPreviewZone(zoneId)
@@ -177,9 +200,11 @@ export default function ThreeDemo() {
           isOpen={sidebarOpen}
           onToggle={setSidebarOpen}
           selectedBetOption={selectedBetOption}
-          onBetOptionSelect={setSelectedBetOption}
+          onBetOptionSelect={handleBetOptionSelect}
           onPreviewZone={handlePreviewZone}  // Dance floor preview!
           isFlexLayout={true}  // Tell sidebar it's in flex layout!
+          allBets={bets}  // All bets across markets!
+          currentBetAmount={currentBet?.amount}  // Amount for locked indicator
         />
       </div>
     </div>

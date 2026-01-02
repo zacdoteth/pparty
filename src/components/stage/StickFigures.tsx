@@ -523,9 +523,133 @@ function DopeSneaker({ scale, color }: SneakerProps) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// USER SPOTLIGHT — Epic animated glow for YOUR character!
+// "The star of the show deserves a spotlight" — Broadway Director
+// ═══════════════════════════════════════════════════════════════════════════
+interface UserSpotlightProps {
+  groundOffset: number
+  flatScale: number
+  color: string
+}
+
+function UserSpotlight({ groundOffset, flatScale, color }: UserSpotlightProps) {
+  const ringRef = useRef<THREE.Mesh>(null!)
+  const outerRingRef = useRef<THREE.Mesh>(null!)
+  const beamRef = useRef<THREE.Mesh>(null!)
+  const glowRef = useRef<THREE.Mesh>(null!)
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime
+
+    // Pulsing inner ring
+    if (ringRef.current) {
+      const pulse = 0.5 + Math.sin(t * 3) * 0.3
+      ringRef.current.material.opacity = pulse
+      ringRef.current.scale.setScalar(1 + Math.sin(t * 2) * 0.1)
+    }
+
+    // Rotating outer ring
+    if (outerRingRef.current) {
+      outerRingRef.current.rotation.z = t * 0.5
+      outerRingRef.current.material.opacity = 0.4 + Math.sin(t * 4) * 0.2
+    }
+
+    // Breathing light beam
+    if (beamRef.current) {
+      beamRef.current.material.opacity = 0.1 + Math.sin(t * 2) * 0.08
+      beamRef.current.scale.x = 1 + Math.sin(t * 3) * 0.15
+      beamRef.current.scale.z = 1 + Math.sin(t * 3) * 0.15
+    }
+
+    // Pulsing ground glow
+    if (glowRef.current) {
+      glowRef.current.material.opacity = 0.25 + Math.sin(t * 2.5) * 0.15
+      glowRef.current.scale.setScalar(1 + Math.sin(t * 1.5) * 0.12)
+    }
+  })
+
+  return (
+    <>
+      {/* Inner pulsing ring — gold! */}
+      <mesh ref={ringRef} position={[0, -groundOffset + 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.35 * flatScale, 0.5 * flatScale, 32]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={0.6} depthWrite={false} />
+      </mesh>
+
+      {/* Outer rotating ring — zone colored! */}
+      <mesh ref={outerRingRef} position={[0, -groundOffset + 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.55 * flatScale, 0.75 * flatScale, 6]} />
+        <meshBasicMaterial color={color} transparent opacity={0.5} depthWrite={false} />
+      </mesh>
+
+      {/* Ground glow — soft zone color */}
+      <mesh ref={glowRef} position={[0, -groundOffset + 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.6 * flatScale, 24]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={0.3} depthWrite={false} />
+      </mesh>
+
+      {/* Vertical spotlight beam — dramatic! */}
+      <mesh ref={beamRef} position={[0, 1.2, 0]}>
+        <cylinderGeometry args={[0.03, 0.25, 4, 12, 1, true]} />
+        <meshBasicMaterial color="#FFD700" transparent opacity={0.12} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+
+      {/* Sparkle particles around character */}
+      <SpotlightSparkles flatScale={flatScale} color={color} />
+    </>
+  )
+}
+
+// ═══ SPARKLES — Floating particles around the user! ═══
+function SpotlightSparkles({ flatScale, color }: { flatScale: number, color: string }) {
+  const particlesRef = useRef<THREE.Group>(null!)
+
+  // Generate sparkle positions
+  const sparkles = useMemo(() =>
+    Array.from({ length: 8 }).map((_, i) => ({
+      angle: (i / 8) * Math.PI * 2,
+      radius: 0.4 + Math.random() * 0.3,
+      speed: 0.5 + Math.random() * 1,
+      yOffset: Math.random() * 0.8,
+      size: 0.02 + Math.random() * 0.02,
+    })), []
+  )
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime
+    if (particlesRef.current) {
+      particlesRef.current.children.forEach((child, i) => {
+        const s = sparkles[i]
+        const angle = s.angle + t * s.speed
+        child.position.x = Math.cos(angle) * s.radius * flatScale
+        child.position.z = Math.sin(angle) * s.radius * flatScale
+        child.position.y = s.yOffset + Math.sin(t * 2 + i) * 0.15
+        // Twinkle effect
+        ;(child as THREE.Mesh).material.opacity = 0.4 + Math.sin(t * 4 + i * 2) * 0.4
+      })
+    }
+  })
+
+  return (
+    <group ref={particlesRef}>
+      {sparkles.map((s, i) => (
+        <mesh key={i} position={[0, s.yOffset, 0]}>
+          <sphereGeometry args={[s.size, 8, 8]} />
+          <meshBasicMaterial
+            color={i % 2 === 0 ? '#FFD700' : color}
+            transparent
+            opacity={0.6}
+          />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // STICK FIGURE — FLAT 2.5D like Paper Mario / Game & Watch!
 // "Every character should feel like a paper cutout dancing in 3D space" — Miyamoto
-// 
+//
 // KEY DIFFERENCES from 3D version:
 // 1. FLAT planes instead of 3D capsules/spheres
 // 2. BLACK OUTLINE for that classic cartoon look
@@ -535,9 +659,11 @@ function DopeSneaker({ scale, color }: SneakerProps) {
 // ═══════════════════════════════════════════════════════════════════════════
 function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, showUsername = true, isUser = false }: StickFigureProps) {
   const groupRef = useRef<THREE.Group>(null!)
+  const headRef = useRef<THREE.Group>(null!)
   const { camera } = useThree()
   const [angles, setAngles] = useState<LimbAngles>(() => getDanceFrame(danceMove, 0))
   const [showSpeech, setShowSpeech] = useState(!!speech)
+  const [headLookUp, setHeadLookUp] = useState(0)  // How much head tilts up toward camera
 
   // Pick from appropriate slang pool based on zone color (green = yes vibes, red = no vibes)
   const getRandomSlang = () => {
@@ -627,6 +753,19 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
     cameraPos.y = groupRef.current.position.y
     groupRef.current.lookAt(cameraPos)
 
+    // ═══ HEAD TILT — Look up at camera when overhead! ═══
+    // Calculate how much camera is above the character
+    const charWorldPos = new THREE.Vector3(position[0], groupRef.current.position.y, position[2])
+    const toCam = camera.position.clone().sub(charWorldPos)
+    const horizontalDist = Math.sqrt(toCam.x * toCam.x + toCam.z * toCam.z)
+    const verticalDist = toCam.y
+
+    // Angle from horizontal (0 = eye level, positive = looking up)
+    const lookUpAngle = Math.atan2(verticalDist, horizontalDist)
+    // Clamp and smooth the head tilt (max ~35 degrees up)
+    const targetTilt = Math.min(0.6, Math.max(0, lookUpAngle * 0.7))
+    setHeadLookUp(prev => prev + (targetTilt - prev) * 0.1)  // Smooth interpolation
+
     // Slight rotation wobble during intro
     if (newIntroProgress < 1) {
       groupRef.current.rotation.z = Math.sin(introTime * 15) * (1 - newIntroProgress) * 0.3
@@ -674,8 +813,12 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
           <meshBasicMaterial color={bodyColor} side={THREE.DoubleSide} />
         </mesh>
 
-        {/* ═══ HEAD — Circular with avatar photo! ═══ */}
-        <group position={[0, torsoHeight + headSize * 0.9, 0]} rotation={[0, 0, angles.head.tilt]}>
+        {/* ═══ HEAD — Circular with avatar photo! Tilts up at camera! ═══ */}
+        <group
+          ref={headRef}
+          position={[0, torsoHeight + headSize * 0.9, 0]}
+          rotation={[-headLookUp, 0, angles.head.tilt]}  // X rotation tilts head back to look up!
+        >
           {/* Head outline circle */}
           <mesh position={[0, 0, -0.02]}>
             <circleGeometry args={[headSize * 1.15, 32]} />
@@ -867,26 +1010,8 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
         <meshBasicMaterial color={color} transparent opacity={0.2} />
       </mesh>
 
-      {/* ═══ USER GLOW — Epic highlight for YOUR character! ═══ */}
-      {isUser && (
-        <>
-          {/* Outer pulsing ring */}
-          <mesh position={[0, -groundOffset + 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.45 * flatScale, 0.65 * flatScale, 32]} />
-            <meshBasicMaterial color="#FFD700" transparent opacity={0.6} depthWrite={false} />
-          </mesh>
-          {/* Inner bright glow */}
-          <mesh position={[0, -groundOffset + 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.5 * flatScale, 24]} />
-            <meshBasicMaterial color="#FFD700" transparent opacity={0.25} depthWrite={false} />
-          </mesh>
-          {/* Vertical light beam */}
-          <mesh position={[0, 0.8, 0]}>
-            <cylinderGeometry args={[0.02, 0.15, 2.5, 8, 1, true]} />
-            <meshBasicMaterial color="#FFD700" transparent opacity={0.15} side={THREE.DoubleSide} depthWrite={false} />
-          </mesh>
-        </>
-      )}
+      {/* ═══ USER GLOW — Epic animated spotlight for YOUR character! ═══ */}
+      {isUser && <UserSpotlight groundOffset={groundOffset} flatScale={flatScale} color={color} />}
 
       {/* ═══ SPAWN BURST — Glowing ring when landing! ═══ */}
       {introProgress > 0.7 && introProgress < 1 && (

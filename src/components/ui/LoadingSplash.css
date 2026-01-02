@@ -119,11 +119,11 @@
   }
 }
 
-/* ═══ PARTY LOGO — Sweet tile block! ═══ */
+/* ═══ PARTY LOGO — Dance Floor Jelly Tiles! ═══ */
 .party-logo {
   position: relative;
-  width: 90px;
-  height: 90px;
+  width: 100px;
+  height: 100px;
   margin: 0 auto 24px;
 }
 
@@ -134,100 +134,111 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 4px;
+  gap: 5px;
   width: 100%;
   height: 100%;
-  transform: perspective(200px) rotateX(10deg) rotateY(-5deg);
+  transform: perspective(300px) rotateX(15deg) rotateY(-8deg);
   animation: grid-float 3s ease-in-out infinite;
 }
 
 @keyframes grid-float {
   0%, 100% {
-    transform: perspective(200px) rotateX(10deg) rotateY(-5deg) translateY(0);
+    transform: perspective(300px) rotateX(15deg) rotateY(-8deg) translateY(0);
   }
   50% {
-    transform: perspective(200px) rotateX(12deg) rotateY(-3deg) translateY(-6px);
+    transform: perspective(300px) rotateX(18deg) rotateY(-5deg) translateY(-8px);
   }
 }
 
-/* Individual tiles */
-.logo-tile {
-  background: linear-gradient(135deg, var(--tile-color), color-mix(in srgb, var(--tile-color) 60%, #000));
-  border-radius: 6px;
-  animation: tile-pulse 1.5s ease-in-out infinite;
+/* ═══ JELLY GLASS TILES — Same look as dance floor! ═══ */
+.logo-tile.jelly {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--tile-color) 90%, #fff) 0%,
+    var(--tile-color) 30%,
+    color-mix(in srgb, var(--tile-color) 70%, #000) 100%
+  );
+  border-radius: 4px;
+  animation: tile-bounce 1.8s ease-in-out infinite;
   box-shadow:
-    0 4px 12px color-mix(in srgb, var(--tile-color) 50%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+    0 6px 20px color-mix(in srgb, var(--tile-color) 60%, transparent),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 6px color-mix(in srgb, var(--tile-color) 40%, #000);
   position: relative;
   overflow: hidden;
+  /* Jelly glass transmission effect */
+  border: 1px solid color-mix(in srgb, var(--tile-color) 60%, rgba(255, 255, 255, 0.3));
 }
 
-/* Glass shine effect */
-.logo-tile::before {
+/* Top shine — wet candy highlight! */
+.logo-tile.jelly::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
-  border-radius: 6px 6px 0 0;
+  top: 2px;
+  left: 10%;
+  right: 10%;
+  height: 40%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  border-radius: 4px 4px 50% 50%;
 }
 
-/* Shimmer sweep */
-.logo-tile::after {
+/* Shimmer sweep — light catching the jelly! */
+.logo-tile.jelly::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    110deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.5) 50%,
-    transparent 70%
+    120deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.6) 45%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.6) 55%,
+    transparent 80%
   );
-  animation: shimmer-sweep 2s ease-in-out infinite;
+  animation: shimmer-sweep 2.5s ease-in-out infinite;
   animation-delay: inherit;
 }
 
-@keyframes tile-pulse {
+@keyframes tile-bounce {
   0%, 100% {
-    transform: scale(0.92);
-    opacity: 0.85;
+    transform: scale(0.88) translateY(0);
   }
   50% {
-    transform: scale(1);
-    opacity: 1;
+    transform: scale(1) translateY(-2px);
   }
 }
 
 @keyframes shimmer-sweep {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(150%); }
 }
 
-/* Glow behind tiles */
+/* Glow behind tiles — neon underglow! */
 .tile-glow {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 140%;
-  height: 140%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(136, 68, 255, 0.4) 0%,
-    rgba(0, 240, 255, 0.2) 30%,
-    transparent 70%
-  );
-  filter: blur(20px);
-  animation: glow-pulse 2s ease-in-out infinite;
+  width: 160%;
+  height: 160%;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(0, 240, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(255, 0, 85, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at center, rgba(189, 0, 255, 0.3) 0%, transparent 60%);
+  filter: blur(25px);
+  animation: glow-pulse 2.5s ease-in-out infinite;
   z-index: 0;
 }
 
 @keyframes glow-pulse {
-  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.85); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
 }
 
 .logo-text {

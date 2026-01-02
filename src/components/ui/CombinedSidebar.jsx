@@ -15,25 +15,8 @@ function MarketCard({ market, isSelected, onSelect }) {
       className={`market-card ${isSelected ? 'selected' : ''}`}
       onClick={() => onSelect(market.id)}
     >
-      <div className="market-card-header">
-        <span className="market-card-live">LIVE</span>
-        <span className="market-card-volume">${market.volume || '12.4K'}</span>
-      </div>
-      <h3 className="market-card-title">{market.name}</h3>
-      <div className="market-card-options">
-        {market.options?.slice(0, 4).map(opt => (
-          <span
-            key={opt.id}
-            className="market-card-option"
-            style={{ color: opt.color }}
-          >
-            {opt.label?.slice(0, 3)}{opt.pct}%
-          </span>
-        ))}
-        {market.options?.length > 4 && (
-          <span className="market-card-more">+{market.options.length - 4}</span>
-        )}
-      </div>
+      <span className="market-card-title">{market.name}</span>
+      <span className="market-card-volume">${market.volume || '12.4K'}</span>
     </button>
   )
 }
@@ -42,7 +25,7 @@ function MarketCard({ market, isSelected, onSelect }) {
 // BETTING SECTION — Casino Roulette Style!
 // "Drag your chip to place your bet, then lock it in!" — Vegas Baby!
 // ═══════════════════════════════════════════════════════════════════════════
-function BettingSection({ market, onBet, balance = 250, selectedOption, onOptionSelect, onPreviewZone, userAvatar = '/tg/zac.jpg' }) {
+function BettingSection({ market, onBet, balance = 250, selectedOption, onOptionSelect, onPreviewZone, userAvatar = '/tg/zac.jpg', betAmount }) {
   const [amount, setAmount] = useState(10)
   const [isDragging, setIsDragging] = useState(false)
   const [chipPos, setChipPos] = useState({ x: 0, y: 0 })
@@ -275,6 +258,9 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
           <span className="locked-option" style={{ color: market.options?.find(o => o.id === selectedOption)?.color }}>
             {market.options?.find(o => o.id === selectedOption)?.label}
           </span>
+          {betAmount && (
+            <span className="locked-amount">${betAmount}</span>
+          )}
           <button
             className="unlock-bet-btn"
             onClick={() => onOptionSelect?.(null)}
@@ -302,6 +288,8 @@ export default function CombinedSidebar({
   onBetOptionSelect,      // Callback when option selected
   onPreviewZone,          // Callback when chip hovers/placed on zone (preview mode!)
   isFlexLayout = false,   // When true, sidebar is part of flex container (not position:fixed)
+  allBets = {},           // All bets across markets: { [marketId]: { optionId, amount } }
+  currentBetAmount,       // Amount for current market's locked indicator
 }) {
   const [isMobile, setIsMobile] = useState(false)
   const [dragY, setDragY] = useState(0)
@@ -393,6 +381,33 @@ export default function CombinedSidebar({
             </div>
           </div>
 
+          {/* ═══ YOUR BETS — Mobile version! ═══ */}
+          {Object.keys(allBets).length > 0 && (
+            <div className="your-bets-section">
+              <h3 className="your-bets-title">YOUR BETS</h3>
+              <div className="your-bets-list">
+                {Object.entries(allBets).map(([marketId, bet]) => {
+                  const market = markets.find(m => m.id === marketId)
+                  const option = market?.options?.find(o => o.id === bet.optionId)
+                  if (!market || !option) return null
+                  return (
+                    <button
+                      key={marketId}
+                      className={`your-bet-item ${marketId === selectedMarketId ? 'active' : ''}`}
+                      onClick={() => onMarketSelect(marketId)}
+                    >
+                      <span className="your-bet-market">{market.name.slice(0, 25)}{market.name.length > 25 ? '...' : ''}</span>
+                      <div className="your-bet-details">
+                        <span className="your-bet-option" style={{ color: option.color }}>{option.label}</span>
+                        <span className="your-bet-amount">${bet.amount}</span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Betting Section */}
           <BettingSection
             market={selectedMarket}
@@ -401,6 +416,7 @@ export default function CombinedSidebar({
             selectedOption={selectedBetOption}
             onOptionSelect={onBetOptionSelect}
             onPreviewZone={onPreviewZone}
+            betAmount={currentBetAmount}
           />
         </div>
 
@@ -436,6 +452,36 @@ export default function CombinedSidebar({
       {/* Divider */}
       <div className="sidebar-divider" />
 
+      {/* ═══ YOUR BETS — All active bets across markets! ═══ */}
+      {Object.keys(allBets).length > 0 && (
+        <div className="your-bets-section">
+          <h3 className="your-bets-title">YOUR BETS</h3>
+          <div className="your-bets-list">
+            {Object.entries(allBets).map(([marketId, bet]) => {
+              const market = markets.find(m => m.id === marketId)
+              const option = market?.options?.find(o => o.id === bet.optionId)
+              if (!market || !option) return null
+              return (
+                <button
+                  key={marketId}
+                  className={`your-bet-item ${marketId === selectedMarketId ? 'active' : ''}`}
+                  onClick={() => onMarketSelect(marketId)}
+                >
+                  <span className="your-bet-market">{market.name.slice(0, 25)}{market.name.length > 25 ? '...' : ''}</span>
+                  <div className="your-bet-details">
+                    <span className="your-bet-option" style={{ color: option.color }}>{option.label}</span>
+                    <span className="your-bet-amount">${bet.amount}</span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Divider */}
+      {Object.keys(allBets).length > 0 && <div className="sidebar-divider" />}
+
       {/* Betting Section */}
       <BettingSection
         market={selectedMarket}
@@ -444,6 +490,7 @@ export default function CombinedSidebar({
         selectedOption={selectedBetOption}
         onOptionSelect={onBetOptionSelect}
         onPreviewZone={onPreviewZone}
+        betAmount={currentBetAmount}
       />
 
       {/* Footer */}

@@ -2395,6 +2395,7 @@ export default function DanceFloor({
         zoneId: userPrediction.zoneId,
         danceMove: 0,  // Default dance for user
         speech: 'you 👆',  // Mark as the user!
+        isUser: true,  // EPIC SPOTLIGHT GLOW!
       })
     }
 

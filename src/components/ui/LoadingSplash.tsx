@@ -15,34 +15,35 @@ interface LoadingSplashProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PARTY LOGO — Sweet block of animated tiles!
+// PARTY LOGO — Dance Floor Tiles Style!
+// "Same jelly glass tiles from the 3D floor" — Art Director
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Tile colors matching the cyberpunk palette
-const TILE_COLORS = [
-  '#00f0ff', // Cyan
-  '#ff0055', // Hot pink
-  '#8844ff', // Purple
-  '#00ff88', // Green
-  '#ffd700', // Gold
-  '#ff6600', // Orange
-  '#00f0ff', // Cyan
-  '#ff0055', // Hot pink
-  '#8844ff', // Purple
+// CYBERPUNK COLORS — Exact match from DanceFloor.tsx!
+const DANCE_FLOOR_COLORS = [
+  '#00F0FF',  // CYAN — "The Tron Look"
+  '#FF0055',  // HOT PINK — "The Cyberpunk Look"
+  '#BD00FF',  // ELECTRIC PURPLE
+  '#00F0FF',  // CYAN
+  '#FFD700',  // GOLD — Center tile!
+  '#FF0055',  // HOT PINK
+  '#39FF14',  // ACID GREEN
+  '#BD00FF',  // ELECTRIC PURPLE
+  '#00F0FF',  // CYAN
 ]
 
 function PartyLogo() {
   return (
     <div className="party-logo">
-      {/* 3x3 tile grid */}
+      {/* 3x3 jelly tile grid — matches dance floor! */}
       <div className="tile-grid">
-        {TILE_COLORS.map((color, i) => (
+        {DANCE_FLOOR_COLORS.map((color, i) => (
           <div
             key={i}
-            className="logo-tile"
+            className="logo-tile jelly"
             style={{
               '--tile-color': color,
-              animationDelay: `${i * 0.08}s`,
+              animationDelay: `${i * 0.1}s`,
             } as React.CSSProperties}
           />
         ))}
