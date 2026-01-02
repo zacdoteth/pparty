@@ -1,0 +1,1061 @@
+/* ═══════════════════════════════════════════════════════════════
+   PREDICTION PARTY — EXACT PORT from vanilla.html
+   "Neo-Tokyo Underground Nightclub Aesthetic" — Toshiro
+═══════════════════════════════════════════════════════════════ */
+
+/* APP CONTAINER */
+.app {
+  width: 100%;
+  max-width: 500px;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCING LOADER — zac vibing while switching markets!
+   "Even loading screens should be a party" — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 18, 0.92);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: loader-fade-in 0.15s ease-out;
+}
+
+@keyframes loader-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.loading-dancer {
+  position: relative;
+  width: 80px;
+  height: 140px;
+}
+
+.loading-avatar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid #00F0FF;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+  animation: head-bob 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes head-bob {
+  from { transform: translateX(-50%) translateY(0); }
+  to { transform: translateX(-50%) translateY(-5px); }
+}
+
+.loading-body {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 40px;
+  background: linear-gradient(180deg, #00F0FF, #FF00FF);
+  border-radius: 4px;
+  animation: body-twist 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes body-twist {
+  from { transform: translateX(-50%) rotate(-5deg); }
+  to { transform: translateX(-50%) rotate(5deg); }
+}
+
+.loading-arm {
+  position: absolute;
+  top: 52px;
+  width: 6px;
+  height: 35px;
+  background: #00F0FF;
+  border-radius: 3px;
+  transform-origin: top center;
+}
+
+.loading-arm.left {
+  left: 15px;
+  animation: arm-swing-left 0.25s ease-in-out infinite alternate;
+}
+
+.loading-arm.right {
+  right: 15px;
+  animation: arm-swing-right 0.25s ease-in-out infinite alternate;
+}
+
+@keyframes arm-swing-left {
+  from { transform: rotate(-45deg); }
+  to { transform: rotate(45deg); }
+}
+
+@keyframes arm-swing-right {
+  from { transform: rotate(45deg); }
+  to { transform: rotate(-45deg); }
+}
+
+.loading-leg {
+  position: absolute;
+  top: 85px;
+  width: 7px;
+  height: 40px;
+  background: #FF00FF;
+  border-radius: 3px;
+  transform-origin: top center;
+}
+
+.loading-leg.left {
+  left: 28px;
+  animation: leg-kick-left 0.2s ease-in-out infinite alternate;
+}
+
+.loading-leg.right {
+  right: 28px;
+  animation: leg-kick-right 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes leg-kick-left {
+  from { transform: rotate(15deg); }
+  to { transform: rotate(-15deg); }
+}
+
+@keyframes leg-kick-right {
+  from { transform: rotate(-15deg); }
+  to { transform: rotate(15deg); }
+}
+
+.loading-text {
+  margin-top: 30px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 2px;
+  text-transform: lowercase;
+  animation: text-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes text-pulse {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DESKTOP LAYOUT — Sidebar FIXED to LEFT + Expanding Arena
+   "The dance floor expands, but never loses its intimacy" — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  .app {
+    max-width: none; /* No max on container — sidebar is fixed */
+    width: 100%;
+    display: block;
+    margin: 0; /* Stick to left edge */
+  }
+
+  /* SIDEBAR — Fixed to left edge of viewport */
+  .home-screen {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    opacity: 1;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(0, 245, 255, 0.15);
+    background: linear-gradient(180deg, rgba(10, 6, 18, 0.98) 0%, rgba(5, 3, 10, 0.99) 100%);
+    z-index: 100;
+    overflow-x: hidden;
+  }
+
+  /* ARENA WRAPPER — Takes remaining space to the right of sidebar */
+  .arena-screen {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+    margin-left: 260px; /* Account for fixed sidebar */
+    width: calc(100vw - 260px);
+    height: 100vh;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* TIGHT to left edge — no dead space! */
+    padding-left: 16px; /* Just a small breathing room */
+  }
+
+  /* The actual arena content has a max-width */
+  .arena-screen > * {
+    max-width: 1100px; /* MAX WIDTH — keeps it cozy! */
+    width: 100%;
+  }
+  
+  /* ClubRoom can grow bigger */
+  .arena-screen .iso-container {
+    max-width: 1200px;
+  }
+  
+  /* Front stage (draggable user area) */
+  .arena-screen .front-stage {
+    max-width: 1200px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOMEPAGE PARTY VIBES — Real Club Spotlights
+═══════════════════════════════════════════════════════════════ */
+.home-party-vibes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Atmospheric Haze/Fog Layer */
+.home-haze {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(138, 43, 226, 0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 50%, rgba(0, 245, 255, 0.05) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 50%, rgba(255, 0, 128, 0.05) 0%, transparent 50%);
+  animation: haze-pulse 8s ease-in-out infinite;
+}
+
+@keyframes haze-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Stage Spotlight — Dramatic Conic Beams */
+.home-spotlight {
+  position: absolute;
+  top: -10%;
+  width: 200px;
+  height: 140%;
+  transform-origin: 50% 0%;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+}
+
+.home-spotlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 100%;
+  background: inherit;
+  clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+  filter: blur(2px);
+}
+
+.home-spotlight::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  background: inherit;
+  border-radius: 50%;
+  filter: blur(10px);
+  opacity: 0.8;
+}
+
+/* Left Cyan Spotlight */
+.home-spotlight.cyan {
+  left: 5%;
+  background: linear-gradient(180deg,
+    rgba(0, 245, 255, 1) 0%,
+    rgba(0, 245, 255, 0.6) 20%,
+    rgba(0, 245, 255, 0.2) 60%,
+    transparent 100%
+  );
+  animation: spotlight-sweep-left 6s ease-in-out infinite;
+}
+
+.home-spotlight.cyan::before {
+  background: linear-gradient(180deg,
+    rgba(0, 245, 255, 0.9) 0%,
+    rgba(0, 245, 255, 0.4) 40%,
+    rgba(0, 245, 255, 0.1) 70%,
+    transparent 100%
+  );
+  width: 100%;
+}
+
+/* Right Pink Spotlight */
+.home-spotlight.pink {
+  right: 5%;
+  left: auto;
+  background: linear-gradient(180deg,
+    rgba(255, 0, 128, 1) 0%,
+    rgba(255, 0, 128, 0.6) 20%,
+    rgba(255, 0, 128, 0.2) 60%,
+    transparent 100%
+  );
+  animation: spotlight-sweep-right 7s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+.home-spotlight.pink::before {
+  background: linear-gradient(180deg,
+    rgba(255, 0, 128, 0.9) 0%,
+    rgba(255, 0, 128, 0.4) 40%,
+    rgba(255, 0, 128, 0.1) 70%,
+    transparent 100%
+  );
+  width: 100%;
+}
+
+/* Center Purple Spotlight */
+.home-spotlight.purple {
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg,
+    rgba(191, 0, 255, 1) 0%,
+    rgba(191, 0, 255, 0.5) 20%,
+    rgba(191, 0, 255, 0.15) 60%,
+    transparent 100%
+  );
+  animation: spotlight-sweep-center 8s ease-in-out infinite;
+  animation-delay: -4s;
+  opacity: 0.25;
+}
+
+.home-spotlight.purple::before {
+  background: linear-gradient(180deg,
+    rgba(191, 0, 255, 0.8) 0%,
+    rgba(191, 0, 255, 0.3) 40%,
+    rgba(191, 0, 255, 0.1) 70%,
+    transparent 100%
+  );
+  width: 100%;
+}
+
+/* Gold Accent Spotlight */
+.home-spotlight.gold {
+  left: 30%;
+  background: linear-gradient(180deg,
+    rgba(255, 215, 0, 0.9) 0%,
+    rgba(255, 215, 0, 0.4) 20%,
+    rgba(255, 215, 0, 0.1) 60%,
+    transparent 100%
+  );
+  animation: spotlight-sweep-accent 9s ease-in-out infinite;
+  animation-delay: -1s;
+  opacity: 0.2;
+  width: 150px;
+}
+
+.home-spotlight.gold::before {
+  background: linear-gradient(180deg,
+    rgba(255, 215, 0, 0.7) 0%,
+    rgba(255, 215, 0, 0.2) 50%,
+    transparent 100%
+  );
+  width: 100%;
+}
+
+@keyframes spotlight-sweep-left {
+  0%, 100% { transform: rotate(-25deg); opacity: 0.25; }
+  50% { transform: rotate(15deg); opacity: 0.4; }
+}
+
+@keyframes spotlight-sweep-right {
+  0%, 100% { transform: rotate(25deg); opacity: 0.25; }
+  50% { transform: rotate(-15deg); opacity: 0.4; }
+}
+
+@keyframes spotlight-sweep-center {
+  0%, 100% { transform: translateX(-50%) rotate(-8deg); opacity: 0.2; }
+  50% { transform: translateX(-50%) rotate(8deg); opacity: 0.3; }
+}
+
+@keyframes spotlight-sweep-accent {
+  0%, 100% { transform: rotate(-15deg); opacity: 0.15; }
+  30% { transform: rotate(20deg); opacity: 0.25; }
+  70% { transform: rotate(-10deg); opacity: 0.2; }
+}
+
+/* Floor Glow */
+.home-floor-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(0deg,
+    rgba(138, 43, 226, 0.1) 0%,
+    transparent 100%
+  );
+  animation: floor-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes floor-glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* Disco Ball Reflections */
+.home-disco-dots {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.disco-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: disco-dot-float 4s ease-in-out infinite;
+}
+
+.disco-dot:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+.disco-dot:nth-child(2) { left: 25%; top: 45%; animation-delay: -0.5s; }
+.disco-dot:nth-child(3) { left: 45%; top: 15%; animation-delay: -1s; }
+.disco-dot:nth-child(4) { left: 60%; top: 55%; animation-delay: -1.5s; }
+.disco-dot:nth-child(5) { left: 75%; top: 30%; animation-delay: -2s; }
+.disco-dot:nth-child(6) { left: 85%; top: 60%; animation-delay: -2.5s; }
+.disco-dot:nth-child(7) { left: 15%; top: 70%; animation-delay: -3s; }
+.disco-dot:nth-child(8) { left: 55%; top: 75%; animation-delay: -3.5s; }
+
+@keyframes disco-dot-float {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  20% {
+    opacity: 0.8;
+    transform: translate(10px, -15px) scale(1);
+  }
+  40% {
+    opacity: 0.4;
+    transform: translate(25px, -5px) scale(0.8);
+  }
+  60% {
+    opacity: 0.7;
+    transform: translate(15px, 10px) scale(1.1);
+  }
+  80% {
+    opacity: 0.3;
+    transform: translate(5px, 5px) scale(0.6);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR — Market List
+═══════════════════════════════════════════════════════════════ */
+.home-screen {
+  padding: 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: transparent;
+  z-index: 10;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fire-emoji {
+  font-size: 18px;
+}
+
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+.see-all-btn {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4da6ff;
+  background: rgba(77, 166, 255, 0.1);
+  border: 1px solid rgba(77, 166, 255, 0.3);
+  border-radius: 12px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.see-all-btn:hover {
+  background: rgba(77, 166, 255, 0.2);
+  border-color: rgba(77, 166, 255, 0.5);
+}
+
+.market-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   USER BALANCE — Your betting power
+═══════════════════════════════════════════════════════════════ */
+.user-balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  margin: 12px 0;
+  background: linear-gradient(135deg, rgba(0, 245, 255, 0.1) 0%, rgba(255, 215, 0, 0.1) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+}
+
+.balance-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.balance-amount {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FRONT STAGE — DJ Booth + Your Avatar (IN FRONT of the floor!)
+   "You're watching the party, ready to join" — Turntable.fm vibes
+═══════════════════════════════════════════════════════════════ */
+.front-stage {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 60px;
+  padding: 10px 0 10px;
+  margin-top: -280px; /* Pull up AGGRESSIVELY to edge of floor */
+  z-index: 150;
+  min-height: 100px;
+}
+
+/* Reposition DJ booth for front stage */
+.front-stage .iso-dj-booth {
+  position: relative !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: scale(0.8) !important;
+  flex-shrink: 0;
+}
+
+/* Reposition draggable user for front stage — Allow drag transforms! */
+.front-stage .draggable-user {
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MARKET CARD — EXACT PORT from vanilla.html
+═══════════════════════════════════════════════════════════════ */
+.market-card {
+  background: linear-gradient(135deg,
+    rgba(20, 18, 35, 0.95) 0%,
+    rgba(10, 8, 20, 0.98) 100%
+  );
+  border: 1px solid rgba(77, 166, 255, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Rainbow gradient line at top */
+.market-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00F0FF, #FF0055, #bf00ff);
+  opacity: 0.6;
+}
+
+/* Glow effect on hover/select */
+.market-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.market-card:active {
+  transform: scale(0.98);
+  border-color: #00F0FF;
+}
+
+.market-card:active::after {
+  opacity: 1;
+}
+
+.market-card.selected {
+  border-color: #FFD700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3),
+              0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.market-card.selected::before {
+  background: linear-gradient(90deg, #FFD700, #FF8800, #FFD700);
+  opacity: 1;
+}
+
+/* CARD TOP ROW — Question + Badge */
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.market-question {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* PARTY SCORE BADGE */
+.party-score {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.party-score.bullish {
+  background: rgba(0, 212, 106, 0.15);
+  border: 1px solid rgba(0, 212, 106, 0.3);
+  color: #00d46a;
+}
+
+.party-score.bearish {
+  background: rgba(255, 0, 128, 0.15);
+  border: 1px solid rgba(255, 0, 128, 0.3);
+  color: #ff0080;
+}
+
+/* DUAL PROGRESS BARS — Kalshi + Party */
+.card-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.card-score-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-source-label {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 38px;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.card-score-row.kalshi .card-source-label { color: #00d46a; }
+.card-score-row.party .card-source-label { color: #00F0FF; }
+
+.card-progress-bar {
+  flex: 1;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+}
+
+.card-fill-yes {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 6px;
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  /* Bar grow animation on load */
+  animation: bar-grow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+  transform-origin: left center;
+  /* Only round left corners - continuous with NO bar */
+  border-radius: 6px 0 0 6px;
+}
+
+.card-fill-no {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+  position: relative;
+  overflow: hidden;
+  /* Only round right corners - continuous with YES bar */
+  border-radius: 0 6px 6px 0;
+}
+
+/* SHIMMER ANIMATION — The magic sauce! */
+.card-fill-yes::after,
+.card-fill-no::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+.card-fill-no::after {
+  animation-delay: 0.8s;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+@keyframes bar-grow {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+.card-percent {
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+/* Kalshi style — Two shades of green */
+.card-score-row.kalshi .card-fill-yes {
+  background: linear-gradient(90deg, #00d46a, #00b85a);
+}
+.card-score-row.kalshi .card-fill-no {
+  background: linear-gradient(90deg, #008844, #00a854);
+  opacity: 0.5;
+}
+
+/* Party style — Cyan/Pink neon */
+.card-score-row.party .card-fill-yes {
+  background: linear-gradient(90deg, #4da6ff, #00d0e8);
+  box-shadow: 0 0 8px rgba(77, 166, 255, 0.3);
+}
+.card-score-row.party .card-fill-no {
+  background: linear-gradient(90deg, #e8005a, #FF0055);
+}
+
+/* FOOTER — Crowd + Volume */
+.market-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  margin-top: 2px;
+}
+
+.market-crowd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crowd-avatars {
+  display: flex;
+}
+
+.mini-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid rgba(20, 18, 35, 1);
+  margin-left: -8px;
+}
+
+.mini-avatar:first-child {
+  margin-left: 0;
+}
+
+.crowd-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.market-volume {
+  font-size: 12px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.vol-label {
+  font-size: 9px;
+  font-weight: 500;
+  opacity: 0.5;
+  margin-left: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MULTI-ANSWER MARKET CARDS — 3-segment progress bars!
+═══════════════════════════════════════════════════════════════ */
+.market-card.multi-market::before {
+  /* Purple gradient for multi markets */
+  background: linear-gradient(90deg, #00FF88, #4DA6FF, #BF00FF);
+}
+
+.market-card.multi-market.selected::before {
+  background: linear-gradient(90deg, #00FF88, #4DA6FF, #BF00FF);
+  opacity: 1;
+}
+
+/* Leader badge — shows the frontrunner */
+.party-score.leader {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  border: none;
+  font-weight: 800;
+}
+
+/* Multi progress bar — horizontal segments */
+.card-progress-bar.multi {
+  display: flex;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.card-fill-multi {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: bar-grow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+  transform-origin: left center;
+  min-width: 0;
+}
+
+.card-fill-multi:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.card-fill-multi:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+/* Shimmer on multi segments */
+.card-fill-multi::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+.card-fill-multi:nth-child(2)::after { animation-delay: 0.4s; }
+.card-fill-multi:nth-child(3)::after { animation-delay: 0.8s; }
+
+.card-percent-mini {
+  font-size: 7px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+/* Legend — option labels under the bars */
+.multi-legend {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ARENA SCREEN — The Main Stage
+═══════════════════════════════════════════════════════════════ */
+.arena-screen {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: visible;
+  z-index: 5;
+  padding-bottom: 80px; /* Reduced — front-stage now overlaps more */
+}
+
+/* Mobile: Hide sidebar and reset arena */
+@media (max-width: 768px) {
+  .home-screen {
+    display: none !important;
+    position: static !important;
+  }
+
+  .arena-screen {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FLOATING BET BUTTON — Opens drag-to-vote modal!
+   "The most satisfying way to make a prediction" — UX Lead
+═══════════════════════════════════════════════════════════════ */
+.floating-bet-button {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px 12px 12px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px rgba(139, 92, 246, 0.5),
+    0 0 40px rgba(139, 92, 246, 0.3);
+  transition: all 0.2s ease-out;
+  z-index: 100;
+  animation: float-pulse 2s ease-in-out infinite;
+}
+
+@keyframes float-pulse {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+.floating-bet-button:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow:
+    0 6px 30px rgba(139, 92, 246, 0.6),
+    0 0 60px rgba(139, 92, 246, 0.4);
+}
+
+.floating-bet-button:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+.bet-button-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .floating-bet-button {
+    bottom: 16px;
+    padding: 10px 20px 10px 10px;
+    font-size: 0.9rem;
+  }
+
+  .bet-button-avatar {
+    width: 36px;
+    height: 36px;
+  }
+}

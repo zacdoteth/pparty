@@ -1,0 +1,299 @@
+/* BettingModal — Drag to Vote UI */
+
+.betting-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.betting-modal {
+  background: linear-gradient(180deg, #1a1428 0%, #0d0a14 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 32px;
+  width: 90%;
+  max-width: 700px;
+  position: relative;
+  box-shadow:
+    0 0 60px rgba(100, 50, 200, 0.3),
+    0 0 120px rgba(100, 50, 200, 0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.betting-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.betting-modal-header h2 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #888;
+  font-size: 1.8rem;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Options Grid */
+.betting-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.betting-option {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+  transition: all 0.2s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.betting-option::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    var(--option-color, #fff) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.betting-option.hovered {
+  border-color: var(--option-color, #fff);
+  transform: scale(1.05);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--option-color, #fff) 40%, transparent);
+}
+
+.betting-option.hovered::before {
+  opacity: 0.15;
+}
+
+.betting-option.selected {
+  border-color: var(--option-color, #fff);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.betting-option.selected::before {
+  opacity: 0.2;
+}
+
+.option-label {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px currentColor;
+  position: relative;
+  z-index: 1;
+}
+
+.option-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.option-chance {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.selected-indicator {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+.selected-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+}
+
+/* Avatar Dock */
+.avatar-dock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.draggable-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #222;
+  cursor: grab;
+  position: relative;
+  transition: transform 0.1s ease-out, box-shadow 0.2s;
+  user-select: none;
+  touch-action: none;
+  z-index: 100;
+}
+
+.draggable-avatar:hover {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.draggable-avatar.dragging {
+  cursor: grabbing;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+  z-index: 1000;
+}
+
+.draggable-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+}
+
+.avatar-cursor {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: 1.2rem;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.avatar-name {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Instructions */
+.betting-instructions {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
+  margin-top: 8px;
+}
+
+.bet-placed {
+  color: #4ade80;
+}
+
+/* Confirm Button */
+.confirm-bet-btn {
+  display: block;
+  width: 100%;
+  margin-top: 24px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.confirm-bet-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(139, 92, 246, 0.5);
+}
+
+.confirm-bet-btn:active {
+  transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .betting-modal {
+    padding: 20px;
+    margin: 16px;
+    border-radius: 20px;
+  }
+
+  .betting-options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .option-label {
+    font-size: 1.3rem;
+  }
+
+  .option-price {
+    font-size: 1.1rem;
+  }
+
+  .draggable-avatar {
+    width: 60px;
+    height: 60px;
+  }
+}

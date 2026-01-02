@@ -1,0 +1,363 @@
+/* ═══════════════════════════════════════════════════════════════
+   DJ BOOTH — EXACT PORT from vanilla.html
+   "Mr. Game & Watch Style Epic Stick Figure DJ" — Toshiro
+═══════════════════════════════════════════════════════════════ */
+
+.iso-dj-booth {
+  position: absolute;
+  /* DJ booth at FRONT of dance floor — lifted up properly! */
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%) scale(0.85);
+  transform-style: preserve-3d;
+  z-index: 100;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DJ PREDICT — MR. GAME & WATCH STYLE EPIC STICK FIGURE
+═══════════════════════════════════════════════════════════════ */
+.stick-dj {
+  position: absolute;
+  left: 50%;
+  /* BEHIND the booth — DJ stands at the decks! */
+  top: -65px;
+  /* Counter-rotate world tilt ONLY — NO rotateY so DJ faces AWAY from camera (toward crowd) */
+  transform: translateX(-50%) rotateX(-55deg);
+  transform-style: preserve-3d;
+  width: 50px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* GAME & WATCH BOUNCE — Sharp, rhythmic head bob */
+  animation: dj-bounce 0.35s ease-in-out infinite;
+}
+
+@keyframes dj-bounce {
+  0%, 100% { transform: translateX(-50%) rotateX(-55deg) translateY(0); }
+  50% { transform: translateX(-50%) rotateX(-55deg) translateY(-3px); }
+}
+
+/* DJ HEAD — BOLD black circle (Game & Watch style) */
+.stick-dj-head {
+  width: 20px;
+  height: 20px;
+  background: #000;
+  border: 3px solid #FFD700;
+  border-radius: 50%;
+  position: relative;
+  z-index: 3;
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 1),
+    0 0 30px rgba(255, 215, 0, 0.5),
+    inset 0 0 6px rgba(255, 215, 0, 0.3);
+}
+
+/* HEADPHONES — THICK iconic arc over head */
+.stick-dj-headphones {
+  position: absolute;
+  top: -3px;
+  left: -6px;
+  right: -6px;
+  height: 18px;
+  border: 3px solid #FFD700;
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  z-index: 4;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+}
+
+/* Headphone ear cups - BIG & BOLD */
+.stick-dj-headphones::before,
+.stick-dj-headphones::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  width: 8px;
+  height: 10px;
+  background: #FFD700;
+  border-radius: 3px;
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.9),
+    inset 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.stick-dj-headphones::before { left: -3px; }
+.stick-dj-headphones::after { right: -3px; }
+
+/* DJ BODY — THICK bold line (Game & Watch style) */
+.stick-dj-body {
+  width: 4px;
+  height: 18px;
+  background: #000;
+  border: 2px solid #FFD700;
+  margin-top: -2px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.9);
+  border-radius: 2px;
+}
+
+/* DJ ARMS — VISIBLE! Scratching the decks animation */
+.stick-dj-arms {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 12px;
+}
+
+.stick-dj-arms::before,
+.stick-dj-arms::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 4px;
+  background: #000;
+  border: 2px solid #FFD700;
+  top: 0;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  transform-origin: center;
+}
+
+/* Left arm - scratching vinyl */
+.stick-dj-arms::before {
+  left: 0;
+  transform: rotate(-20deg);
+  animation: scratch-left 0.3s ease-in-out infinite alternate;
+}
+
+/* Right arm - on mixer */
+.stick-dj-arms::after {
+  right: 0;
+  transform: rotate(20deg);
+  animation: scratch-right 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes scratch-left {
+  0% { transform: rotate(-20deg) translateX(-2px); }
+  100% { transform: rotate(-15deg) translateX(2px); }
+}
+
+@keyframes scratch-right {
+  0% { transform: rotate(20deg); }
+  100% { transform: rotate(25deg); }
+}
+
+/* DJ LEGS — THICK & BOLD spread stance */
+.stick-dj-legs {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 20px;
+}
+
+.stick-dj-legs::before,
+.stick-dj-legs::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 20px;
+  background: #000;
+  border: 2px solid #FFD700;
+  top: 0;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  border-radius: 2px;
+}
+
+/* Wide DJ stance */
+.stick-dj-legs::before {
+  left: 2px;
+  transform: rotate(-8deg);
+}
+.stick-dj-legs::after {
+  right: 2px;
+  transform: rotate(8deg);
+}
+
+/* DJ Label — BELOW the DJ booth */
+.stick-dj-label {
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  /* No counter-rotation needed — DJ faces crowd */
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #FFD700;
+  text-shadow:
+    0 0 15px #FFD700,
+    0 0 30px rgba(255, 215, 0, 0.8),
+    2px 2px 0 #000;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DJ BOOTH BASE — EPIC MR. GAME & WATCH CONSOLE
+═══════════════════════════════════════════════════════════════ */
+.dj-booth-block {
+  position: relative;
+  width: 130px;
+  height: 50px;
+  transform-style: preserve-3d;
+}
+
+/* TOP FACE — Sleek black console with gold trim */
+.dj-booth-top {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #000 0%, #111 100%);
+  border: 3px solid #FFD700;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 0 20px rgba(255, 215, 0, 0.2),
+    0 0 30px rgba(255, 215, 0, 0.4),
+    0 0 60px rgba(255, 215, 0, 0.2);
+}
+
+/* FRONT-LEFT FACE — Visible in isometric view */
+.dj-booth-front-left {
+  position: absolute;
+  width: 100%;
+  height: 40px;
+  bottom: 0;
+  background: linear-gradient(180deg, #111 0%, #000 100%);
+  transform: rotateX(-90deg);
+  transform-origin: bottom;
+  border-bottom: 3px solid #FFD700;
+  box-shadow: inset 0 -10px 25px rgba(255, 215, 0, 0.15);
+}
+
+/* LED strip on front face — EPIC ANIMATED */
+.dj-booth-front-left::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  right: 10px;
+  height: 5px;
+  background: linear-gradient(90deg, #FF0055, #FFD700, #00F0FF, #FF0055);
+  background-size: 200% 100%;
+  border-radius: 3px;
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.8),
+    0 0 30px rgba(255, 0, 85, 0.5);
+  animation: led-scroll 2s linear infinite;
+}
+
+@keyframes led-scroll {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* FRONT-RIGHT FACE — Side panel */
+.dj-booth-front-right {
+  position: absolute;
+  width: 40px;
+  height: 100%;
+  right: 0;
+  background: linear-gradient(90deg, #111 0%, #000 100%);
+  transform: rotateY(90deg);
+  transform-origin: right;
+  border-right: 2px solid rgba(255, 215, 0, 0.3);
+  box-shadow: inset 8px 0 20px rgba(255, 215, 0, 0.1);
+}
+
+/* DJ Turntables — EPIC SPINNING VINYL */
+.dj-turntables {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 35px;
+  z-index: 2;
+}
+
+.dj-turntable {
+  width: 28px;
+  height: 28px;
+  background: radial-gradient(circle, #333 0%, #000 60%, #222 100%);
+  border-radius: 50%;
+  border: 2px solid #FFD700;
+  box-shadow:
+    inset 0 0 10px rgba(0, 0, 0, 0.9),
+    0 0 15px rgba(255, 215, 0, 0.4);
+  animation: spin-record 1.5s linear infinite;
+  position: relative;
+}
+
+/* Record grooves */
+.dj-turntable::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 50%;
+}
+
+/* Record label — golden center */
+.dj-turntable::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #FFD700, #FF8800);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+}
+
+@keyframes spin-record {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Mixer in center — GAME & WATCH STYLE */
+.dj-mixer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 30px;
+  background: linear-gradient(180deg, #222, #000);
+  border-radius: 3px;
+  border: 2px solid #FFD700;
+  z-index: 1;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.dj-mixer-slider {
+  position: absolute;
+  width: 4px;
+  height: 10px;
+  background: linear-gradient(180deg, #FFD700, #FF8800);
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.7);
+  animation: mixer-slide 0.4s ease-in-out infinite alternate;
+}
+
+.dj-mixer-slider:first-child { top: 4px; }
+.dj-mixer-slider:last-child { bottom: 4px; animation-delay: 0.2s; }
+
+@keyframes mixer-slide {
+  0% { transform: translateX(-50%) translateY(-2px); }
+  100% { transform: translateX(-50%) translateY(2px); }
+}

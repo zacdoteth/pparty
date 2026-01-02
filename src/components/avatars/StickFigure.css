@@ -1,0 +1,1063 @@
+/* ═══════════════════════════════════════════════════════════════
+   STICK FIGURE — EXACT PORT from vanilla.html
+   "A stick figure is not just lines; it is ATTITUDE." — Toshiro
+═══════════════════════════════════════════════════════════════ */
+
+/* Billboard Sprite — Counter-rotate to STAND UP and face camera */
+.iso-avatar {
+  position: absolute;
+  transform-style: preserve-3d;
+  /* MIYAMOTO FIX: Counter-rotate to match 65deg floor tilt! */
+  transform: rotateX(-65deg) translateZ(85px);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* SKY DROP ANIMATION — Characters fall from sky on spawn */
+.iso-avatar.sky-drop {
+  animation: sky-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes sky-drop {
+  0% {
+    transform: rotateX(-65deg) translateZ(85px) translateY(-400px);
+    opacity: 0;
+  }
+  60% {
+    transform: rotateX(-65deg) translateZ(85px) translateY(10px);
+    opacity: 1;
+  }
+  80% {
+    transform: rotateX(-65deg) translateZ(85px) translateY(-5px);
+  }
+  100% {
+    transform: rotateX(-65deg) translateZ(85px) translateY(0);
+  }
+}
+
+/* SQUIRCLE SHADOW — Separate element, stays FLAT on floor */
+.iso-avatar-shadow {
+  position: absolute;
+  width: 32px;
+  height: 14px;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%) translateZ(-85px);
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STICK FIGURE SPRITE — Pure CSS Xiao Xiao Style
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar-sprite {
+  width: 50px;
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-top: -45px;
+}
+
+/* STICK FIGURE HEAD — MR. GAME & WATCH STYLE */
+.stick-head {
+  width: 34px;
+  height: 34px;
+  background: #000;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 0 15px rgba(255,255,255,0.5);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* AVATAR PHOTO — Circular crop inside the head */
+.avatar-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* STICK FIGURE BODY — Thin neon line, EXTENDS to meet legs! */
+.stick-body {
+  width: 4px;
+  height: 34px;  /* EXTENDED to overlap with legs at hip joint */
+  background: #fff;
+  margin-top: -2px;
+  position: relative;
+  z-index: 2;
+  border-radius: 2px;
+}
+
+/* STICK ARMS — Thin neon line */
+.stick-arms {
+  position: absolute;
+  top: 38px;  /* Just below head (34px) + small offset */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: #fff;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* STICK LEGS — V-shape CONNECTED at crotch like a REAL stick figure!
+   "The hip is where body meets soul" — Miyamoto */
+.stick-legs {
+  position: absolute;
+  /* OVERLAP with body by 2px for seamless hip connection */
+  top: 63px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 28px;
+}
+
+.stick-legs .leg-left,
+.stick-legs .leg-right {
+  position: absolute;
+  width: 4px;
+  height: 26px;
+  background: #fff;
+  /* BOTH legs start from CENTER TOP — THE HIP JOINT! */
+  top: 0;
+  left: 50%;
+  border-radius: 2px;
+  /* Transform origin at TOP CENTER so they pivot from hip */
+  transform-origin: 50% 0;
+}
+
+.stick-legs .leg-left {
+  /* Rotate outward from center — PERFECT V-SHAPE */
+  transform: translateX(-2px) rotate(-15deg);
+}
+
+.stick-legs .leg-right {
+  /* Rotate outward from center — MIRROR */
+  transform: translateX(-2px) rotate(15deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPEECH BUBBLE — PORTAL VERSION (OUTSIDE 3D CONTEXT!)
+   The bubble is rendered via React Portal to escape perspective distortion!
+   "Finally, FLAT bubbles that stand STRAIGHT UP!" — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+
+/* Legacy vote-bubble (hidden, kept for fallback) */
+.vote-bubble {
+  display: none;
+}
+
+/* Portal-based speech bubble — PERFECTLY FLAT! */
+.vote-bubble-portal {
+  position: absolute;
+  transform: translateX(-50%) translateY(-100%);
+  /* Styling — crisp and readable */
+  padding: 6px 12px;
+  background: #fff;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.5),
+    0 0 0 2px rgba(255, 255, 255, 0.95),
+    0 0 20px rgba(255, 255, 255, 0.3);
+  opacity: 0;
+  animation: speech-pop-portal 8s ease-in-out infinite;
+  animation-delay: var(--speech-delay, 0s);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Speech bubble tail */
+.vote-bubble-portal::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #fff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.bubble-username {
+  font-weight: 700;
+}
+
+@keyframes speech-pop-portal {
+  0%, 85%, 100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%) translateY(10px) scale(0.85);
+  }
+  8%, 75% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-100%) translateY(0) scale(1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STICK FIGURE STATES — Neon Glow Lines
+═══════════════════════════════════════════════════════════════ */
+
+/* YES BET STATE — PURE CYAN NEON! */
+.iso-avatar.bet-yes .stick-head {
+  border-color: #00F0FF;
+  box-shadow: 0 0 20px #00F0FF, 0 0 40px rgba(0, 240, 255, 0.8);
+}
+.iso-avatar.bet-yes .stick-body,
+.iso-avatar.bet-yes .stick-arms,
+.iso-avatar.bet-yes .stick-legs .leg-left,
+.iso-avatar.bet-yes .stick-legs .leg-right {
+  background: #00F0FF;
+  box-shadow: 0 0 12px #00F0FF, 0 0 25px rgba(0, 240, 255, 0.8);
+}
+
+/* NO BET STATE — PURE PINK NEON! */
+.iso-avatar.bet-no .stick-head {
+  border-color: #FF0055;
+  box-shadow: 0 0 20px #FF0055, 0 0 40px rgba(255, 0, 85, 0.8);
+}
+.iso-avatar.bet-no .stick-body,
+.iso-avatar.bet-no .stick-arms,
+.iso-avatar.bet-no .stick-legs .leg-left,
+.iso-avatar.bet-no .stick-legs .leg-right {
+  background: #FF0055;
+  box-shadow: 0 0 12px #FF0055, 0 0 25px rgba(255, 0, 85, 0.8);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MULTI-ZONE STATES — Zone1 Green, Zone2 Blue, Zone3 Purple
+═══════════════════════════════════════════════════════════════ */
+
+/* ZONE 1 — EMERALD GREEN with dark outline for contrast! */
+.iso-avatar.bet-zone1 .stick-head {
+  border-color: #00FF88;
+  box-shadow: 0 0 20px #00FF88, 0 0 40px rgba(0, 255, 136, 0.8);
+}
+.iso-avatar.bet-zone1 .stick-body,
+.iso-avatar.bet-zone1 .stick-arms,
+.iso-avatar.bet-zone1 .stick-legs .leg-left,
+.iso-avatar.bet-zone1 .stick-legs .leg-right {
+  background: #00FF88;
+  box-shadow: 0 0 12px #00FF88, 0 0 25px rgba(0, 255, 136, 0.8);
+  /* Dark outline for visibility on green tiles */
+  outline: 2px solid rgba(0, 50, 30, 0.8);
+  outline-offset: -1px;
+}
+
+/* ZONE 2 — SAPPHIRE BLUE with dark outline for contrast! */
+.iso-avatar.bet-zone2 .stick-head {
+  border-color: #4DA6FF;
+  box-shadow: 0 0 20px #4DA6FF, 0 0 40px rgba(77, 166, 255, 0.8);
+}
+.iso-avatar.bet-zone2 .stick-body,
+.iso-avatar.bet-zone2 .stick-arms,
+.iso-avatar.bet-zone2 .stick-legs .leg-left,
+.iso-avatar.bet-zone2 .stick-legs .leg-right {
+  background: #4DA6FF;
+  box-shadow: 0 0 12px #4DA6FF, 0 0 25px rgba(77, 166, 255, 0.8);
+  /* Dark outline for visibility on blue tiles */
+  outline: 2px solid rgba(0, 30, 80, 0.8);
+  outline-offset: -1px;
+}
+
+/* ZONE 3 — AMETHYST PURPLE with dark outline for contrast! */
+.iso-avatar.bet-zone3 .stick-head {
+  border-color: #BF00FF;
+  box-shadow: 0 0 20px #BF00FF, 0 0 40px rgba(191, 0, 255, 0.8);
+}
+.iso-avatar.bet-zone3 .stick-body,
+.iso-avatar.bet-zone3 .stick-arms,
+.iso-avatar.bet-zone3 .stick-legs .leg-left,
+.iso-avatar.bet-zone3 .stick-legs .leg-right {
+  background: #BF00FF;
+  box-shadow: 0 0 12px #BF00FF, 0 0 25px rgba(191, 0, 255, 0.8);
+  /* Dark outline for visibility on purple tiles */
+  outline: 2px solid rgba(50, 0, 60, 0.8);
+  outline-offset: -1px;
+}
+
+/* ADD DARK OUTLINES to YES/NO for better contrast too */
+.iso-avatar.bet-yes .stick-body,
+.iso-avatar.bet-yes .stick-arms,
+.iso-avatar.bet-yes .stick-legs .leg-left,
+.iso-avatar.bet-yes .stick-legs .leg-right {
+  outline: 2px solid rgba(0, 50, 60, 0.8);
+  outline-offset: -1px;
+}
+
+.iso-avatar.bet-no .stick-body,
+.iso-avatar.bet-no .stick-arms,
+.iso-avatar.bet-no .stick-legs .leg-left,
+.iso-avatar.bet-no .stick-legs .leg-right {
+  outline: 2px solid rgba(60, 0, 20, 0.8);
+  outline-offset: -1px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FIGHTING STANCE — Default High-Energy Idle
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar .stick-body {
+  animation: stance-body 1.5s ease-in-out infinite;
+}
+@keyframes stance-body {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+.iso-avatar .stick-arms {
+  animation: stance-arms 1.2s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes stance-arms {
+  0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+  50% { transform: translateX(-50%) rotate(5deg); }
+}
+
+.iso-avatar .stick-legs .leg-left {
+  animation: stance-leg-l 1.3s ease-in-out infinite;
+}
+.iso-avatar .stick-legs .leg-right {
+  animation: stance-leg-r 1.3s ease-in-out infinite;
+}
+@keyframes stance-leg-l {
+  0%, 100% { transform: rotate(-15deg) translateY(0); }
+  50% { transform: rotate(-10deg) translateY(-1px); }
+}
+@keyframes stance-leg-r {
+  0%, 100% { transform: rotate(15deg) translateY(0); }
+  50% { transform: rotate(10deg) translateY(-1px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 1: THE BOUNCE — Classic Jump!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-bounce {
+  animation: dance-bounce 0.9s ease-in-out infinite;
+}
+@keyframes dance-bounce {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0) scale(1); }
+  50% { transform: rotateX(-65deg) translateZ(85px) translateY(-12px) scale(1.03); }
+}
+.iso-avatar.dance-bounce .stick-arms {
+  animation: bounce-arms 0.9s ease-in-out infinite;
+}
+@keyframes bounce-arms {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); width: 32px; }
+  50% { transform: translateX(-50%) rotate(-20deg); width: 38px; }
+}
+.iso-avatar.dance-bounce .stick-legs .leg-left { animation: bounce-leg-l 0.9s ease-in-out infinite; }
+.iso-avatar.dance-bounce .stick-legs .leg-right { animation: bounce-leg-r 0.9s ease-in-out infinite; }
+@keyframes bounce-leg-l {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(-20deg) translateY(-3px); }
+}
+@keyframes bounce-leg-r {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(20deg) translateY(-3px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 2: THE FLOSS — Fortnite Classic!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-floss {
+  animation: dance-floss 1.2s ease-in-out infinite;
+}
+@keyframes dance-floss {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateX(-6px); }
+  50% { transform: rotateX(-65deg) translateZ(85px) translateX(6px); }
+}
+.iso-avatar.dance-floss .stick-arms {
+  animation: floss-arms 0.6s ease-in-out infinite;
+}
+@keyframes floss-arms {
+  0%, 100% { transform: translateX(-50%) rotate(-35deg) scaleX(1.3); }
+  50% { transform: translateX(-50%) rotate(35deg) scaleX(1.3); }
+}
+.iso-avatar.dance-floss .stick-body {
+  animation: floss-hips 0.6s ease-in-out infinite;
+}
+@keyframes floss-hips {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 3: THE ROBOT — Mechanical Precision!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-robot {
+  animation: dance-robot 2s steps(4) infinite;
+}
+@keyframes dance-robot {
+  0%, 25% { transform: rotateX(-65deg) translateZ(85px) rotate(0deg); }
+  25%, 50% { transform: rotateX(-65deg) translateZ(85px) rotate(10deg) translateY(-4px); }
+  50%, 75% { transform: rotateX(-65deg) translateZ(85px) rotate(-10deg) translateY(-4px); }
+  75%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(0deg); }
+}
+.iso-avatar.dance-robot .stick-arms {
+  animation: robot-arms 2s steps(4) infinite;
+}
+@keyframes robot-arms {
+  0%, 25% { transform: translateX(-50%) rotate(60deg); }
+  25%, 50% { transform: translateX(-50%) rotate(0deg); }
+  50%, 75% { transform: translateX(-50%) rotate(-60deg); }
+  75%, 100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 4: THE WAVE — Smooth Body Roll!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-wave {
+  animation: dance-wave 2.5s ease-in-out infinite;
+}
+@keyframes dance-wave {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0) scaleY(1); }
+  25% { transform: rotateX(-65deg) translateZ(85px) translateY(-6px) scaleY(1.05); }
+  50% { transform: rotateX(-65deg) translateZ(85px) translateY(0) scaleY(0.97); }
+  75% { transform: rotateX(-65deg) translateZ(85px) translateY(3px) scaleY(1.02); }
+}
+.iso-avatar.dance-wave .stick-arms {
+  animation: wave-arms 2.5s ease-in-out infinite;
+}
+@keyframes wave-arms {
+  0%, 100% { transform: translateX(-50%) rotate(0deg) translateY(0); }
+  25% { transform: translateX(-50%) rotate(20deg) translateY(-6px); }
+  50% { transform: translateX(-50%) rotate(0deg) translateY(0); }
+  75% { transform: translateX(-50%) rotate(-20deg) translateY(3px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 5: JUMPING JACKS — High Energy!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-jumpjack {
+  animation: dance-jumpjack 1s ease-in-out infinite;
+}
+@keyframes dance-jumpjack {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0); }
+  50% { transform: rotateX(-55deg) translateZ(88px) translateY(-12px); }
+}
+.iso-avatar.dance-jumpjack .stick-arms {
+  animation: jumpjack-arms 1s ease-in-out infinite;
+}
+@keyframes jumpjack-arms {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); width: 32px; }
+  50% { transform: translateX(-50%) rotate(-60deg); width: 44px; }
+}
+.iso-avatar.dance-jumpjack .stick-legs .leg-left { animation: jumpjack-leg-l 1s ease-in-out infinite; }
+.iso-avatar.dance-jumpjack .stick-legs .leg-right { animation: jumpjack-leg-r 1s ease-in-out infinite; }
+@keyframes jumpjack-leg-l {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(-30deg); }
+}
+@keyframes jumpjack-leg-r {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(30deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 6: HEADBANG — Rock On!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-headbang {
+  animation: dance-headbang 0.6s ease-in-out infinite;
+}
+@keyframes dance-headbang {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(0deg); }
+  50% { transform: rotateX(-65deg) translateZ(85px) rotate(8deg) translateY(4px); }
+}
+.iso-avatar.dance-headbang .stick-head {
+  animation: headbang-head 0.6s ease-in-out infinite;
+}
+@keyframes headbang-head {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px) scale(0.97); }
+}
+.iso-avatar.dance-headbang .stick-arms {
+  animation: headbang-arms 1.2s ease-in-out infinite;
+}
+@keyframes headbang-arms {
+  0%, 100% { transform: translateX(-50%) rotate(20deg); }
+  50% { transform: translateX(-50%) rotate(-20deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 7: DISCO POINT — Saturday Night Fever!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-disco {
+  animation: dance-disco 1.8s ease-in-out infinite;
+}
+@keyframes dance-disco {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(-3deg); }
+  25% { transform: rotateX(-55deg) translateZ(88px) translateY(-8px) rotate(3deg); }
+  50% { transform: rotateX(-65deg) translateZ(85px) rotate(-3deg); }
+  75% { transform: rotateX(-55deg) translateZ(88px) translateY(-8px) rotate(3deg); }
+}
+.iso-avatar.dance-disco .stick-arms {
+  animation: disco-arms 1.8s ease-in-out infinite;
+}
+@keyframes disco-arms {
+  0%, 50% { transform: translateX(-50%) rotate(-45deg) scaleX(1.2); }
+  25% { transform: translateX(-35%) rotate(45deg) scaleX(1.2); }
+  75% { transform: translateX(-65%) rotate(45deg) scaleX(1.2); }
+  100% { transform: translateX(-50%) rotate(-45deg) scaleX(1.2); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 8: RUNNING MAN — Classic Hip Hop!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-runman {
+  animation: dance-runman 0.8s ease-in-out infinite;
+}
+@keyframes dance-runman {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0); }
+  50% { transform: rotateX(-65deg) translateZ(85px) translateY(-6px); }
+}
+.iso-avatar.dance-runman .stick-legs .leg-left { animation: runman-leg-l 0.8s ease-in-out infinite; }
+.iso-avatar.dance-runman .stick-legs .leg-right { animation: runman-leg-r 0.8s ease-in-out infinite; }
+@keyframes runman-leg-l {
+  0%, 100% { transform: rotate(-25deg) translateY(0); height: 22px; }
+  50% { transform: rotate(15deg) translateY(-6px); height: 18px; }
+}
+@keyframes runman-leg-r {
+  0%, 100% { transform: rotate(15deg) translateY(-6px); height: 18px; }
+  50% { transform: rotate(-25deg) translateY(0); height: 22px; }
+}
+.iso-avatar.dance-runman .stick-arms {
+  animation: runman-arms 0.8s ease-in-out infinite;
+}
+@keyframes runman-arms {
+  0%, 100% { transform: translateX(-50%) rotate(15deg); }
+  50% { transform: translateX(-50%) rotate(-15deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 9: THE DAB — Iconic Move!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-dab {
+  animation: dance-dab 2.5s ease-in-out infinite;
+}
+@keyframes dance-dab {
+  0%, 70%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(0deg); }
+  35% { transform: rotateX(-55deg) translateZ(88px) rotate(-18deg) translateY(-4px); }
+}
+.iso-avatar.dance-dab .stick-arms {
+  animation: dab-arms 2.5s ease-in-out infinite;
+}
+@keyframes dab-arms {
+  0%, 70%, 100% { transform: translateX(-50%) rotate(0deg); width: 32px; }
+  35% { transform: translateX(-35%) rotate(-50deg) scaleX(1.5); width: 42px; }
+}
+.iso-avatar.dance-dab .stick-head {
+  animation: dab-head 2.5s ease-in-out infinite;
+}
+@keyframes dab-head {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(-20deg) translateX(-3px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 10: THE TWIST — Classic 60s!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-twist {
+  animation: dance-twist 1.6s ease-in-out infinite;
+}
+@keyframes dance-twist {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(-10deg) translateY(0); }
+  50% { transform: rotateX(-65deg) translateZ(85px) rotate(10deg) translateY(-4px); }
+}
+.iso-avatar.dance-twist .stick-body {
+  animation: twist-body 0.8s ease-in-out infinite;
+}
+@keyframes twist-body {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+.iso-avatar.dance-twist .stick-arms {
+  animation: twist-arms 0.8s ease-in-out infinite;
+}
+@keyframes twist-arms {
+  0%, 100% { transform: translateX(-50%) rotate(15deg); }
+  50% { transform: translateX(-50%) rotate(-15deg); }
+}
+.iso-avatar.dance-twist .stick-legs .leg-left,
+.iso-avatar.dance-twist .stick-legs .leg-right {
+  animation: twist-legs 0.4s ease-in-out infinite;
+}
+@keyframes twist-legs {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(12deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 11: THE SHUFFLE — Melbourne Shuffle!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-shuffle {
+  animation: dance-shuffle 1.2s ease-in-out infinite;
+}
+@keyframes dance-shuffle {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateX(0); }
+  25% { transform: rotateX(-55deg) translateZ(87px) translateX(-5px) translateY(-2px); }
+  50% { transform: rotateX(-65deg) translateZ(85px) translateX(0); }
+  75% { transform: rotateX(-55deg) translateZ(87px) translateX(5px) translateY(-2px); }
+}
+.iso-avatar.dance-shuffle .stick-legs .leg-left {
+  animation: shuffle-leg-l 0.6s ease-in-out infinite;
+}
+.iso-avatar.dance-shuffle .stick-legs .leg-right {
+  animation: shuffle-leg-r 0.6s ease-in-out infinite;
+}
+@keyframes shuffle-leg-l {
+  0%, 100% { transform: rotate(-22deg) translateY(0); }
+  50% { transform: rotate(10deg) translateY(-5px); }
+}
+@keyframes shuffle-leg-r {
+  0%, 100% { transform: rotate(10deg) translateY(-5px); }
+  50% { transform: rotate(-22deg) translateY(0); }
+}
+.iso-avatar.dance-shuffle .stick-arms {
+  animation: shuffle-arms 1.2s ease-in-out infinite;
+}
+@keyframes shuffle-arms {
+  0%, 50%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(12deg) translateY(-2px); }
+  75% { transform: translateX(-50%) rotate(-12deg) translateY(-2px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 12: ORANGE JUSTICE — The Fortnite Classic!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-orange {
+  animation: dance-orange 1s ease-in-out infinite;
+}
+@keyframes dance-orange {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(-3deg); }
+  50% { transform: rotateX(-55deg) translateZ(88px) rotate(3deg) translateY(-6px); }
+}
+.iso-avatar.dance-orange .stick-body {
+  animation: orange-body 0.5s ease-in-out infinite;
+}
+@keyframes orange-body {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+.iso-avatar.dance-orange .stick-arms {
+  animation: orange-arms 0.5s ease-in-out infinite;
+}
+@keyframes orange-arms {
+  0%, 100% { transform: translateX(-35%) rotate(-30deg) scaleX(1.1); }
+  50% { transform: translateX(-65%) rotate(30deg) scaleX(1.1); }
+}
+.iso-avatar.dance-orange .stick-legs .leg-left {
+  animation: orange-leg-l 0.5s ease-in-out infinite;
+}
+.iso-avatar.dance-orange .stick-legs .leg-right {
+  animation: orange-leg-r 0.5s ease-in-out infinite;
+}
+@keyframes orange-leg-l {
+  0%, 100% { transform: translateX(-2px) rotate(-15deg); }
+  50% { transform: translateX(-2px) rotate(20deg) translateY(-3px); }
+}
+@keyframes orange-leg-r {
+  0%, 100% { transform: translateX(-2px) rotate(20deg) translateY(-3px); }
+  50% { transform: translateX(-2px) rotate(-15deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 13: WACKY WAVING INFLATABLE ARM FLAILING TUBE MAN!!!
+   "WACKY WAVING INFLATABLE ARM FLAILING TUBE MAN!" — Al Harrington
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-wacky {
+  animation: dance-wacky 0.6s ease-in-out infinite;
+}
+@keyframes dance-wacky {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) scaleY(1) rotate(0deg); }
+  25% { transform: rotateX(-55deg) translateZ(90px) scaleY(1.15) rotate(-5deg) translateY(-8px); }
+  50% { transform: rotateX(-65deg) translateZ(85px) scaleY(0.9) rotate(5deg); }
+  75% { transform: rotateX(-55deg) translateZ(90px) scaleY(1.1) rotate(-3deg) translateY(-5px); }
+}
+.iso-avatar.dance-wacky .stick-arms {
+  animation: wacky-arms 0.3s ease-in-out infinite;
+}
+@keyframes wacky-arms {
+  0% { transform: translateX(-50%) rotate(-80deg) scaleX(1.4); width: 50px; }
+  25% { transform: translateX(-50%) rotate(80deg) scaleX(1.3); width: 48px; }
+  50% { transform: translateX(-50%) rotate(-70deg) scaleX(1.5); width: 52px; }
+  75% { transform: translateX(-50%) rotate(60deg) scaleX(1.2); width: 46px; }
+  100% { transform: translateX(-50%) rotate(-80deg) scaleX(1.4); width: 50px; }
+}
+.iso-avatar.dance-wacky .stick-body {
+  animation: wacky-body 0.6s ease-in-out infinite;
+}
+@keyframes wacky-body {
+  0%, 100% { transform: scaleY(1) rotate(0deg); }
+  25% { transform: scaleY(1.2) rotate(-8deg); }
+  50% { transform: scaleY(0.8) rotate(8deg); }
+  75% { transform: scaleY(1.1) rotate(-5deg); }
+}
+.iso-avatar.dance-wacky .stick-legs .leg-left,
+.iso-avatar.dance-wacky .stick-legs .leg-right {
+  animation: wacky-legs 0.3s ease-in-out infinite alternate;
+}
+@keyframes wacky-legs {
+  0% { transform: translateX(-2px) rotate(-25deg) scaleY(0.9); }
+  100% { transform: translateX(-2px) rotate(25deg) scaleY(1.1); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 14: THE SWAY — Chill vibes, smooth waves
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-sway {
+  animation: dance-sway 2s ease-in-out infinite;
+}
+@keyframes dance-sway {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(-8deg) translateX(-3px); }
+  50% { transform: rotateX(-65deg) translateZ(85px) rotate(8deg) translateX(3px); }
+}
+.iso-avatar.dance-sway .stick-arms {
+  animation: sway-arms 2s ease-in-out infinite;
+}
+@keyframes sway-arms {
+  0%, 100% { transform: translateX(-50%) rotate(15deg); }
+  50% { transform: translateX(-50%) rotate(-15deg); }
+}
+.iso-avatar.dance-sway .stick-body {
+  animation: sway-body 2s ease-in-out infinite;
+}
+@keyframes sway-body {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 15: THE TWERK — Booty shake time!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-twerk {
+  animation: dance-twerk 0.4s ease-in-out infinite;
+}
+@keyframes dance-twerk {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0) rotate(-2deg); }
+  50% { transform: rotateX(-55deg) translateZ(87px) translateY(-3px) rotate(2deg); }
+}
+.iso-avatar.dance-twerk .stick-body {
+  animation: twerk-body 0.2s ease-in-out infinite;
+}
+@keyframes twerk-body {
+  0%, 100% { transform: rotate(-10deg) scaleY(0.95); }
+  50% { transform: rotate(10deg) scaleY(1.05); }
+}
+.iso-avatar.dance-twerk .stick-arms {
+  animation: twerk-arms 0.4s ease-in-out infinite;
+}
+@keyframes twerk-arms {
+  0%, 100% { transform: translateX(-50%) rotate(-20deg) translateY(5px); }
+  50% { transform: translateX(-50%) rotate(20deg) translateY(-5px); }
+}
+.iso-avatar.dance-twerk .stick-legs .leg-left { animation: twerk-leg-l 0.2s ease-in-out infinite; }
+.iso-avatar.dance-twerk .stick-legs .leg-right { animation: twerk-leg-r 0.2s ease-in-out infinite; }
+@keyframes twerk-leg-l {
+  0%, 100% { transform: translateX(-2px) rotate(-8deg) translateY(2px); }
+  50% { transform: translateX(-2px) rotate(-20deg) translateY(-2px); }
+}
+@keyframes twerk-leg-r {
+  0%, 100% { transform: translateX(-2px) rotate(8deg) translateY(-2px); }
+  50% { transform: translateX(-2px) rotate(20deg) translateY(2px); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 16: THE CARTWHEEL — Spinning celebration!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-cartwheel {
+  animation: dance-cartwheel 2s ease-in-out infinite;
+}
+@keyframes dance-cartwheel {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) rotate(0deg) translateY(0); }
+  15% { transform: rotateX(-55deg) translateZ(88px) rotate(-15deg) translateY(-5px); }
+  30% { transform: rotateX(-55deg) translateZ(92px) rotate(-180deg) translateY(-15px) scale(0.9); }
+  45% { transform: rotateX(-55deg) translateZ(88px) rotate(-270deg) translateY(-5px); }
+  60% { transform: rotateX(-65deg) translateZ(85px) rotate(-360deg) translateY(0); }
+  70%, 85% { transform: rotateX(-65deg) translateZ(85px) rotate(-360deg) translateY(0); }
+}
+.iso-avatar.dance-cartwheel .stick-arms {
+  animation: cartwheel-arms 2s ease-in-out infinite;
+}
+@keyframes cartwheel-arms {
+  0%, 60%, 100% { transform: translateX(-50%) rotate(0deg); width: 40px; }
+  15% { transform: translateX(-50%) rotate(-45deg); width: 50px; }
+  30% { transform: translateX(-50%) rotate(-90deg); width: 55px; }
+  45% { transform: translateX(-50%) rotate(-45deg); width: 50px; }
+}
+.iso-avatar.dance-cartwheel .stick-legs .leg-left,
+.iso-avatar.dance-cartwheel .stick-legs .leg-right {
+  animation: cartwheel-legs 2s ease-in-out infinite;
+}
+@keyframes cartwheel-legs {
+  0%, 60%, 100% { transform: translateX(-2px) rotate(var(--leg-angle, 15deg)); }
+  30% { transform: translateX(-2px) rotate(calc(var(--leg-angle, 15deg) + 90deg)); }
+}
+.iso-avatar.dance-cartwheel .stick-legs .leg-left { --leg-angle: -15deg; }
+.iso-avatar.dance-cartwheel .stick-legs .leg-right { --leg-angle: 15deg; }
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 17: THE SHOTGUN — Fortnite Hype Classic!
+   "Pull back, shoot forward!" — Epic Games
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-shotgun {
+  animation: dance-shotgun 0.8s ease-in-out infinite;
+}
+@keyframes dance-shotgun {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0) rotate(0deg); }
+  25% { transform: rotateX(-55deg) translateZ(90px) translateY(-15px) rotate(-5deg); }
+  50% { transform: rotateX(-65deg) translateZ(85px) translateY(0) rotate(5deg); }
+  75% { transform: rotateX(-55deg) translateZ(90px) translateY(-15px) rotate(-5deg); }
+}
+.iso-avatar.dance-shotgun .stick-arms {
+  animation: shotgun-arms 0.4s ease-in-out infinite;
+}
+@keyframes shotgun-arms {
+  0%, 100% { transform: translateX(-30%) rotate(-60deg) scaleX(1.4); width: 50px; }
+  50% { transform: translateX(-70%) rotate(60deg) scaleX(1.4); width: 50px; }
+}
+.iso-avatar.dance-shotgun .stick-body {
+  animation: shotgun-body 0.4s ease-in-out infinite;
+}
+@keyframes shotgun-body {
+  0%, 100% { transform: rotate(-12deg); }
+  50% { transform: rotate(12deg); }
+}
+.iso-avatar.dance-shotgun .stick-legs .leg-left { animation: shotgun-leg-l 0.4s ease-in-out infinite; }
+.iso-avatar.dance-shotgun .stick-legs .leg-right { animation: shotgun-leg-r 0.4s ease-in-out infinite; }
+@keyframes shotgun-leg-l {
+  0%, 100% { transform: translateX(-2px) rotate(-30deg); }
+  50% { transform: translateX(-2px) rotate(20deg) translateY(-5px); }
+}
+@keyframes shotgun-leg-r {
+  0%, 100% { transform: translateX(-2px) rotate(20deg) translateY(-5px); }
+  50% { transform: translateX(-2px) rotate(-30deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 18: THE TAKE THE L — Victory taunt!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-takel {
+  animation: dance-takel 1s ease-in-out infinite;
+}
+@keyframes dance-takel {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0); }
+  25%, 75% { transform: rotateX(-55deg) translateZ(87px) translateY(-8px); }
+  50% { transform: rotateX(-65deg) translateZ(85px) translateY(0); }
+}
+.iso-avatar.dance-takel .stick-arms {
+  animation: takel-arms 0.5s ease-in-out infinite;
+}
+@keyframes takel-arms {
+  0%, 100% { transform: translateX(-30%) rotate(-90deg) scaleX(1.3); }
+  50% { transform: translateX(-70%) rotate(-90deg) scaleX(1.3); }
+}
+.iso-avatar.dance-takel .stick-legs .leg-left { animation: takel-leg-l 0.5s ease-in-out infinite; }
+.iso-avatar.dance-takel .stick-legs .leg-right { animation: takel-leg-r 0.5s ease-in-out infinite; }
+@keyframes takel-leg-l {
+  0%, 100% { transform: translateX(-2px) rotate(-20deg); }
+  50% { transform: translateX(-2px) rotate(15deg) translateY(-4px); }
+}
+@keyframes takel-leg-r {
+  0%, 100% { transform: translateX(-2px) rotate(15deg) translateY(-4px); }
+  50% { transform: translateX(-2px) rotate(-20deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 19: THE ELECTRO SHUFFLE — High energy EDM!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-electro {
+  animation: dance-electro 0.6s ease-in-out infinite;
+}
+@keyframes dance-electro {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateX(-8px) rotate(-8deg); }
+  50% { transform: rotateX(-55deg) translateZ(90px) translateX(8px) translateY(-10px) rotate(8deg); }
+}
+.iso-avatar.dance-electro .stick-arms {
+  animation: electro-arms 0.3s linear infinite;
+}
+@keyframes electro-arms {
+  0% { transform: translateX(-50%) rotate(-60deg) scaleX(1.3); }
+  25% { transform: translateX(-50%) rotate(0deg) scaleX(1.1); }
+  50% { transform: translateX(-50%) rotate(60deg) scaleX(1.3); }
+  75% { transform: translateX(-50%) rotate(0deg) scaleX(1.1); }
+  100% { transform: translateX(-50%) rotate(-60deg) scaleX(1.3); }
+}
+.iso-avatar.dance-electro .stick-legs .leg-left { animation: electro-leg-l 0.3s ease-in-out infinite; }
+.iso-avatar.dance-electro .stick-legs .leg-right { animation: electro-leg-r 0.3s ease-in-out infinite; }
+@keyframes electro-leg-l {
+  0%, 100% { transform: translateX(-2px) rotate(-35deg) translateY(0); }
+  50% { transform: translateX(-2px) rotate(25deg) translateY(-8px); }
+}
+@keyframes electro-leg-r {
+  0%, 100% { transform: translateX(-2px) rotate(25deg) translateY(-8px); }
+  50% { transform: translateX(-2px) rotate(-35deg) translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCE 20: THE HYPE — Ultimate celebration!
+═══════════════════════════════════════════════════════════════ */
+.iso-avatar.dance-hype {
+  animation: dance-hype 0.5s ease-in-out infinite;
+}
+@keyframes dance-hype {
+  0%, 100% { transform: rotateX(-65deg) translateZ(85px) translateY(0) scale(1); }
+  50% { transform: rotateX(-55deg) translateZ(95px) translateY(-20px) scale(1.05); }
+}
+.iso-avatar.dance-hype .stick-arms {
+  animation: hype-arms 0.25s ease-in-out infinite;
+}
+@keyframes hype-arms {
+  0%, 100% { transform: translateX(-50%) rotate(-70deg) scaleX(1.5); width: 55px; }
+  50% { transform: translateX(-50%) rotate(70deg) scaleX(1.5); width: 55px; }
+}
+.iso-avatar.dance-hype .stick-body {
+  animation: hype-body 0.25s ease-in-out infinite;
+}
+@keyframes hype-body {
+  0%, 100% { transform: rotate(-15deg) scaleY(0.9); }
+  50% { transform: rotate(15deg) scaleY(1.1); }
+}
+.iso-avatar.dance-hype .stick-legs .leg-left { animation: hype-leg-l 0.25s ease-in-out infinite; }
+.iso-avatar.dance-hype .stick-legs .leg-right { animation: hype-leg-r 0.25s ease-in-out infinite; }
+@keyframes hype-leg-l {
+  0%, 100% { transform: translateX(-2px) rotate(-40deg); }
+  50% { transform: translateX(-2px) rotate(30deg) translateY(-8px); }
+}
+@keyframes hype-leg-r {
+  0%, 100% { transform: translateX(-2px) rotate(30deg) translateY(-8px); }
+  50% { transform: translateX(-2px) rotate(-40deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — Counter-rotation MUST match floor tilt!
+   "The billboard effect only works if the angles cancel" — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+
+/* Tablet — Floor uses 60deg, so avatars use -60deg */
+@media (max-width: 768px) {
+  .iso-avatar {
+    transform: rotateX(-60deg) translateZ(75px);
+  }
+
+  .iso-avatar-shadow {
+    transform: translateX(-50%) translateZ(-75px);
+  }
+
+  .iso-avatar.sky-drop {
+    animation: sky-drop-tablet 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes sky-drop-tablet {
+    0% {
+      transform: rotateX(-60deg) translateZ(75px) translateY(-400px);
+      opacity: 0;
+    }
+    60% {
+      transform: rotateX(-60deg) translateZ(75px) translateY(10px);
+      opacity: 1;
+    }
+    80% {
+      transform: rotateX(-60deg) translateZ(75px) translateY(-5px);
+    }
+    100% {
+      transform: rotateX(-60deg) translateZ(75px) translateY(0);
+    }
+  }
+
+  /* Dance animations for tablet */
+  .iso-avatar.dance-bounce {
+    animation: dance-bounce-tablet 0.9s ease-in-out infinite;
+  }
+  @keyframes dance-bounce-tablet {
+    0%, 100% { transform: rotateX(-60deg) translateZ(75px) translateY(0) scale(1); }
+    50% { transform: rotateX(-60deg) translateZ(75px) translateY(-12px) scale(1.03); }
+  }
+
+  /* Speech bubble billboard for tablet */
+  .vote-bubble {
+    transform: translateX(-50%) rotateX(60deg);
+  }
+
+  @keyframes speech-pop {
+    0%, 85%, 100% {
+      opacity: 0;
+      transform: translateX(-50%) rotateX(60deg) translateY(5px) scale(0.9);
+    }
+    8%, 75% {
+      opacity: 1;
+      transform: translateX(-50%) rotateX(60deg) translateY(0) scale(1);
+    }
+  }
+}
+
+/* Small mobile — Floor uses 55deg, so avatars use -55deg */
+@media (max-width: 480px) {
+  .iso-avatar {
+    transform: rotateX(-55deg) translateZ(65px);
+  }
+
+  .iso-avatar-shadow {
+    transform: translateX(-50%) translateZ(-65px);
+  }
+
+  .iso-avatar.sky-drop {
+    animation: sky-drop-mobile 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes sky-drop-mobile {
+    0% {
+      transform: rotateX(-55deg) translateZ(65px) translateY(-400px);
+      opacity: 0;
+    }
+    60% {
+      transform: rotateX(-55deg) translateZ(65px) translateY(10px);
+      opacity: 1;
+    }
+    80% {
+      transform: rotateX(-55deg) translateZ(65px) translateY(-5px);
+    }
+    100% {
+      transform: rotateX(-55deg) translateZ(65px) translateY(0);
+    }
+  }
+
+  /* Dance animations for mobile */
+  .iso-avatar.dance-bounce {
+    animation: dance-bounce-mobile 0.9s ease-in-out infinite;
+  }
+  @keyframes dance-bounce-mobile {
+    0%, 100% { transform: rotateX(-55deg) translateZ(65px) translateY(0) scale(1); }
+    50% { transform: rotateX(-55deg) translateZ(65px) translateY(-12px) scale(1.03); }
+  }
+
+  /* Speech bubble billboard for mobile */
+  .vote-bubble {
+    transform: translateX(-50%) rotateX(55deg);
+  }
+
+  @keyframes speech-pop {
+    0%, 85%, 100% {
+      opacity: 0;
+      transform: translateX(-50%) rotateX(55deg) translateY(5px) scale(0.9);
+    }
+    8%, 75% {
+      opacity: 1;
+      transform: translateX(-50%) rotateX(55deg) translateY(0) scale(1);
+    }
+  }
+}

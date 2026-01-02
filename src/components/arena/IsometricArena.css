@@ -1,0 +1,803 @@
+/**
+ * PREDICTION PARTY CLUB
+ * ONE BIG FLOOR • Turntable.fm vibes • Nintendo charm
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   APP LAYOUT
+═══════════════════════════════════════════════════════════════ */
+.club-app {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(180deg, #0a0812 0%, #120a18 50%, #0a0812 100%);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════════════ */
+.club-sidebar { display: none; }
+
+@media (min-width: 1000px) {
+  .club-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 340px;
+    min-width: 340px;
+    background: rgba(10, 10, 15, 0.98);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 18px;
+    gap: 12px;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .sidebar-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+  }
+  
+  .see-all {
+    margin-left: auto;
+    padding: 5px 12px;
+    background: transparent;
+    border: 2px solid #00E5FF;
+    border-radius: 20px;
+    color: #00E5FF;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  
+  .sidebar-markets { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  
+  .market-card {
+    background: rgba(20, 20, 30, 0.9);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .market-card:hover { border-color: rgba(255, 255, 255, 0.15); }
+  .market-card.active { border-color: #FFD700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+  
+  .market-card-header { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .market-question { flex: 1; font-size: 12px; font-weight: 700; color: #fff; line-height: 1.3; }
+  .market-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 800; color: #000; }
+  .market-change { padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+  .market-change.positive { background: rgba(0, 255, 100, 0.15); color: #00FF64; }
+  .market-change.negative { background: rgba(255, 60, 60, 0.15); color: #FF4444; }
+  
+  .market-bars { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
+  .bar-row { display: flex; align-items: center; gap: 5px; }
+  .bar-label { width: 40px; font-size: 9px; font-weight: 700; color: rgba(255, 255, 255, 0.4); }
+  .bar-track { flex: 1; height: 5px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .bar-fill.kalshi { background: linear-gradient(90deg, #00D9FF, #0088FF); }
+  .bar-fill.party { background: linear-gradient(90deg, #00FF64, #FF4444); }
+  .bar-pct { width: 26px; font-size: 10px; font-weight: 700; color: rgba(255, 255, 255, 0.6); text-align: right; }
+  
+  .market-options { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; font-size: 8px; }
+  .option-dot { color: rgba(255, 255, 255, 0.4); }
+  .option-dot:nth-child(1) { color: #00FF64; }
+  .option-dot:nth-child(2) { color: #00D9FF; }
+  .option-dot:nth-child(3) { color: #FF00FF; }
+  
+  .market-footer { display: flex; align-items: center; gap: 6px; }
+  .market-avatars { display: flex; }
+  .mini-avatar { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #1a1a20; background-size: cover; margin-left: -5px; }
+  .mini-avatar:first-child { margin-left: 0; }
+  .market-people { flex: 1; font-size: 9px; color: rgba(255, 255, 255, 0.4); }
+  .market-volume { font-size: 10px; font-weight: 700; color: rgba(255, 255, 255, 0.6); }
+  
+  .sidebar-balance {
+    background: rgba(20, 20, 30, 0.9);
+    border: 2px solid rgba(0, 255, 100, 0.25);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .balance-amt { font-size: 24px; font-weight: 800; color: #00FF64; text-shadow: 0 0 15px rgba(0, 255, 100, 0.4); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN STAGE
+═══════════════════════════════════════════════════════════════ */
+.club-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  gap: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Stage lights */
+.stage-lights {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.spotlight {
+  position: absolute;
+  top: -100px;
+  width: 300px;
+  height: 600px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+  clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+  animation: spotlight-move 12s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -2.4s);
+}
+.spotlight:nth-child(1) { left: 0%; background: linear-gradient(180deg, rgba(255, 80, 150, 0.12) 0%, transparent 100%); }
+.spotlight:nth-child(2) { left: 20%; background: linear-gradient(180deg, rgba(80, 200, 255, 0.10) 0%, transparent 100%); }
+.spotlight:nth-child(3) { left: 40%; background: linear-gradient(180deg, rgba(255, 200, 80, 0.10) 0%, transparent 100%); }
+.spotlight:nth-child(4) { left: 60%; background: linear-gradient(180deg, rgba(80, 255, 150, 0.10) 0%, transparent 100%); }
+.spotlight:nth-child(5) { left: 80%; background: linear-gradient(180deg, rgba(180, 80, 255, 0.12) 0%, transparent 100%); }
+
+@keyframes spotlight-move {
+  0%, 100% { transform: rotate(-10deg) translateX(-40px); opacity: 0.7; }
+  50% { transform: rotate(10deg) translateX(40px); opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MARQUEE
+═══════════════════════════════════════════════════════════════ */
+.marquee {
+  width: 100%;
+  max-width: 700px;
+  background: linear-gradient(180deg, #1a1010 0%, #0d0606 100%);
+  border: 4px solid #2a1a1a;
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 60px rgba(255, 200, 0, 0.1);
+  z-index: 20;
+}
+
+.marquee-bulbs {
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 10px;
+}
+
+.bulb {
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle at 30% 30%, #FFD700, #FF8C00);
+  border-radius: 50%;
+  box-shadow: 0 0 8px #FFD700, 0 0 16px rgba(255, 215, 0, 0.5);
+  animation: bulb-chase 2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+@keyframes bulb-chase {
+  0%, 45% { opacity: 1; box-shadow: 0 0 10px #FFD700, 0 0 20px rgba(255, 215, 0, 0.6); }
+  50%, 100% { opacity: 0.3; box-shadow: 0 0 4px #FF8C00; }
+}
+
+.marquee-content {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, #201212 0%, #120808 100%);
+  padding: 14px 18px;
+  gap: 14px;
+}
+
+.vote-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 4px solid;
+  font-size: 22px;
+  font-weight: 900;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.vote-btn:hover { transform: scale(1.1); }
+.vote-btn.no { border-color: #FF4466; color: #FF4466; box-shadow: 0 0 20px rgba(255, 68, 102, 0.3); }
+.vote-btn.yes { border-color: #00E5FF; color: #00E5FF; box-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
+
+.marquee-center { flex: 1; text-align: center; }
+
+.marquee-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #FF4466;
+  margin-bottom: 6px;
+}
+.live-dot { width: 8px; height: 8px; background: #FF4466; border-radius: 50%; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.9); } }
+.time { color: rgba(255, 255, 255, 0.35); }
+
+.marquee-center h1 {
+  font-size: clamp(14px, 3vw, 20px);
+  font-weight: 900;
+  color: #FFD700;
+  margin: 0 0 8px 0;
+  text-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+}
+
+.marquee-odds {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 10px;
+}
+.marquee-odds .yes { color: #00FF64; }
+.marquee-odds .no { color: #FF4466; }
+
+.marquee-bars { display: flex; flex-direction: column; gap: 4px; }
+.mbar { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 700; color: rgba(255, 255, 255, 0.45); }
+.mbar-track { flex: 1; height: 10px; background: #0a0606; border-radius: 5px; overflow: hidden; display: flex; }
+.mbar-fill.yes { background: linear-gradient(90deg, #00AA44, #00FF64); }
+.mbar-fill.no { background: linear-gradient(90deg, #FF4466, #AA0022); }
+
+/* ═══════════════════════════════════════════════════════════════
+   THE BIG DANCE FLOOR — Turntable.fm style!
+═══════════════════════════════════════════════════════════════ */
+.dance-floor-container {
+  width: 100%;
+  max-width: 1000px;
+  perspective: 1000px;
+  z-index: 10;
+}
+
+.dance-floor {
+  display: flex;
+  width: 100%;
+  min-height: 350px;
+  transform: rotateX(55deg);
+  transform-style: preserve-3d;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow:
+    0 50px 100px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(100, 100, 255, 0.1);
+}
+
+.floor-zone {
+  position: relative;
+  flex: 1;
+  min-height: 350px;
+  background: transparent;
+  border: none;
+  transition: box-shadow 0.3s;
+  transform-style: preserve-3d;
+  margin: 0 4px;
+}
+
+.floor-zone:first-child { margin-left: 0; }
+.floor-zone:last-child { margin-right: 0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   3D CRIB/ROOM WALLS — Isometric room effect like a baby crib!
+   Back wall + side walls create contained VIP booth feel
+═══════════════════════════════════════════════════════════════ */
+
+/* BACK WALL — rises UP from the back edge of the floor */
+.floor-zone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--color) 50%, #000) 0%,
+    color-mix(in srgb, var(--color) 30%, #000) 50%,
+    color-mix(in srgb, var(--color) 15%, #000) 100%
+  );
+  border: 4px solid var(--color);
+  border-bottom: none;
+  transform-origin: bottom center;
+  transform: rotateX(-90deg);
+  box-shadow:
+    inset 0 0 40px color-mix(in srgb, var(--color) 40%, transparent),
+    inset 0 -30px 60px color-mix(in srgb, var(--color) 20%, transparent),
+    0 0 30px color-mix(in srgb, var(--color) 50%, transparent);
+  animation: wall-glow 3s ease-in-out infinite;
+}
+
+/* LEFT WALL — rises UP from the left edge */
+.floor-zone::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--color) 45%, #000) 0%,
+    color-mix(in srgb, var(--color) 25%, #000) 50%,
+    color-mix(in srgb, var(--color) 10%, #000) 100%
+  );
+  border: 4px solid var(--color);
+  border-right: none;
+  transform-origin: right center;
+  transform: rotateY(90deg);
+  box-shadow:
+    inset 0 0 30px color-mix(in srgb, var(--color) 30%, transparent);
+  animation: wall-glow 3s ease-in-out infinite 0.5s;
+}
+
+/* Breathing glow animation for walls */
+@keyframes wall-glow {
+  0%, 100% {
+    opacity: 0.85;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.2);
+  }
+}
+
+/* FLOOR SURFACE — the actual dance floor with thick glowing border */
+.floor-zone > .zone-grid {
+  position: relative;
+  border: 6px solid var(--color);
+  border-radius: 4px;
+  box-shadow:
+    0 0 20px var(--color),
+    0 0 40px color-mix(in srgb, var(--color) 50%, transparent),
+    inset 0 0 30px color-mix(in srgb, var(--color) 25%, transparent);
+  animation: floor-pulse 3s ease-in-out infinite;
+}
+
+@keyframes floor-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px var(--color),
+      0 0 40px color-mix(in srgb, var(--color) 50%, transparent),
+      inset 0 0 30px color-mix(in srgb, var(--color) 25%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 30px var(--color),
+      0 0 60px color-mix(in srgb, var(--color) 60%, transparent),
+      inset 0 0 40px color-mix(in srgb, var(--color) 35%, transparent);
+  }
+}
+
+.floor-zone.hovered {
+  z-index: 10;
+}
+
+.floor-zone.hovered > .zone-grid {
+  box-shadow:
+    0 0 40px var(--color),
+    0 0 80px color-mix(in srgb, var(--color) 70%, transparent),
+    inset 0 0 50px color-mix(in srgb, var(--color) 40%, transparent);
+}
+
+.floor-zone.hovered::before,
+.floor-zone.hovered::after {
+  filter: brightness(1.4);
+  box-shadow:
+    inset 0 0 50px color-mix(in srgb, var(--color) 60%, transparent),
+    0 0 40px color-mix(in srgb, var(--color) 70%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   VOXEL FLOOR GRID — 3D Stage platform effect!
+   "The floor is the stage. Make it pop." — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+.zone-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  /* 3D STAGE PLATFORM — Thick borders make it pop! */
+  border-top: 3px solid color-mix(in srgb, var(--tile-color, var(--color)) 70%, white);
+  border-left: 3px solid color-mix(in srgb, var(--tile-color, var(--color)) 60%, white);
+  border-bottom: 12px solid color-mix(in srgb, var(--tile-color, var(--color)) 50%, black);
+  border-right: 10px solid color-mix(in srgb, var(--tile-color, var(--color)) 40%, black);
+  border-radius: 4px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px color-mix(in srgb, var(--tile-color, var(--color)) 30%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3D VOXEL TILES — Thick bottom + right borders for depth!
+   "Each tile is a little stage" — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+.grid-tile {
+  position: relative;
+  background: var(--tile-color, var(--color));
+  margin: 0;
+  padding: 0;
+  /* Top surface highlight */
+  border-top: 2px solid color-mix(in srgb, var(--tile-color, var(--color)) 80%, white);
+  border-left: 2px solid color-mix(in srgb, var(--tile-color, var(--color)) 70%, white);
+  /* 3D DEPTH — Thick bottom and right borders! */
+  border-bottom: 8px solid color-mix(in srgb, var(--tile-color, var(--color)) 60%, black);
+  border-right: 6px solid color-mix(in srgb, var(--tile-color, var(--color)) 50%, black);
+  box-shadow:
+    inset 0 0 10px color-mix(in srgb, var(--tile-color, var(--color)) 30%, transparent);
+  animation: tile-pulse 2s ease-in-out infinite alternate;
+  animation-delay: calc(var(--index, 0) * 0.05s);
+  /* GPU ACCELERATION — Smooth 60fps on mobile */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Lighting gradient — brighter top-left, darker bottom-right */
+.grid-tile:nth-child(8n+1) { filter: brightness(1.1); }
+.grid-tile:nth-child(8n+2) { filter: brightness(1.05); }
+.grid-tile:nth-child(8n+3) { filter: brightness(1.0); }
+.grid-tile:nth-child(8n+4) { filter: brightness(0.95); }
+.grid-tile:nth-child(8n+5) { filter: brightness(0.9); }
+.grid-tile:nth-child(8n+6) { filter: brightness(0.88); }
+.grid-tile:nth-child(8n+7) { filter: brightness(0.85); }
+.grid-tile:nth-child(8n+8) { filter: brightness(0.82); }
+
+/* Row-based darkening */
+.grid-tile:nth-child(n+9) { filter: brightness(0.95); }
+.grid-tile:nth-child(n+17) { filter: brightness(0.9); }
+.grid-tile:nth-child(n+25) { filter: brightness(0.85); }
+.grid-tile:nth-child(n+33) { filter: brightness(0.8); }
+.grid-tile:nth-child(n+41) { filter: brightness(0.75); }
+
+@keyframes tile-pulse {
+  0% { opacity: 0.85; }
+  100% { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TILE RIPPLE — Tiles react when zone is hovered during drag!
+   "The floor should acknowledge your presence" — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+
+/* When zone is hovered, tiles do a wave ripple */
+.floor-zone.hovered .grid-tile {
+  animation: tile-ripple 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  animation-delay: calc(var(--index, 0) * 0.02s);
+}
+
+@keyframes tile-ripple {
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.08) translateZ(5px);
+    filter: brightness(1.3);
+    box-shadow:
+      inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Extra glow on hovered zone tiles */
+.floor-zone.hovered .grid-tile {
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    0 0 15px color-mix(in srgb, var(--tile-color) 50%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--tile-color) 70%, black);
+  border-right-color: color-mix(in srgb, var(--tile-color) 60%, black);
+}
+
+/* Staggered wave pattern — creates ripple from center */
+.floor-zone.hovered .grid-tile:nth-child(8n+1) { animation-delay: 0.00s; }
+.floor-zone.hovered .grid-tile:nth-child(8n+2) { animation-delay: 0.03s; }
+.floor-zone.hovered .grid-tile:nth-child(8n+3) { animation-delay: 0.06s; }
+.floor-zone.hovered .grid-tile:nth-child(8n+4) { animation-delay: 0.09s; }
+.floor-zone.hovered .grid-tile:nth-child(8n+5) { animation-delay: 0.06s; }
+.floor-zone.hovered .grid-tile:nth-child(8n+6) { animation-delay: 0.03s; }
+.floor-zone.hovered .grid-tile:nth-child(8n+7) { animation-delay: 0.06s; }
+.floor-zone.hovered .grid-tile:nth-child(8n+8) { animation-delay: 0.09s; }
+
+/* Zone sign — Big and bold like reference! */
+.zone-sign {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%) rotateX(-55deg);
+  text-align: center;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.sign-label {
+  font-size: clamp(40px, 8vw, 72px);
+  font-weight: 900;
+  color: var(--color);
+  text-shadow: 
+    0 0 40px var(--color),
+    0 0 80px var(--color),
+    0 4px 0 rgba(0, 0, 0, 0.3);
+  letter-spacing: 4px;
+  line-height: 1;
+}
+
+.sign-pct {
+  font-size: clamp(32px, 6vw, 56px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 
+    0 0 30px var(--color),
+    0 2px 0 rgba(0, 0, 0, 0.3);
+  opacity: 0.95;
+  margin-top: -5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DANCING FIGURES — Nintendo charm!
+═══════════════════════════════════════════════════════════════ */
+.dancer {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotateX(-55deg);
+  z-index: 20;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.dancer-bubble {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 25;
+}
+.dancer-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #fff;
+}
+.bubble-name { color: var(--color); font-weight: 800; }
+
+.dancer-head {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid var(--color);
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 12px var(--color), 0 0 25px color-mix(in srgb, var(--color) 40%, transparent);
+}
+.dancer-head img { width: 100%; height: 100%; object-fit: cover; }
+
+.dancer-body {
+  width: 32px;
+  height: 46px;
+  margin-top: -4px;
+}
+
+.limb {
+  stroke: var(--color);
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px var(--color)) drop-shadow(0 0 12px color-mix(in srgb, var(--color) 50%, transparent));
+}
+
+/* Dance animations */
+.dance-bounce { animation: d-bounce 0.4s ease-in-out infinite; }
+.dance-sway { animation: d-sway 0.5s ease-in-out infinite; }
+.dance-pump { animation: d-pump 0.35s ease-in-out infinite; }
+.dance-wave { animation: d-wave 0.45s ease-in-out infinite; }
+.dance-groove { animation: d-groove 0.55s ease-in-out infinite; }
+.dance-hop { animation: d-hop 0.4s ease-in-out infinite; }
+.dance-rock { animation: d-rock 0.5s ease-in-out infinite; }
+.dance-vibe { animation: d-vibe 0.6s ease-in-out infinite; }
+
+@keyframes d-bounce { 0%, 100% { transform: rotateX(-55deg) translateY(0); } 50% { transform: rotateX(-55deg) translateY(-6px); } }
+@keyframes d-sway { 0%, 100% { transform: rotateX(-55deg) rotate(-3deg); } 50% { transform: rotateX(-55deg) rotate(3deg); } }
+@keyframes d-pump { 0%, 100% { transform: rotateX(-55deg) scale(1); } 50% { transform: rotateX(-55deg) scale(1.06) translateY(-3px); } }
+@keyframes d-wave { 0%, 100% { transform: rotateX(-55deg) translateX(-2px) rotate(-2deg); } 50% { transform: rotateX(-55deg) translateX(2px) rotate(2deg); } }
+@keyframes d-groove { 0%, 100% { transform: rotateX(-55deg) translateX(-3px); } 50% { transform: rotateX(-55deg) translateX(3px); } }
+@keyframes d-hop { 0%, 100% { transform: rotateX(-55deg) translateY(0); } 50% { transform: rotateX(-55deg) translateY(-8px) scale(0.95); } }
+@keyframes d-rock { 0%, 100% { transform: rotateX(-55deg) rotate(-4deg); } 50% { transform: rotateX(-55deg) rotate(4deg) translateY(-2px); } }
+@keyframes d-vibe { 0%, 25% { transform: rotateX(-55deg) scale(1); } 50% { transform: rotateX(-55deg) scale(1.04) rotate(1deg); } 75%, 100% { transform: rotateX(-55deg) scale(1) rotate(-1deg); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   DJ BOOTH
+═══════════════════════════════════════════════════════════════ */
+.dj-booth {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -20px;
+  z-index: 15;
+}
+
+.dj-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #FFD700;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  z-index: 2;
+}
+.dj-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.dj-deck {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #2a2a35 0%, #1a1a22 100%);
+  border: 2px solid #444;
+  border-radius: 8px;
+  margin-top: -10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.deck-circle {
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle, #333 30%, #111 70%);
+  border: 2px solid #555;
+  border-radius: 50%;
+  animation: spin 3s linear infinite;
+}
+.deck-circle:nth-child(2) { animation-direction: reverse; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   USER AVATAR
+═══════════════════════════════════════════════════════════════ */
+.user-dock {
+  position: relative;
+  z-index: 100;
+  margin-top: 10px;
+}
+
+.user-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: grab;
+  filter: drop-shadow(0 0 12px var(--glow));
+  transition: filter 0.2s;
+}
+.user-avatar-wrap.dragging { cursor: grabbing; }
+.user-avatar-wrap.hovering { filter: drop-shadow(0 0 25px var(--glow)) drop-shadow(0 0 40px var(--glow)); }
+
+.user-speech {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--glow);
+  color: #000;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 0 15px var(--glow);
+}
+.user-speech::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--glow);
+}
+
+.user-head {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--glow);
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 14px var(--glow);
+  z-index: 5;
+}
+.user-head img { width: 100%; height: 100%; object-fit: cover; }
+
+.user-body {
+  width: 32px;
+  height: 48px;
+  margin-top: -4px;
+  z-index: 5;
+}
+.user-body .limb {
+  stroke: var(--glow);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 5px var(--glow));
+}
+
+.wave-l { animation: wave-arm 0.5s ease-in-out infinite; transform-origin: 20px 5px; }
+.wave-r { animation: wave-arm 0.5s ease-in-out infinite 0.25s; transform-origin: 20px 5px; }
+@keyframes wave-arm { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-15deg); } }
+
+.user-name {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--glow);
+  text-shadow: 0 0 8px var(--glow);
+  margin-top: -4px;
+}
+
+.user-platform {
+  width: 60px;
+  height: 20px;
+  margin-top: 4px;
+  background: linear-gradient(180deg, #FFD700 0%, #CC9900 100%);
+  border: 2px solid #FFAA00;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(255, 180, 0, 0.4);
+  transform: perspective(100px) rotateX(30deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE BALANCE
+═══════════════════════════════════════════════════════════════ */
+.mobile-balance {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  background: rgba(12, 12, 18, 0.95);
+  border: 2px solid rgba(0, 255, 100, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 50;
+}
+.mobile-balance span:last-child { font-size: 20px; font-weight: 800; color: #00FF64; text-shadow: 0 0 12px rgba(0, 255, 100, 0.4); }
+
+@media (min-width: 1000px) {
+  .mobile-balance { display: none; }
+  .club-stage { padding: 20px 25px; gap: 20px; }
+  .dance-floor { min-height: 400px; }
+  .floor-zone { min-height: 400px; }
+  .dancer-head { width: 32px; height: 32px; }
+  .dancer-body { width: 32px; height: 44px; }
+}

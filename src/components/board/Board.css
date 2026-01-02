@@ -1,0 +1,397 @@
+/**
+ * Board CSS — THE CHAMELEON STAGE
+ * "Every pixel serves the vibe." — Toshiro
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   BOARD WRAPPER
+═══════════════════════════════════════════════════════════════ */
+.chameleon-board-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE BOARD — Main container
+═══════════════════════════════════════════════════════════════ */
+.chameleon-board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(180deg, #0a0a1a 0%, #050510 100%);
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 0 100px rgba(0, 0, 0, 0.3);
+}
+
+/* Scanlines overlay */
+.chameleon-board::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Grid pattern */
+.chameleon-board::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ZONES CONTAINER — Flexbox for dynamic columns
+═══════════════════════════════════════════════════════════════ */
+.zones-container {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  height: 75%;
+  padding: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INDIVIDUAL ZONE
+═══════════════════════════════════════════════════════════════ */
+.zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--zone-color) 8%, transparent) 0%,
+    color-mix(in srgb, var(--zone-color) 3%, transparent) 100%
+  );
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.zone.active {
+  border-color: var(--zone-color);
+}
+
+.zone.locked {
+  border-color: var(--zone-color);
+  border-width: 3px;
+}
+
+/* Zone glow overlay — THE SPOTLIGHT */
+.zone-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center bottom,
+    var(--zone-color) 0%,
+    color-mix(in srgb, var(--zone-color) 50%, transparent) 30%,
+    transparent 70%
+  );
+  opacity: 0.05;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* ═══ SPOTLIGHT BEAM — Nintendo-style dramatic lighting ═══ */
+.zone-spotlight {
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  width: 120%;
+  height: 200%;
+  transform: translateX(-50%);
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 40%,
+    color-mix(in srgb, var(--zone-color) 15%, transparent) 48%,
+    color-mix(in srgb, var(--zone-color) 30%, transparent) 50%,
+    color-mix(in srgb, var(--zone-color) 15%, transparent) 52%,
+    transparent 60%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  filter: blur(8px);
+}
+
+.zone.active .zone-spotlight {
+  opacity: 1;
+  animation: spotlight-breathe 1.5s ease-in-out infinite;
+}
+
+@keyframes spotlight-breathe {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* ═══ FLOOR GLOW — Light pooling at the bottom ═══ */
+.zone-floor-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--zone-color) 25%, transparent) 0%,
+    color-mix(in srgb, var(--zone-color) 10%, transparent) 40%,
+    transparent 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.zone.active .zone-floor-glow {
+  opacity: 1;
+}
+
+.zone.locked .zone-floor-glow {
+  opacity: 0.7;
+}
+
+/* ═══ RIPPLE RINGS — Expanding circles on hover ═══ */
+.zone-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid var(--zone-color);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zone.active .zone-ripple {
+  animation: ripple-expand 1.5s ease-out infinite;
+}
+
+.zone.active .zone-ripple:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.zone.active .zone-ripple:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes ripple-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* ═══ GRID HIGHLIGHT — Floor pattern lights up ═══ */
+.zone-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--zone-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--zone-color) 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 60%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 60%);
+}
+
+.zone.active .zone-grid {
+  opacity: 0.15;
+}
+
+.zone.locked .zone-grid {
+  opacity: 0.1;
+}
+
+/* Zone content */
+.zone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+}
+
+.zone-label {
+  font-size: clamp(24px, 5vw, 48px);
+  font-weight: 900;
+  color: var(--zone-color);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px var(--zone-color);
+}
+
+.zone-pct {
+  font-size: clamp(12px, 2.5vw, 18px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.5px;
+}
+
+/* Price indicator (Kalshi-style cents) */
+.zone-price {
+  font-size: clamp(18px, 4vw, 32px);
+  font-weight: 800;
+  color: var(--zone-color);
+  text-shadow: 0 0 20px var(--zone-color);
+  letter-spacing: -1px;
+}
+
+/* Invite text — "Drop to bet YES" */
+.zone-invite {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--zone-color);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--zone-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--zone-color) 30%, transparent);
+  animation: invite-pulse 1s ease-in-out infinite;
+}
+
+@keyframes invite-pulse {
+  0%, 100% { 
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--zone-color) 30%, transparent);
+  }
+  50% { 
+    transform: translateX(-50%) scale(1.02);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--zone-color) 50%, transparent);
+  }
+}
+
+/* Locked indicator badge */
+.locked-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 16px;
+  background: var(--zone-color);
+  color: #000;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px var(--zone-color);
+}
+
+/* Pulse ring when hovering */
+.zone-pulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 16px;
+  border: 2px solid var(--zone-color);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOBBY AREA — Where player starts
+═══════════════════════════════════════════════════════════════ */
+.lobby-area {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Lobby label */
+.lobby-area::before {
+  content: 'LOBBY';
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INSTRUCTIONS
+═══════════════════════════════════════════════════════════════ */
+.board-instructions {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.board-instructions strong {
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .chameleon-board {
+    aspect-ratio: 9 / 14;
+    border-radius: 16px;
+  }
+
+  .zones-container {
+    flex-direction: column;
+    height: 70%;
+  }
+
+  .lobby-area {
+    height: 30%;
+  }
+
+  .zone-label {
+    font-size: 24px;
+  }
+}

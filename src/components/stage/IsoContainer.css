@@ -1,0 +1,29 @@
+/* ═══════════════════════════════════════════════════════════════
+   ISO CONTAINER — EXACT PORT from vanilla.html
+   "The 3D World Stage" — Toshiro
+═══════════════════════════════════════════════════════════════ */
+
+.iso-room {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  /* CRITICAL: 1200px perspective reduces sprite warping */
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* THE WORLD DIV — STRAIGHT-ON Isometric View */
+.iso-world {
+  position: relative;
+  transform-style: preserve-3d;
+  /* PICTO-PARTY FIX: rotateX only — faces VIEWER directly like PictoChat/Habbo */
+  /* No rotateZ means NO/YES zones face you straight on! */
+  transform: rotateX(55deg);
+  transform-origin: center center;
+}

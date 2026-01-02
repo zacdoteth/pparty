@@ -1,6 +1,7 @@
 {
   "name": "predictionparty",
   "version": "0.1.0",
+  "type": "module",
   "description": "The Turntable.fm for Crypto Prediction Markets",
   "scripts": {
     "dev": "vite",
@@ -8,6 +9,20 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
     "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "^0.182.0",
+    "framer-motion": "^12.23.26",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "three": "^0.182.0"
   }
 }

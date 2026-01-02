@@ -1,0 +1,403 @@
+/**
+ * DraggableUser CSS — YOUR AVATAR IN THE CLUB
+ * Matches StickFigure style but with drag behaviors
+ *
+ * NINTENDO JUICE EDITION — Squash, stretch, shake!
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   SCREEN SHAKE — Impact feedback on zone drop!
+   "Every landing should feel like the world noticed." — Miyamoto
+═══════════════════════════════════════════════════════════════ */
+@keyframes screen-shake {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  10% { transform: translateX(-4px) translateY(2px); }
+  20% { transform: translateX(4px) translateY(-2px); }
+  30% { transform: translateX(-3px) translateY(1px); }
+  40% { transform: translateX(3px) translateY(-1px); }
+  50% { transform: translateX(-2px) translateY(1px); }
+  60% { transform: translateX(2px) translateY(0); }
+  70% { transform: translateX(-1px) translateY(0); }
+  80% { transform: translateX(1px) translateY(0); }
+  90% { transform: translateX(0) translateY(0); }
+}
+
+:global(body.screen-shake) {
+  animation: screen-shake 0.3s ease-out;
+}
+
+/* Also apply to main content wrapper if exists */
+body.screen-shake,
+body.screen-shake #root,
+body.screen-shake .app-container {
+  animation: screen-shake 0.3s ease-out;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DRAGGABLE USER — Base Container
+═══════════════════════════════════════════════════════════════ */
+.draggable-user {
+  position: relative;
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: grab;
+  z-index: 100;
+  touch-action: none;
+  user-select: none;
+  filter: drop-shadow(0 0 15px var(--user-color));
+  /* GPU acceleration for smooth dragging */
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.draggable-user.dragging {
+  cursor: grabbing;
+  z-index: 500;
+  filter: drop-shadow(0 0 25px var(--user-color)) drop-shadow(0 0 40px var(--user-color));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LANDING SQUASH — Nintendo impact feel!
+═══════════════════════════════════════════════════════════════ */
+.draggable-user.landed {
+  animation: land-squash 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes land-squash {
+  0% {
+    transform: scaleX(0.8) scaleY(1.3);
+  }
+  40% {
+    transform: scaleX(1.2) scaleY(0.8);
+  }
+  70% {
+    transform: scaleX(0.95) scaleY(1.05);
+  }
+  100% {
+    transform: scaleX(1) scaleY(1);
+  }
+}
+
+/* Landing impact ring */
+.draggable-user.landed::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 20px;
+  background: radial-gradient(ellipse, var(--user-color) 0%, transparent 70%);
+  opacity: 0;
+  animation: impact-ring 0.3s ease-out forwards;
+}
+
+@keyframes impact-ring {
+  0% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(2);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHADOW — Squircle on floor
+═══════════════════════════════════════════════════════════════ */
+.draggable-user-shadow {
+  position: absolute;
+  bottom: -8px;
+  width: 40px;
+  height: 12px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.draggable-user.dragging .draggable-user-shadow {
+  transform: scale(1.3);
+  opacity: 0.3;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPEECH BUBBLE — EPIC GOLDEN STYLE! Miyamoto approved!
+═══════════════════════════════════════════════════════════════ */
+.drag-speech {
+  position: absolute;
+  top: -55px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #FFE066 0%, #FFD700 50%, #FFA500 100%);
+  border: 3px solid #CC9900;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #000;
+  white-space: nowrap;
+  box-shadow: 
+    0 4px 25px rgba(255, 200, 0, 0.6),
+    0 0 40px rgba(255, 215, 0, 0.4);
+  animation: speech-float 2s ease-in-out infinite;
+  z-index: 10;
+}
+
+.drag-speech::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 12px solid #FFA500;
+}
+
+@keyframes speech-float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-6px); }
+}
+
+/* Speech changes color when hovering zone */
+.draggable-user[class*="hovering-"] .drag-speech {
+  background: linear-gradient(135deg, var(--user-color) 0%, var(--user-color) 100%);
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 4px 25px var(--user-color),
+    0 0 40px var(--user-color);
+}
+
+.draggable-user[class*="hovering-"] .drag-speech::after {
+  border-top-color: var(--user-color);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE SPRITE — Mr. Game & Watch Style with GLOW!
+═══════════════════════════════════════════════════════════════ */
+.draggable-user-sprite {
+  position: relative;
+  width: 60px;
+  height: 85px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* HEAD — Circle with photo, BIGGER! */
+.user-head {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid var(--user-color);
+  overflow: hidden;
+  background: #000;
+  box-shadow: 
+    0 0 20px var(--user-color),
+    0 0 40px rgba(255, 215, 0, 0.3);
+  z-index: 2;
+}
+
+.user-head img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* BODY — Vertical line with GLOW */
+.user-body {
+  width: 5px;
+  height: 26px;
+  background: var(--user-color);
+  margin-top: -3px;
+  box-shadow: 
+    0 0 12px var(--user-color),
+    0 0 20px rgba(255, 215, 0, 0.4);
+  border-radius: 2px;
+}
+
+/* ARMS — Horizontal line with animation */
+.user-arms {
+  position: absolute;
+  top: 48px;
+  width: 40px;
+  height: 5px;
+  background: var(--user-color);
+  box-shadow: 0 0 12px var(--user-color);
+  border-radius: 2px;
+}
+
+/* Arm wave animation when dragging */
+.draggable-user.dragging .user-arms {
+  animation: arm-wave 0.3s ease-in-out infinite;
+}
+
+@keyframes arm-wave {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+
+/* LEGS — V-shape with GLOW */
+.user-legs {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  gap: 0;
+}
+
+.user-legs .leg-left,
+.user-legs .leg-right {
+  display: block;
+  width: 5px;
+  height: 24px;
+  background: var(--user-color);
+  box-shadow: 0 0 12px var(--user-color);
+  transform-origin: top center;
+  border-radius: 2px;
+}
+
+.user-legs .leg-left {
+  transform: rotate(-12deg);
+}
+
+.user-legs .leg-right {
+  transform: rotate(12deg);
+}
+
+/* Walk animation when dragging */
+.draggable-user.dragging .leg-left {
+  animation: leg-walk-l 0.25s ease-in-out infinite;
+}
+
+.draggable-user.dragging .leg-right {
+  animation: leg-walk-r 0.25s ease-in-out infinite;
+}
+
+@keyframes leg-walk-l {
+  0%, 100% { transform: rotate(-25deg); }
+  50% { transform: rotate(5deg); }
+}
+
+@keyframes leg-walk-r {
+  0%, 100% { transform: rotate(5deg); }
+  50% { transform: rotate(-25deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GOLDEN TROPHY BASE — Miyamoto's champion podium!
+═══════════════════════════════════════════════════════════════ */
+.trophy-base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -4px;
+}
+
+.trophy-top {
+  width: 55px;
+  height: 10px;
+  background: linear-gradient(180deg, #FFE066 0%, #FFD700 50%, #FFAA00 100%);
+  border-radius: 5px 5px 0 0;
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.7),
+    inset 0 2px 5px rgba(255, 255, 255, 0.5);
+  border: 2px solid #CC9900;
+  border-bottom: none;
+}
+
+.trophy-middle {
+  width: 40px;
+  height: 22px;
+  background: linear-gradient(180deg, #CC9900 0%, #AA7700 100%);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  border-left: 2px solid #AA7700;
+  border-right: 2px solid #AA7700;
+}
+
+.trophy-bottom {
+  width: 60px;
+  height: 12px;
+  background: linear-gradient(180deg, #FFD700 0%, #CC9900 50%, #AA7700 100%);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 25px rgba(255, 215, 0, 0.6);
+  border: 2px solid #996600;
+  border-top: none;
+}
+
+/* Trophy glow when hovering zone */
+.draggable-user.dragging .trophy-top,
+.draggable-user[class*="hovering-"] .trophy-top {
+  box-shadow: 
+    0 0 25px var(--user-color),
+    0 0 40px var(--user-color),
+    inset 0 2px 5px rgba(255, 255, 255, 0.5);
+  border-color: var(--user-color);
+}
+
+.draggable-user.dragging .trophy-bottom,
+.draggable-user[class*="hovering-"] .trophy-bottom {
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 30px var(--user-color);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   USERNAME BADGE — Golden pill
+═══════════════════════════════════════════════════════════════ */
+.user-name-badge {
+  margin-top: 8px;
+  padding: 5px 14px;
+  background: linear-gradient(135deg, #FFE066 0%, #FFD700 50%, #FFA500 100%);
+  border: 2px solid #CC9900;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #000;
+  white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(255, 215, 0, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOVER RING — Pulsing ring when over zone
+═══════════════════════════════════════════════════════════════ */
+.hover-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--user-color);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ZONE HOVER STATES — Color changes
+═══════════════════════════════════════════════════════════════ */
+.draggable-user.hovering-yes {
+  --user-color: #00F0FF;
+}
+
+.draggable-user.hovering-no {
+  --user-color: #FF0055;
+}
+
+.draggable-user.hovering-zone1 {
+  --user-color: #22c55e;
+}
+
+.draggable-user.hovering-zone2 {
+  --user-color: #3b82f6;
+}
+
+.draggable-user.hovering-zone3 {
+  --user-color: #a855f7;
+}
+

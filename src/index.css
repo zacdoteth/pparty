@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════
+   PREDICTION PARTY — EXACT PORT from vanilla.html
+   "Neo-Tokyo Underground Nightclub Aesthetic" — Toshiro
+═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Neo-Tokyo Palette */
+  --bg-dark: #000000;
+  --bg-mid: #0a0a12;
+  --bg-light: #0f0f1a;
+
+  /* Neon Accents */
+  --neon-cyan: #00F0FF;
+  --neon-pink: #FF0055;
+  --neon-gold: #FFD700;
+  --neon-purple: #bf00ff;
+
+  /* UI */
+  --glass: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  /* Deep club gradient */
+  background: radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #0a0612 50%, #000000 100%);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100%;
+}
+
+/* 3D Preserve for isometric world */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RANGE SLIDER STYLING — Nintendo-chunky feel
+═══════════════════════════════════════════════════════════════ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: grab;
+  border: 3px solid #000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: grab;
+  border: 3px solid #000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODAL SCROLLBAR STYLING
+═══════════════════════════════════════════════════════════════ */
+.bet-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bet-modal::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+}
+
+.bet-modal::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+}
+
+.bet-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
