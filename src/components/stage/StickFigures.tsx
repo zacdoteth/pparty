@@ -45,6 +45,7 @@ export interface Dancer {
   zoneId: string      // Which option zone they're on
   danceMove?: number  // 0-9 for dance type, random if not set
   speech?: string     // Optional speech bubble text
+  isUser?: boolean    // Is this the current user? Shows glow!
 }
 
 interface StickFigureProps {
@@ -55,6 +56,7 @@ interface StickFigureProps {
   color: string        // Zone color for effects
   scale?: number
   showUsername?: boolean  // Show username under character
+  isUser?: boolean     // Current user — show epic glow!
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -531,7 +533,7 @@ function DopeSneaker({ scale, color }: SneakerProps) {
 // 4. BILLBOARD facing — always faces camera like Paper Mario
 // 5. INTRO ANIMATION — Drop in from above with bounce!
 // ═══════════════════════════════════════════════════════════════════════════
-function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, showUsername = true }: StickFigureProps) {
+function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, showUsername = true, isUser = false }: StickFigureProps) {
   const groupRef = useRef<THREE.Group>(null!)
   const { camera } = useThree()
   const [angles, setAngles] = useState<LimbAngles>(() => getDanceFrame(danceMove, 0))
@@ -865,6 +867,27 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
         <meshBasicMaterial color={color} transparent opacity={0.2} />
       </mesh>
 
+      {/* ═══ USER GLOW — Epic highlight for YOUR character! ═══ */}
+      {isUser && (
+        <>
+          {/* Outer pulsing ring */}
+          <mesh position={[0, -groundOffset + 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.45 * flatScale, 0.65 * flatScale, 32]} />
+            <meshBasicMaterial color="#FFD700" transparent opacity={0.6} depthWrite={false} />
+          </mesh>
+          {/* Inner bright glow */}
+          <mesh position={[0, -groundOffset + 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.5 * flatScale, 24]} />
+            <meshBasicMaterial color="#FFD700" transparent opacity={0.25} depthWrite={false} />
+          </mesh>
+          {/* Vertical light beam */}
+          <mesh position={[0, 0.8, 0]}>
+            <cylinderGeometry args={[0.02, 0.15, 2.5, 8, 1, true]} />
+            <meshBasicMaterial color="#FFD700" transparent opacity={0.15} side={THREE.DoubleSide} depthWrite={false} />
+          </mesh>
+        </>
+      )}
+
       {/* ═══ SPAWN BURST — Glowing ring when landing! ═══ */}
       {introProgress > 0.7 && introProgress < 1 && (
         <mesh position={[0, -groundOffset + 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -954,6 +977,7 @@ export function DancerGroup({ dancers, zoneRanges, gridCols, gridRows, tileSize,
             color={dancer.color}
             scale={isMobile ? 0.85 : 1.3}  // Smaller on mobile for better fit!
             showUsername={!isMobile}  // Hide usernames on mobile - less clutter
+            isUser={dancer.isUser}  // Show glow for current user!
           />
         )
       ))}

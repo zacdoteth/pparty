@@ -59,6 +59,11 @@ export interface DanceFloorProps {
   marketQuestion?: string // 3D floating title in sky (Smash Bros style!)
   marketIcon?: string     // PREMOJI icon above title (🏈, 🗳️, etc.)
   selectedZone?: string   // Zone to illuminate (from sidebar bet selection!)
+  // ═══ LOADING & INTRO ═══
+  showIntro?: boolean           // Show intro camera animation
+  onLoadProgress?: (progress: number) => void
+  onLoadComplete?: () => void
+  onIntroComplete?: () => void
   children?: React.ReactNode
   className?: string
   style?: React.CSSProperties
@@ -83,10 +88,10 @@ const DESKTOP_GRID = {
   cols: 24,
   rows: 12,
   camera: {
-    // PERFECT FRAME — Close enough to see the action, wide enough to see the party!
-    // Y=15 (elevation), Z=25 (distance) — fills ~80% of viewport
-    position: [0, 15, 25] as [number, number, number],
-    fov: 50,  // Standard "human eye" lens
+    // TIGHTER FRAME — More intimate view, still see both edges!
+    // Y=12 (lower angle), Z=18 (closer) — immersive but shows full width
+    position: [0, 12, 18] as [number, number, number],
+    fov: 55,  // Slightly wider lens to capture edges
   },
 } as const
 
@@ -1802,16 +1807,20 @@ interface SkyText3DProps {
 
 function SkyText3D({ question, icon, isMobile = false }: SkyText3DProps) {
   const groupRef = useRef<THREE.Group>(null)
+  const { camera } = useThree()
 
-  // Subtle floating animation — majestic hover
+  // Billboard effect + subtle floating animation
   useFrame(({ clock }) => {
     if (groupRef.current) {
+      // ═══ BILLBOARD — Always face camera during rotation! ═══
+      groupRef.current.lookAt(camera.position)
+      // Floating animation on Y axis
       groupRef.current.position.y = 10 + Math.sin(clock.elapsedTime * 0.4) * 0.2
     }
   })
 
-  // Inter Bold for that Polymarket crispness
-  const fontUrl = 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff2'
+  // Inter Bold — TTF format for troika-three-text compatibility!
+  const fontUrl = '/fonts/Inter-Bold.ttf'
 
   // TYPOGRAPHY SPEC — Polymarket style
   const titleSize = isMobile ? 1.0 : 1.6
@@ -1904,6 +1913,48 @@ interface SceneProps {
 
 function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion, marketIcon, selectedZone }: SceneProps) {
   const ranges = useMemo(() => calculateColumnRanges(options, gridCols), [options, gridCols])
+
+  // ═══ MARKET TRANSITION — Sweet intro/outro animation! ═══
+  const transitionGroupRef = useRef<THREE.Group>(null)
+  const prevOptionsRef = useRef<string>('')
+  const [isTransitioning, setIsTransitioning] = useState(false)
+
+  // Create a stable key from options
+  const optionsKey = useMemo(() => options.map(o => o.id).join(','), [options])
+
+  // Detect market change and trigger transition
+  useEffect(() => {
+    if (prevOptionsRef.current && prevOptionsRef.current !== optionsKey) {
+      setIsTransitioning(true)
+    }
+    prevOptionsRef.current = optionsKey
+  }, [optionsKey])
+
+  // Animate the transition
+  useFrame((_, delta) => {
+    if (!transitionGroupRef.current) return
+
+    const group = transitionGroupRef.current
+
+    if (isTransitioning) {
+      // Quick scale down + fade
+      group.scale.x = THREE.MathUtils.lerp(group.scale.x, 0.85, delta * 8)
+      group.scale.y = THREE.MathUtils.lerp(group.scale.y, 0.85, delta * 8)
+      group.scale.z = THREE.MathUtils.lerp(group.scale.z, 0.85, delta * 8)
+      group.position.y = THREE.MathUtils.lerp(group.position.y, -0.5, delta * 8)
+
+      // End transition after brief moment
+      if (group.scale.x < 0.86) {
+        setIsTransitioning(false)
+      }
+    } else {
+      // Smooth scale back up + rise
+      group.scale.x = THREE.MathUtils.lerp(group.scale.x, 1, delta * 6)
+      group.scale.y = THREE.MathUtils.lerp(group.scale.y, 1, delta * 6)
+      group.scale.z = THREE.MathUtils.lerp(group.scale.z, 1, delta * 6)
+      group.position.y = THREE.MathUtils.lerp(group.position.y, 0, delta * 6)
+    }
+  })
 
   // ═══ GRID MATH — 1.0 unit step creates 0.08 gutter between 0.92 tiles ═══
   const unit = FLOOR.gridUnit  // 1.0 — the secret sauce for visible gutters!
@@ -2057,32 +2108,56 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
         )
       })}
 
-      {/* ═══ FLOOR BASE — Black reflective surface under jelly ═══ */}
-      <mesh position={[0, -0.01, 0]} receiveShadow>
-        <boxGeometry args={[floorWidth, 0.02, floorDepth]} />
-        <meshStandardMaterial color="#080810" roughness={0.3} metalness={0.5} />
-      </mesh>
+      {/* ═══ TRANSITION GROUP — Sweet animation when switching markets! ═══ */}
+      <group ref={transitionGroupRef}>
+        {/* ═══ FLOOR BASE — Black reflective surface under jelly ═══ */}
+        <mesh position={[0, -0.01, 0]} receiveShadow>
+          <boxGeometry args={[floorWidth, 0.02, floorDepth]} />
+          <meshStandardMaterial color="#080810" roughness={0.3} metalness={0.5} />
+        </mesh>
 
-      {/* ═══ JELLY TILE FLOOR — Glassy wet neon candy! ═══ */}
-      <InstancedTileFloor
-        tiles={tiles}
-        gridCols={gridCols}
-        gridRows={gridRows}
-        isMobile={isMobile}
-        onTileClick={onTileClick}
-        selectedZone={selectedZone}
-      />
+        {/* ═══ JELLY TILE FLOOR — Glassy wet neon candy! ═══ */}
+        <InstancedTileFloor
+          tiles={tiles}
+          gridCols={gridCols}
+          gridRows={gridRows}
+          isMobile={isMobile}
+          onTileClick={onTileClick}
+          selectedZone={selectedZone}
+        />
 
-      {/* ═══ FLOATING ISLAND — FINAL DESTINATION BASE! ═══ */}
-      {!isMobile && <FloatingIsland width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} />}
+        {/* ═══ FLOATING ISLAND — FINAL DESTINATION BASE! ═══ */}
+        {!isMobile && <FloatingIsland width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} />}
+
+        {/* ═══ PLATFORM BASE ═══ */}
+        <Platform width={floorWidth} depth={floorDepth} />
+
+        {/* ═══ SKY PODIUMS — Dope floating signs! ═══ */}
+        {podiums.map(({ optionId, position, label, pct, color, rank }) => (
+          <SkyPodium key={optionId} position={position} label={label} pct={pct} color={color} rank={rank} />
+        ))}
+
+        {/* ═══ DANCING STICK FIGURES! ═══ */}
+        {dancers && dancers.length > 0 && (
+          <Suspense fallback={null}>
+            <DancerGroup
+              dancers={dancers}
+              zoneRanges={ranges}
+              gridCols={gridCols}
+              gridRows={gridRows}
+              tileSize={FLOOR.tileSize}
+              tileGap={FLOOR.gridUnit - FLOOR.tileSize}  // 1.0 - 0.92 = 0.08 gap
+              isMobile={isMobile}
+            />
+          </Suspense>
+        )}
+      </group>
 
       {/* ═══ CLUB LIGHT RIG — Sweeping volumetric god rays! (Desktop only) ═══ */}
       {!isMobile && <ClubLightRig width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} />}
 
       {/* ═══ SKYNET LASER ARRAY — Electric Forest 2AM vibes! ═══ */}
       <SkynetLaserArray width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} />
-
-      {/* ═══ LASER SPIROGRAPH — Removed per user request ═══ */}
 
       {/* ═══ ALIEN FOREST ATMOSPHERE — Fog for laser visibility! ═══ */}
       <fogExp2 attach="fog" args={['#030208', isMobile ? 0.025 : 0.018]} />
@@ -2093,33 +2168,10 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
       {!isMobile && <AscendingEnergySparks width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} />}
       {!isMobile && <CosmicDust width={floorWidth} depth={floorDepth} isMobile={isMobile} />}
 
-      {/* ═══ PLATFORM BASE ═══ */}
-      <Platform width={floorWidth} depth={floorDepth} />
-
-      {/* ═══ SKY PODIUMS — Dope floating signs! ═══ */}
-      {podiums.map(({ optionId, position, label, pct, color, rank }) => (
-        <SkyPodium key={optionId} position={position} label={label} pct={pct} color={color} rank={rank} />
-      ))}
-
       {/* ═══ SKY TEXT 3D — PREMOJI STYLE floating market title! ═══ */}
       {marketQuestion && (
         <Suspense fallback={null}>
           <SkyText3D question={marketQuestion} icon={marketIcon} isMobile={isMobile} />
-        </Suspense>
-      )}
-
-      {/* ═══ DANCING STICK FIGURES! ═══ */}
-      {dancers && dancers.length > 0 && (
-        <Suspense fallback={null}>
-          <DancerGroup
-            dancers={dancers}
-            zoneRanges={ranges}
-            gridCols={gridCols}
-            gridRows={gridRows}
-            tileSize={FLOOR.tileSize}
-            tileGap={FLOOR.gridUnit - FLOOR.tileSize}  // 1.0 - 0.92 = 0.08 gap
-            isMobile={isMobile}
-          />
         </Suspense>
       )}
     </>
@@ -2127,22 +2179,52 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// RESPONSIVE CAMERA — One epic view that scales to ANY screen!
-// "Desktop layout everywhere, just zoom out on mobile" — Responsive Design
+// RESPONSIVE CAMERA — Auto-rotating globe effect!
+// "Spins like a globe, stops when you touch it" — Museum Display Mode
 // ═══════════════════════════════════════════════════════════════════════════
 interface CameraControllerProps {
   isMobile?: boolean
 }
 
 function CameraController({ isMobile = false }: CameraControllerProps) {
-  // NO AUTO-ZOOM! Camera starts at perfect Stadium View position
-  // User can manually zoom/rotate if they want
+  const controlsRef = useRef<any>(null)
+  const [isInteracting, setIsInteracting] = useState(false)
+  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Resume auto-rotate after user stops interacting
+  const handleInteractionEnd = useCallback(() => {
+    // Clear any existing timeout
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current)
+    }
+    // Resume rotation after 3 seconds of no interaction
+    interactionTimeoutRef.current = setTimeout(() => {
+      setIsInteracting(false)
+    }, 3000)
+  }, [])
+
+  const handleInteractionStart = useCallback(() => {
+    setIsInteracting(true)
+    if (interactionTimeoutRef.current) {
+      clearTimeout(interactionTimeoutRef.current)
+    }
+  }, [])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (interactionTimeoutRef.current) {
+        clearTimeout(interactionTimeoutRef.current)
+      }
+    }
+  }, [])
 
   return (
     <OrbitControls
+      ref={controlsRef}
       makeDefault
       enableDamping={true}
-      dampingFactor={0.08}
+      dampingFactor={0.05}
       enableZoom={true}
       enableRotate={true}
       enablePan={false}
@@ -2152,13 +2234,71 @@ function CameraController({ isMobile = false }: CameraControllerProps) {
       maxPolarAngle={Math.PI / 2 - 0.08}
       rotateSpeed={isMobile ? 0.5 : 0.8}
       zoomSpeed={1.0}
-      target={[0, 0, 0]}  // DEAD CENTER of the floor!
+      target={[0, 0, 0]}
+      // ═══ AUTO-ROTATE — Globe spinning effect! ═══
+      autoRotate={!isInteracting}
+      autoRotateSpeed={0.5}  // Slow, majestic rotation
+      // ═══ INTERACTION HANDLERS — Stop on touch! ═══
+      onStart={handleInteractionStart}
+      onEnd={handleInteractionEnd}
       touches={{
         ONE: THREE.TOUCH.ROTATE,
         TWO: THREE.TOUCH.DOLLY_PAN,
       }}
     />
   )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOADING TRACKER — Reports drei loading progress to parent
+// ═══════════════════════════════════════════════════════════════════════════
+interface LoadingTrackerProps {
+  onProgress?: (progress: number) => void
+  onComplete?: () => void
+}
+
+function LoadingTracker({ onProgress, onComplete }: LoadingTrackerProps) {
+  const completedRef = useRef(false)
+  const [startTime] = useState(() => Date.now())
+
+  // Minimum time to show loading screen (let users see the cool logo!)
+  const MIN_DISPLAY_TIME = 2000  // 2 seconds
+
+  // Animate progress over time and complete when ready
+  useEffect(() => {
+    let animationFrame: number
+    let completed = false
+
+    const animate = () => {
+      if (completed) return
+
+      const elapsed = Date.now() - startTime
+      const progressPct = Math.min(95, (elapsed / MIN_DISPLAY_TIME) * 100)
+
+      onProgress?.(progressPct)
+
+      // Complete after minimum time
+      if (elapsed >= MIN_DISPLAY_TIME && !completedRef.current) {
+        completedRef.current = true
+        completed = true
+        onProgress?.(100)
+        // Small delay to show 100% before dismissing
+        setTimeout(() => onComplete?.(), 200)
+        return
+      }
+
+      animationFrame = requestAnimationFrame(animate)
+    }
+
+    animationFrame = requestAnimationFrame(animate)
+
+    return () => {
+      completed = true
+      cancelAnimationFrame(animationFrame)
+    }
+  }, [startTime, onProgress, onComplete])
+
+  return null  // Invisible component
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2176,6 +2316,10 @@ export default function DanceFloor({
   marketQuestion,
   marketIcon,
   selectedZone,
+  showIntro,
+  onLoadProgress,
+  onLoadComplete,
+  onIntroComplete,
   children,
   className = '',
   style = {},
@@ -2270,6 +2414,9 @@ export default function DanceFloor({
           gl.toneMappingExposure = isMobile ? 1.0 : 1.2
         }}
       >
+        {/* ═══ LOADING TRACKER — Reports progress to parent ═══ */}
+        <LoadingTracker onProgress={onLoadProgress} onComplete={onLoadComplete} />
+
         <CameraController isMobile={isMobile} />
         <DanceFloorScene
           options={optionsWithColors}

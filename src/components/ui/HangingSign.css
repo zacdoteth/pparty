@@ -1,0 +1,321 @@
+/* ═══════════════════════════════════════════════════════════════
+   HANGING SIGN — Suspended from the Viewport Ceiling
+   "Industrial Broadway — chains meet Vegas" — Toshiro
+
+   Typography Rules Applied:
+   - 50% rule: sign occupies ~50% of readable width
+   - 8pt grid alignment
+   - Optical balance over mathematical center
+═══════════════════════════════════════════════════════════════ */
+
+.hanging-sign-container {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+
+  /* Settle-in animation */
+  animation: sign-settle 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes sign-settle {
+  0% {
+    transform: translateX(-50%) translateY(-100%) rotate(-8deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-50%) translateY(0) rotate(3deg);
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(-50%) translateY(0) rotate(-1.5deg);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) rotate(0);
+  }
+}
+
+/* ═══ CHAINS — Industrial Hardware ═══ */
+.hanging-chains {
+  display: flex;
+  justify-content: space-between;
+  width: 70%;
+  margin-bottom: -2px;
+}
+
+.chain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chain-link {
+  width: 8px;
+  height: 14px;
+  border: 2px solid #8B7355;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #A0926A 0%, #6B5D45 50%, #4A4030 100%);
+  margin-bottom: -4px; /* Overlap for interlocking look */
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.chain-link:nth-child(odd) {
+  transform: rotate(90deg) scaleX(0.7);
+  margin: -2px 0;
+}
+
+/* ═══ THE SIGN — Broadway Marquee ═══ */
+.hanging-sign {
+  animation: gentle-sway 4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@keyframes gentle-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(0.5deg); }
+  75% { transform: rotate(-0.5deg); }
+}
+
+.sign-frame {
+  background: linear-gradient(180deg,
+    #1a1a1a 0%,
+    #0d0d0d 50%,
+    #000000 100%
+  );
+  border: 3px solid #FFD700;
+  border-radius: 6px;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 40px rgba(255, 215, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+/* ═══ VEGAS BULBS — Chasing lights ═══ */
+.sign-lights {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px 6px;
+  background: linear-gradient(180deg, #1a1510 0%, #0d0a05 100%);
+}
+
+.sign-lights.top {
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.sign-lights.bottom {
+  border-top: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.sign-lights span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #FFFACD, #FFD700 40%, #B8860B 100%);
+  box-shadow:
+    0 0 8px #FFD700,
+    0 0 16px rgba(255, 215, 0, 0.5);
+  animation: bulb-chase 1.2s ease-in-out infinite;
+}
+
+/* Staggered chase */
+.sign-lights span:nth-child(1) { animation-delay: 0s; }
+.sign-lights span:nth-child(2) { animation-delay: 0.1s; }
+.sign-lights span:nth-child(3) { animation-delay: 0.2s; }
+.sign-lights span:nth-child(4) { animation-delay: 0.3s; }
+.sign-lights span:nth-child(5) { animation-delay: 0.4s; }
+.sign-lights span:nth-child(6) { animation-delay: 0.5s; }
+.sign-lights span:nth-child(7) { animation-delay: 0.6s; }
+.sign-lights span:nth-child(8) { animation-delay: 0.7s; }
+.sign-lights span:nth-child(9) { animation-delay: 0.8s; }
+.sign-lights span:nth-child(10) { animation-delay: 0.9s; }
+.sign-lights span:nth-child(11) { animation-delay: 1.0s; }
+.sign-lights span:nth-child(12) { animation-delay: 1.1s; }
+
+.sign-lights.bottom span {
+  animation-direction: reverse;
+}
+
+@keyframes bulb-chase {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.85);
+    box-shadow: 0 0 4px #B8860B;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow:
+      0 0 12px #FFD700,
+      0 0 24px rgba(255, 215, 0, 0.7);
+  }
+}
+
+/* ═══ SIGN CONTENT ═══ */
+.sign-content {
+  padding: 8px 16px 10px;
+  background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+  text-align: center;
+}
+
+/* META ROW — LIVE + Countdown */
+.sign-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.sign-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 0, 80, 0.2);
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 0, 80, 0.4);
+  font-size: 8px;
+  font-weight: 700;
+  color: #ff4080;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sign-live .live-dot {
+  width: 5px;
+  height: 5px;
+  background: #ff4080;
+  border-radius: 50%;
+  animation: live-pulse 1s ease-in-out infinite;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
+.sign-countdown {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sign-countdown .countdown-icon {
+  font-size: 8px;
+}
+
+/* THE QUESTION — Star typography */
+.sign-question {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  line-height: 1.3;
+  max-width: 280px;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.5),
+    0 0 20px rgba(255, 215, 0, 0.3);
+
+  /* Clamp to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — Scale up for desktop
+═══════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  .hanging-chains {
+    width: 60%;
+  }
+
+  .chain-link {
+    width: 10px;
+    height: 18px;
+    border-width: 3px;
+  }
+
+  .sign-frame {
+    border-width: 4px;
+    border-radius: 8px;
+    box-shadow:
+      0 0 30px rgba(255, 215, 0, 0.5),
+      0 0 60px rgba(255, 215, 0, 0.25),
+      0 12px 48px rgba(0, 0, 0, 0.9);
+  }
+
+  .sign-lights {
+    padding: 5px 10px;
+  }
+
+  .sign-lights span {
+    width: 8px;
+    height: 8px;
+  }
+
+  .sign-content {
+    padding: 10px 24px 12px;
+  }
+
+  .sign-live {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+
+  .sign-countdown {
+    font-size: 10px;
+  }
+
+  .sign-question {
+    font-size: 14px;
+    letter-spacing: 2px;
+    max-width: 360px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .chain-link {
+    width: 12px;
+    height: 22px;
+  }
+
+  .sign-frame {
+    border-width: 5px;
+    box-shadow:
+      0 0 40px rgba(255, 215, 0, 0.6),
+      0 0 80px rgba(255, 215, 0, 0.3),
+      0 16px 64px rgba(0, 0, 0, 0.95);
+  }
+
+  .sign-lights span {
+    width: 10px;
+    height: 10px;
+  }
+
+  .sign-content {
+    padding: 12px 32px 14px;
+  }
+
+  .sign-question {
+    font-size: 16px;
+    letter-spacing: 2.5px;
+    max-width: 440px;
+  }
+}

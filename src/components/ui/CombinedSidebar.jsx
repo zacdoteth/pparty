@@ -111,6 +111,7 @@ export default function CombinedSidebar({
   onToggle,
   selectedBetOption,      // Which bet option is selected — illuminates zone!
   onBetOptionSelect,      // Callback when option selected
+  isFlexLayout = false,   // When true, sidebar is part of flex container (not position:fixed)
 }) {
   const [isMobile, setIsMobile] = useState(false)
   const [dragY, setDragY] = useState(0)
@@ -222,7 +223,7 @@ export default function CombinedSidebar({
 
   // Desktop sidebar
   return (
-    <div className="sidebar-desktop">
+    <div className={`sidebar-desktop ${isFlexLayout ? 'flex-layout' : ''}`}>
       {/* Header */}
       <div className="sidebar-header">
         <h2>HOT MARKETS</h2>

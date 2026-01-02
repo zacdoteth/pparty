@@ -10,6 +10,7 @@ import ClubRoom from './components/stage/ClubRoom'
 import StickFigure from './components/avatars/StickFigure'
 import DraggableUser from './components/avatars/DraggableUser'
 import MarqueeSign from './components/ui/MarqueeSign'
+import HangingSign from './components/ui/HangingSign'
 import BetConfirmationModal from './components/board/BetConfirmationModal'
 import BettingSidebar from './components/ui/BettingSidebar'
 import BettingModal from './components/ui/BettingModal'
@@ -500,6 +501,13 @@ function App() {
           <div className="disco-dot" />
         </div>
       </div>
+
+      {/* ═══ HANGING SIGN — Suspended from ceiling ═══ */}
+      <HangingSign
+        question={selectedMarket.question}
+        isLive={true}
+        countdown="2h 15m"
+      />
 
       {/* ═══ SIDEBAR — Market List (Desktop) ═══ */}
       <div className="home-screen">

@@ -6,6 +6,7 @@
 import React, { useState, useCallback } from 'react'
 import DanceFloor, { createBinaryOptions, createMultiOptions } from './components/stage/DanceFloor.tsx'
 import CombinedSidebar from './components/ui/CombinedSidebar'
+import LoadingSplash from './components/ui/LoadingSplash'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MARKET DATA — Different market configurations
@@ -73,6 +74,12 @@ export default function ThreeDemo() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedBetOption, setSelectedBetOption] = useState(null)
 
+  // ═══ LOADING & INTRO STATE ═══
+  const [loadProgress, setLoadProgress] = useState(0)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [showIntro, setShowIntro] = useState(true)
+  const [introComplete, setIntroComplete] = useState(false)
+
   const selectedMarket = MARKETS.find(m => m.id === selectedMarketId) || MARKETS[0]
 
   const handleTileClick = useCallback((optionId, col, row) => {
@@ -90,41 +97,79 @@ export default function ThreeDemo() {
     setBalance(prev => Math.max(0, prev - amount))
   }, [])
 
+  // Sidebar width constant — single source of truth
+  const SIDEBAR_WIDTH = 300
+
   return (
     <div style={{
+      display: 'flex',
       width: '100vw',
       height: '100vh',
       background: 'linear-gradient(180deg, #0a0815 0%, #1a0830 50%, #0f0620 100%)',
       overflow: 'hidden',
-      position: 'relative',
     }}>
-      {/* FULL BLEED THREE.JS SCENE — positioned absolutely to fill container */}
-      <div style={{ position: 'absolute', inset: 0 }}>
+      {/* LOADING SPLASH — Shows while assets load (covers everything) */}
+      <LoadingSplash
+        progress={loadProgress}
+        isLoaded={isLoaded}
+        onIntroComplete={() => {
+          setShowIntro(true)
+          setIntroComplete(true)  // Sidebar fades in when intro complete!
+        }}
+      />
+
+      {/* ═══ LEFT: MAIN VIEWPORT (Canvas lives here) ═══ */}
+      <div style={{
+        flex: 1,
+        position: 'relative',
+        height: '100%',
+        minWidth: 0, // Critical for flex shrinking!
+      }}>
         <DanceFloor
-        key={selectedMarketId}
-        options={selectedMarket.options}
-        gridCols={24}
-        gridRows={12}
-        onTileClick={handleTileClick}
-        dancersPerZone={7}
-        marketQuestion={selectedMarket.name}
-        marketIcon={selectedMarket.icon}
-        selectedZone={selectedBetOption}
+          // NO KEY! Keep Canvas alive for instant market switching
+          options={selectedMarket.options}
+          gridCols={24}
+          gridRows={12}
+          onTileClick={handleTileClick}
+          dancersPerZone={7}
+          marketQuestion={selectedMarket.name}
+          marketIcon={selectedMarket.icon}
+          selectedZone={selectedBetOption}
+          // ═══ USER'S AVATAR — Appears when they select a zone! ═══
+          userPrediction={selectedBetOption ? {
+            zoneId: selectedBetOption,
+            avatar: '/tg/zac.jpg',  // User's avatar
+          } : undefined}
+          // ═══ INTRO ANIMATION ═══
+          showIntro={showIntro && !introComplete}
+          onLoadProgress={setLoadProgress}
+          onLoadComplete={() => setIsLoaded(true)}
+          onIntroComplete={() => setIntroComplete(true)}
         />
       </div>
 
-      {/* SPOTIFY-STYLE SIDEBAR */}
-      <CombinedSidebar
-        markets={MARKETS}
-        selectedMarketId={selectedMarketId}
-        onMarketSelect={handleMarketSelect}
-        onBet={handleBet}
-        balance={balance}
-        isOpen={sidebarOpen}
-        onToggle={setSidebarOpen}
-        selectedBetOption={selectedBetOption}
-        onBetOptionSelect={setSelectedBetOption}
-      />
+      {/* ═══ RIGHT: SIDEBAR (Fixed width, part of flex flow) ═══ */}
+      <div style={{
+        width: SIDEBAR_WIDTH,
+        height: '100%',
+        flexShrink: 0,
+        opacity: introComplete ? 1 : 0,
+        transition: 'opacity 0.6s ease-out',
+        pointerEvents: introComplete ? 'auto' : 'none',
+      }}>
+        <CombinedSidebar
+          markets={MARKETS}
+          selectedMarketId={selectedMarketId}
+          onMarketSelect={handleMarketSelect}
+          onBet={handleBet}
+          balance={balance}
+          isOpen={sidebarOpen}
+          onToggle={setSidebarOpen}
+          selectedBetOption={selectedBetOption}
+          onBetOptionSelect={setSelectedBetOption}
+          isFlexLayout={true}  // Tell sidebar it's in flex layout!
+        />
+      </div>
     </div>
   )
 }
