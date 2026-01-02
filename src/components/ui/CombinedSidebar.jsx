@@ -61,14 +61,33 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
     onPreviewZone?.(previewZone)
   }, [hoveredZone, pendingZone, onPreviewZone])
 
-  // ═══ CLICK OUTSIDE — Dismiss popup when clicking the overlay! ═══
-  const handleOverlayClick = useCallback((e) => {
-    // Only dismiss if clicking directly on the overlay
-    if (e.target.classList.contains('betting-overlay')) {
-      setPendingZone(null)
-      setChipPos({ x: 0, y: 0 })
+  // ═══ CLICK OUTSIDE — Dismiss popup when clicking elsewhere! ═══
+  useEffect(() => {
+    if (!pendingZone || isDragging) return
+
+    const handleClickOutside = (e) => {
+      // Check if clicking inside popup or chip
+      const clickedPopup = popupRef.current?.contains(e.target)
+      const clickedChip = chipRef.current?.contains(e.target)
+
+      if (!clickedPopup && !clickedChip) {
+        setPendingZone(null)
+        setChipPos({ x: 0, y: 0 })
+      }
     }
-  }, [])
+
+    // Small delay to prevent immediate dismissal
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('touchstart', handleClickOutside)
+    }, 100)
+
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [pendingZone, isDragging])
 
   if (!market) return null
 
@@ -183,9 +202,6 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
 
   return (
     <div className={`betting-section casino-style ${pendingZone && !isDragging ? 'has-pending' : ''}`} ref={containerRef}>
-      {/* ═══ LIGHTBOX OVERLAY — Click to dismiss! ═══ */}
-      {pendingZone && !isDragging && <div className="betting-overlay" onClick={handleOverlayClick} />}
-
       {/* ═══ DROP ZONES — Roulette table! ═══ */}
       <div className="bet-zones" title={!pendingZone && !selectedOption ? 'Drag chip here' : undefined}>
         {market.options?.map(opt => (
@@ -244,12 +260,8 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
             >
               <img src={userAvatar} alt="You" className="chip-avatar" />
             </div>
-            {/* Drag me bubble tooltip */}
-            {!pendingZone && !isDragging && (
-              <div className="drag-me-bubble">drag me!</div>
-            )}
           </div>
-          <span className="chip-label">YOU</span>
+          <span className="chip-label">DRAG TO BET</span>
         </div>
       )}
 
