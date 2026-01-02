@@ -62,11 +62,12 @@ export interface DanceFloorProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CONSTANTS
+// CONSTANTS — "APPLE CHICLET" GRID SPEC
 // ═══════════════════════════════════════════════════════════════════════════
 const FLOOR = {
-  tileSize: 0.68,
-  tileGap: 0.08,
+  tileSize: 0.92,      // Tile width/depth — leaves 0.08 gap in a 1.0 grid
+  tileHeight: 0.4,     // Chunky keycap height
+  gridUnit: 1.0,       // Grid step (1.0 spacing creates visible gutters)
   wallHeight: 0.5,
   wallThickness: 0.12,
 } as const
@@ -249,11 +250,12 @@ function JellyTile({ position, color, col, row, optionId, onTileClick, isMobile 
   const [tapHighlight, setTapHighlight] = useState(false)  // MOBILE TAP FEEDBACK!
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // JELLY GEOMETRY SPEC — Rounded box for that gummy cube!
-  const tileWidth = 0.95
-  const tileHeight = 0.5
-  const tileDepth = 0.95
-  const cornerRadius = 0.05
+  // ═══ APPLE CHICLET GEOMETRY — "iPhone Button" Curve! ═══
+  // Dimensions leave 0.08 gutter gap in a 1.0 grid step
+  const tileWidth = FLOOR.tileSize      // 0.92 — creates the gap!
+  const tileHeight = FLOOR.tileHeight   // 0.4 — chunky keycap
+  const tileDepth = FLOOR.tileSize      // 0.92 — square chiclet
+  const cornerRadius = 0.05             // Catches light on curved edges!
 
   // Combined highlight state (hover OR tap)
   const isHighlighted = hovered || tapHighlight
@@ -1586,13 +1588,14 @@ interface SceneProps {
 function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false }: SceneProps) {
   const ranges = useMemo(() => calculateColumnRanges(options, gridCols), [options, gridCols])
 
-  const unit = FLOOR.tileSize + FLOOR.tileGap
+  // ═══ GRID MATH — 1.0 unit step creates 0.08 gutter between 0.92 tiles ═══
+  const unit = FLOOR.gridUnit  // 1.0 — the secret sauce for visible gutters!
   const floorWidth = gridCols * unit
   const floorDepth = gridRows * unit
   const halfW = floorWidth / 2
   const halfD = floorDepth / 2
 
-  // Generate tiles
+  // Generate tiles — positioned at center of each grid cell
   const tiles = useMemo(() => {
     const list: { pos: [number, number, number]; color: string; optionId: string; col: number; row: number }[] = []
 
@@ -1601,10 +1604,11 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
         const range = getOptionForColumn(col, ranges)
         if (!range) continue
 
+        // Position at cell center: col * 1.0 leaves natural gaps between 0.92 tiles
         const x = (col + 0.5) * unit - halfW
         const z = (row + 0.5) * unit - halfD
 
-        list.push({ pos: [x, 0.25, z], color: range.color, optionId: range.optionId, col, row })
+        list.push({ pos: [x, FLOOR.tileHeight / 2, z], color: range.color, optionId: range.optionId, col, row })
       }
     }
 
@@ -1788,7 +1792,7 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
             gridCols={gridCols}
             gridRows={gridRows}
             tileSize={FLOOR.tileSize}
-            tileGap={FLOOR.tileGap}
+            tileGap={FLOOR.gridUnit - FLOOR.tileSize}  // 1.0 - 0.92 = 0.08 gap
             isMobile={isMobile}
           />
         </Suspense>

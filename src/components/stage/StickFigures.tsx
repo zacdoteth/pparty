@@ -485,71 +485,36 @@ interface SneakerProps {
 }
 
 function DopeSneaker({ scale, color }: SneakerProps) {
-  // Create geometries with TRANSLATED pivots — origin is now at the SOLE BOTTOM!
-  const { platformGeo, midsoleGeo, upperGeo, toeGeo, heelGeo, accentGeo } = useMemo(() => {
-    const platformHeight = 0.035 * scale   // CHUNKY platform!
-    const midsoleHeight = 0.025 * scale    // Air unit layer
-    const upperHeight = 0.055 * scale      // Taller upper
+  // Simpler boot that matches zone color — cleaner look!
+  const { soleGeo, bootGeo } = useMemo(() => {
+    const soleHeight = 0.025 * scale
+    const bootHeight = 0.07 * scale
 
-    // PLATFORM OUTSOLE — thick chunky base (the "Air Max" look)
-    const platform = new THREE.BoxGeometry(0.11 * scale, platformHeight, 0.18 * scale)
-    platform.translate(0, platformHeight / 2, 0)  // Pivot at BOTTOM!
+    // SOLE — thin dark base
+    const sole = new THREE.BoxGeometry(0.09 * scale, soleHeight, 0.14 * scale)
+    sole.translate(0, soleHeight / 2, 0)
 
-    // MIDSOLE — white foam layer above platform
-    const midsole = new THREE.BoxGeometry(0.10 * scale, midsoleHeight, 0.16 * scale)
-    midsole.translate(0, platformHeight + midsoleHeight / 2, 0)
+    // BOOT — zone-colored upper
+    const boot = new THREE.BoxGeometry(0.075 * scale, bootHeight, 0.11 * scale)
+    boot.translate(0, soleHeight + bootHeight / 2, -0.01 * scale)
 
-    // UPPER — zone-colored body, sits on midsole
-    const upper = new THREE.BoxGeometry(0.085 * scale, upperHeight, 0.13 * scale)
-    upper.translate(0, platformHeight + midsoleHeight + upperHeight / 2, -0.015 * scale)
-
-    // TOE CAP — rounded front bumper
-    const toe = new THREE.CapsuleGeometry(0.028 * scale, 0.03 * scale, 4, 8)
-    toe.rotateX(Math.PI / 2)
-    toe.translate(0, platformHeight + midsoleHeight * 0.8, 0.065 * scale)
-
-    // HEEL TAB — back pull tab
-    const heel = new THREE.BoxGeometry(0.04 * scale, 0.035 * scale, 0.02 * scale)
-    heel.translate(0, platformHeight + midsoleHeight + upperHeight * 0.7, -0.065 * scale)
-
-    // ACCENT STRIPE — diagonal swoosh-style
-    const accent = new THREE.BoxGeometry(0.065 * scale, 0.015 * scale, 0.002 * scale)
-    accent.rotateZ(-0.3)
-    accent.translate(0.025 * scale, platformHeight + midsoleHeight + upperHeight * 0.4, 0.07 * scale)
-
-    return { platformGeo: platform, midsoleGeo: midsole, upperGeo: upper, toeGeo: toe, heelGeo: heel, accentGeo: accent }
+    return { soleGeo: sole, bootGeo: boot }
   }, [scale])
 
   return (
     <group>
-      {/* Platform outsole — dark rubber with zone glow */}
-      <mesh geometry={platformGeo}>
-        <meshStandardMaterial color="#1a1a1a" roughness={0.7} emissive={color} emissiveIntensity={0.15} />
+      {/* Sole — dark with subtle zone glow */}
+      <mesh geometry={soleGeo}>
+        <meshBasicMaterial color="#111111" />
       </mesh>
-      {/* Midsole — bright white foam */}
-      <mesh geometry={midsoleGeo}>
-        <meshStandardMaterial color="#ffffff" roughness={0.35} />
+      {/* Boot — matches body color! */}
+      <mesh geometry={bootGeo}>
+        <meshBasicMaterial color={color} />
       </mesh>
-      {/* Upper — ZONE COLOR with glow! */}
-      <mesh geometry={upperGeo}>
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} roughness={0.4} />
-      </mesh>
-      {/* Toe cap — white leather */}
-      <mesh geometry={toeGeo}>
-        <meshStandardMaterial color="#ffffff" roughness={0.3} />
-      </mesh>
-      {/* Heel tab — contrasting accent */}
-      <mesh geometry={heelGeo}>
-        <meshStandardMaterial color="#ffffff" roughness={0.4} />
-      </mesh>
-      {/* Side accent stripe — glowing swoosh! */}
-      <mesh geometry={accentGeo}>
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-      {/* Mirror accent on other side */}
-      <mesh position={[-0.05 * scale, 0, 0]}>
-        <boxGeometry args={[0.065 * scale, 0.015 * scale, 0.002 * scale]} />
-        <meshBasicMaterial color="#ffffff" />
+      {/* Black outline on boot */}
+      <mesh position={[0, 0.025 * scale + 0.035 * scale, -0.01 * scale - 0.056 * scale]}>
+        <planeGeometry args={[0.08 * scale, 0.072 * scale]} />
+        <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
       </mesh>
     </group>
   )
@@ -731,55 +696,53 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
           </mesh>
         </group>
 
-        {/* ═══ SPEECH BUBBLE — Sleek minimal with username at top! ═══ */}
+        {/* ═══ SPEECH BUBBLE — Real chat bubble style! ═══ */}
         {showSpeech && (() => {
-          // Calculate bubble width based on text length
-          const charWidth = 0.06  // Approximate width per character
-          const textWidth = Math.max(username.length, currentSpeech.length) * charWidth
-          const bubbleWidth = Math.max(1.0, Math.min(2.6, textWidth + 0.2))  // Clamp
+          // Single line: "name: message"
+          const fullText = `${username}: ${currentSpeech}`
+          const charWidth = 0.058
+          const textWidth = fullText.length * charWidth
+          const bubbleWidth = Math.max(0.8, Math.min(2.8, textWidth + 0.08))  // Tight padding
           const halfWidth = bubbleWidth / 2
-          const bubbleHeight = 0.42  // Taller for two-line layout
+          const bubbleHeight = 0.22  // Single line height
 
           return (
             <Billboard
-              position={[headSize * 2.0, torsoHeight + headSize * 2.4, 0]}
+              position={[headSize * 2.0, torsoHeight + headSize * 2.2, 0]}
               follow={true}
               lockX={false}
               lockY={false}
               lockZ={false}
             >
-              {/* ULTRA-THIN BORDER — 50% thinner! Zone colored! */}
+              {/* Border — zone colored */}
               <mesh position={[0, 0, -0.035]}>
-                <planeGeometry args={[bubbleWidth + 0.03, bubbleHeight + 0.03]} />
+                <planeGeometry args={[bubbleWidth + 0.025, bubbleHeight + 0.025]} />
                 <meshBasicMaterial color={color} />
               </mesh>
-              {/* Subtle outer glow — softer */}
+              {/* Subtle glow */}
               <mesh position={[0, 0, -0.04]}>
-                <planeGeometry args={[bubbleWidth + 0.08, bubbleHeight + 0.08]} />
-                <meshBasicMaterial color={color} transparent opacity={0.2} />
+                <planeGeometry args={[bubbleWidth + 0.06, bubbleHeight + 0.06]} />
+                <meshBasicMaterial color={color} transparent opacity={0.15} />
               </mesh>
-              {/* Bubble background — dark interior */}
+              {/* Dark background */}
               <mesh position={[0, 0, -0.02]}>
                 <planeGeometry args={[bubbleWidth, bubbleHeight]} />
-                <meshBasicMaterial color="#08080f" />
+                <meshBasicMaterial color="#0a0a12" />
               </mesh>
 
-              {/* USERNAME at TOP — bold, zone colored, smaller */}
+              {/* Single line: "name: message" */}
               <Text
-                position={[-halfWidth + 0.06, 0.11, 0]}
-                fontSize={0.085}
-                color={color}
+                position={[-halfWidth + 0.04, 0, 0]}
+                fontSize={0.09}
                 anchorX="left"
                 anchorY="middle"
-                fontWeight="bold"
               >
-                @{username}
+                <meshBasicMaterial color={color} />
+                {username}:
               </Text>
-
-              {/* MESSAGE below username — white, main content */}
               <Text
-                position={[-halfWidth + 0.06, -0.06, 0.001]}
-                fontSize={0.11}
+                position={[-halfWidth + 0.04 + (username.length + 1) * 0.052, 0, 0.001]}
+                fontSize={0.09}
                 color="#ffffff"
                 anchorX="left"
                 anchorY="middle"
@@ -787,14 +750,14 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
                 {currentSpeech}
               </Text>
 
-              {/* Tail pointing down — thinner! */}
-              <mesh position={[-halfWidth + 0.12, -0.28, -0.03]} rotation={[0, 0, Math.PI / 4]}>
-                <planeGeometry args={[0.08, 0.08]} />
+              {/* Tail pointing down */}
+              <mesh position={[-halfWidth + 0.1, -0.16, -0.03]} rotation={[0, 0, Math.PI / 4]}>
+                <planeGeometry args={[0.07, 0.07]} />
                 <meshBasicMaterial color={color} />
               </mesh>
-              <mesh position={[-halfWidth + 0.12, -0.26, -0.02]} rotation={[0, 0, Math.PI / 4]}>
-                <planeGeometry args={[0.05, 0.05]} />
-                <meshBasicMaterial color="#08080f" />
+              <mesh position={[-halfWidth + 0.1, -0.145, -0.02]} rotation={[0, 0, Math.PI / 4]}>
+                <planeGeometry args={[0.045, 0.045]} />
+                <meshBasicMaterial color="#0a0a12" />
               </mesh>
             </Billboard>
           )
