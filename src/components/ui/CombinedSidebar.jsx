@@ -3,8 +3,114 @@
  * "Desktop: fixed right sidebar. Mobile: swipe-up bottom sheet" — UX Architect
  */
 
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import './CombinedSidebar.css'
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LIVE BETTORS — Real TG community members!
+// "Social proof drives FOMO" — Growth Hacker
+// ═══════════════════════════════════════════════════════════════════════════
+const TG_AVATARS = [
+  { name: 'AzFlin', avatar: '/tg/AzFlin.jpg' },
+  { name: 'biz', avatar: '/tg/biz.jpg' },
+  { name: 'ferengi', avatar: '/tg/ferengi.jpg' },
+  { name: 'frostyflakes', avatar: '/tg/frostyflakes.jpg' },
+  { name: 'icobeast', avatar: '/tg/icobeast.jpg' },
+  { name: 'jin', avatar: '/tg/jin.jpg' },
+  { name: 'phanes', avatar: '/tg/phanes.jpg' },
+  { name: 'pupul', avatar: '/tg/pupul.jpg' },
+  { name: 'rekt', avatar: '/tg/rekt.jpg' },
+  { name: 'rob', avatar: '/tg/rob.jpg' },
+  { name: 'shinkiro14', avatar: '/tg/shinkiro14.jpg' },
+  { name: 'skely', avatar: '/tg/skely.jpg' },
+  { name: 'Tintin', avatar: '/tg/Tintin.jpg' },
+  { name: 'ultra', avatar: '/tg/ultra.png' },
+  { name: 'vn', avatar: '/tg/vn.jpg' },
+]
+
+// Seeded random for consistent fake data
+function seededRandom(seed) {
+  const x = Math.sin(seed) * 10000
+  return x - Math.floor(x)
+}
+
+function LiveBettors({ market, selectedMarketId, userBet, userAvatar = '/tg/zac.jpg', onMarketSelect }) {
+  // Generate "random" bets for this market (seeded by market id for consistency)
+  const bettors = useMemo(() => {
+    if (!market?.options) return []
+
+    const seed = selectedMarketId?.charCodeAt(0) || 0
+
+    // Generate random amounts, picks, and P&L for each TG member
+    return TG_AVATARS.map((user, i) => {
+      const userSeed = seed + i * 7
+      const optionIndex = Math.floor(seededRandom(userSeed) * market.options.length)
+      const option = market.options[optionIndex]
+      // Random amount: $5 to $500, weighted toward lower amounts
+      const amount = Math.floor(5 + seededRandom(userSeed + 1) * seededRandom(userSeed + 2) * 495)
+      // Random P&L: -40% to +80% of bet amount (more winners than losers for FOMO!)
+      const pnlPct = (seededRandom(userSeed + 3) * 1.2) - 0.4  // -0.4 to +0.8
+      const pnl = Math.round(amount * pnlPct)
+      return {
+        id: user.name,
+        name: user.name,
+        avatar: user.avatar,
+        amount,
+        pnl,
+        optionId: option.id,
+        optionLabel: option.label,
+        optionColor: option.color,
+      }
+    }).sort((a, b) => b.pnl - a.pnl)  // Sort by P&L (biggest winners first!)
+  }, [market, selectedMarketId])
+
+  if (!market) return null
+
+  // Find where user would rank if they have a bet
+  const userRank = userBet ? bettors.filter(b => b.amount > userBet.amount).length + 1 : null
+
+  return (
+    <div className="live-bettors">
+      <div className="live-bettors-header">
+        <span className="live-dot" />
+        <span className="live-bettors-title">LEADERBOARD</span>
+        <span className="live-bettors-count">{bettors.length + (userBet ? 1 : 0)}</span>
+      </div>
+      <div className="live-bettors-list">
+        {/* User's bet pinned at top if exists */}
+        {userBet && (
+          <div className="bettor-row you">
+            <span className="bettor-rank">#{userRank}</span>
+            <img src={userAvatar} alt="You" className="bettor-avatar" />
+            <div className="bettor-info">
+              <span className="bettor-name">You</span>
+              <span className="bettor-pick" style={{ color: userBet.optionColor }}>
+                {userBet.optionLabel?.split(' ')[0]}
+              </span>
+            </div>
+            <span className="bettor-amount">${userBet.amount}</span>
+          </div>
+        )}
+        {/* Other bettors */}
+        {bettors.map((bettor, i) => (
+          <div key={bettor.id} className="bettor-row">
+            <span className="bettor-rank">#{userBet ? i + 2 : i + 1}</span>
+            <img src={bettor.avatar} alt={bettor.name} className="bettor-avatar" />
+            <div className="bettor-info">
+              <span className="bettor-name">{bettor.name}</span>
+              <span className="bettor-pick" style={{ color: bettor.optionColor }}>
+                {bettor.optionLabel?.split(' ')[0]}
+              </span>
+            </div>
+            <span className={`bettor-pnl ${bettor.pnl >= 0 ? 'profit' : 'loss'}`}>
+              {bettor.pnl >= 0 ? '+' : ''}{bettor.pnl}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MARKET CARD — Individual market in the list
@@ -396,9 +502,9 @@ export default function CombinedSidebar({
                       className={`your-bet-item ${marketId === selectedMarketId ? 'active' : ''}`}
                       onClick={() => onMarketSelect(marketId)}
                     >
-                      <span className="your-bet-market">{market.name.slice(0, 25)}{market.name.length > 25 ? '...' : ''}</span>
+                      <span className="your-bet-market">{market.name}</span>
                       <div className="your-bet-details">
-                        <span className="your-bet-option" style={{ color: option.color }}>{option.label}</span>
+                        <span className="your-bet-option" style={{ color: option.color }}>{option.label?.split(' ')[0]}</span>
                         <span className="your-bet-amount">${bet.amount}</span>
                       </div>
                     </button>
@@ -408,7 +514,18 @@ export default function CombinedSidebar({
             </div>
           )}
 
-          {/* Betting Section */}
+          {/* Live Bettors / Leaderboard — Mobile (above betting!) */}
+          <LiveBettors
+            market={selectedMarket}
+            selectedMarketId={selectedMarketId}
+            userBet={allBets[selectedMarketId] ? {
+              ...allBets[selectedMarketId],
+              optionLabel: selectedMarket?.options?.find(o => o.id === allBets[selectedMarketId]?.optionId)?.label,
+              optionColor: selectedMarket?.options?.find(o => o.id === allBets[selectedMarketId]?.optionId)?.color,
+            } : null}
+          />
+
+          {/* Betting Section — At bottom for thumb zone! */}
           <BettingSection
             market={selectedMarket}
             onBet={onBet}
@@ -467,9 +584,9 @@ export default function CombinedSidebar({
                   className={`your-bet-item ${marketId === selectedMarketId ? 'active' : ''}`}
                   onClick={() => onMarketSelect(marketId)}
                 >
-                  <span className="your-bet-market">{market.name.slice(0, 25)}{market.name.length > 25 ? '...' : ''}</span>
+                  <span className="your-bet-market">{market.name}</span>
                   <div className="your-bet-details">
-                    <span className="your-bet-option" style={{ color: option.color }}>{option.label}</span>
+                    <span className="your-bet-option" style={{ color: option.color }}>{option.label?.split(' ')[0]}</span>
                     <span className="your-bet-amount">${bet.amount}</span>
                   </div>
                 </button>
@@ -482,7 +599,21 @@ export default function CombinedSidebar({
       {/* Divider */}
       {Object.keys(allBets).length > 0 && <div className="sidebar-divider" />}
 
-      {/* Betting Section */}
+      {/* Live Bettors / Leaderboard — Social proof! (above betting) */}
+      <LiveBettors
+        market={selectedMarket}
+        selectedMarketId={selectedMarketId}
+        userBet={allBets[selectedMarketId] ? {
+          ...allBets[selectedMarketId],
+          optionLabel: selectedMarket?.options?.find(o => o.id === allBets[selectedMarketId]?.optionId)?.label,
+          optionColor: selectedMarket?.options?.find(o => o.id === allBets[selectedMarketId]?.optionId)?.color,
+        } : null}
+      />
+
+      {/* Divider */}
+      <div className="sidebar-divider" />
+
+      {/* Betting Section — At bottom for thumb zone! */}
       <BettingSection
         market={selectedMarket}
         onBet={onBet}
