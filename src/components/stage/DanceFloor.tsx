@@ -1825,8 +1825,8 @@ function SkyText3D({ question, icon, isMobile = false }: SkyText3DProps) {
     if (groupRef.current) {
       // ═══ BILLBOARD — Always face camera during rotation! ═══
       groupRef.current.lookAt(camera.position)
-      // Floating animation on Y axis
-      groupRef.current.position.y = 10 + Math.sin(clock.elapsedTime * 0.4) * 0.2
+      // Floating animation on Y axis (base = 9)
+      groupRef.current.position.y = 9 + Math.sin(clock.elapsedTime * 0.4) * 0.2
     }
   })
 
@@ -1840,7 +1840,7 @@ function SkyText3D({ question, icon, isMobile = false }: SkyText3DProps) {
   const maxWidth = isMobile ? 14 : 26
 
   return (
-    <group ref={groupRef} position={[0, 10, -5]}>
+    <group ref={groupRef} position={[0, 9, -4]}>
       {/* ═══ GOLD OUTER GLOW — Polymarket signature aesthetic! ═══ */}
       <Text
         font={fontUrl}

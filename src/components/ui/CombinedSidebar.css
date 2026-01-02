@@ -159,6 +159,23 @@
 .betting-section.casino-style {
   padding: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+/* ═══ LIGHTBOX OVERLAY — Focus on popup! ═══ */
+.betting-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 150;
+  animation: overlay-fade 0.2s ease-out;
+}
+
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ═══ BET ZONES — Roulette table layout ═══ */
@@ -399,15 +416,7 @@
   white-space: nowrap;
 }
 
-.chip-popup::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: var(--zone-color);
-}
+/* Removed carrot/arrow - cleaner look */
 
 @keyframes popup-appear {
   from {
