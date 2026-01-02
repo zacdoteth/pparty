@@ -153,8 +153,10 @@ export default function ThreeDemo() {
         width: SIDEBAR_WIDTH,
         height: '100%',
         flexShrink: 0,
+        // Nintendo-style slide in from right!
+        transform: introComplete ? 'translateX(0)' : 'translateX(100%)',
         opacity: introComplete ? 1 : 0,
-        transition: 'opacity 0.6s ease-out',
+        transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease-out',
         pointerEvents: introComplete ? 'auto' : 'none',
       }}>
         <CombinedSidebar

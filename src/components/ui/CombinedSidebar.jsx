@@ -21,17 +21,17 @@ function MarketCard({ market, isSelected, onSelect }) {
       </div>
       <h3 className="market-card-title">{market.name}</h3>
       <div className="market-card-options">
-        {market.options?.slice(0, 3).map(opt => (
+        {market.options?.slice(0, 4).map(opt => (
           <span
             key={opt.id}
             className="market-card-option"
             style={{ color: opt.color }}
           >
-            {opt.label?.split(' ')[0]} {opt.pct}%
+            {opt.label?.slice(0, 3)}{opt.pct}%
           </span>
         ))}
-        {market.options?.length > 3 && (
-          <span className="market-card-more">+{market.options.length - 3}</span>
+        {market.options?.length > 4 && (
+          <span className="market-card-more">+{market.options.length - 4}</span>
         )}
       </div>
     </button>
@@ -39,61 +39,222 @@ function MarketCard({ market, isSelected, onSelect }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// BETTING SECTION — Quick bet interface
-// Now with ZONE ILLUMINATION callback!
+// BETTING SECTION — Casino Roulette Style!
+// "Drag your chip to place your bet, then lock it in!" — Vegas Baby!
 // ═══════════════════════════════════════════════════════════════════════════
-function BettingSection({ market, onBet, balance = 250, selectedOption, onOptionSelect }) {
+function BettingSection({ market, onBet, balance = 250, selectedOption, onOptionSelect, userAvatar = '/tg/zac.jpg' }) {
   const [amount, setAmount] = useState(10)
+  const [isDragging, setIsDragging] = useState(false)
+  const [chipPos, setChipPos] = useState({ x: 0, y: 0 })
+  const [hoveredZone, setHoveredZone] = useState(null)
+  const [pendingZone, setPendingZone] = useState(null)
+  const chipRef = useRef(null)
+  const containerRef = useRef(null)
+  const dragStartCursor = useRef({ x: 0, y: 0 })
+  const dragStartChipPos = useRef({ x: 0, y: 0 })
 
   if (!market) return null
 
-  const handleBet = () => {
-    if (selectedOption && amount > 0) {
-      onBet?.(selectedOption, amount)
+  const pendingOption = market.options?.find(o => o.id === pendingZone)
+
+  // ═══ LOCK IN ═══
+  const handleLockIn = () => {
+    if (pendingZone && amount > 0) {
+      onOptionSelect?.(pendingZone)
+      onBet?.(pendingZone, amount)
+      setPendingZone(null)
+      setChipPos({ x: 0, y: 0 })
     }
   }
 
-  const handleOptionClick = (optionId) => {
-    onOptionSelect?.(optionId)
-  }
+  // ═══ GET ZONE AT POINT ═══
+  const getZoneAtPoint = useCallback((clientX, clientY) => {
+    const zones = containerRef.current?.querySelectorAll('.bet-zone')
+    if (!zones) return null
+
+    for (const zone of zones) {
+      const rect = zone.getBoundingClientRect()
+      // Add some padding for easier drops
+      const padding = 5
+      if (clientX >= rect.left - padding &&
+          clientX <= rect.right + padding &&
+          clientY >= rect.top - padding &&
+          clientY <= rect.bottom + padding) {
+        return zone.dataset.optionId
+      }
+    }
+    return null
+  }, [])
+
+  // ═══ DRAG START ═══
+  const handleDragStart = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+
+    // Store cursor start position and current chip position
+    dragStartCursor.current = { x: clientX, y: clientY }
+    dragStartChipPos.current = { x: chipPos.x, y: chipPos.y }
+
+    setIsDragging(true)
+  }, [chipPos])
+
+  // ═══ DRAG MOVE ═══
+  const handleDragMove = useCallback((e) => {
+    if (!isDragging) return
+    e.preventDefault()
+
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+
+    // Simple delta: how far cursor moved from start
+    const deltaX = clientX - dragStartCursor.current.x
+    const deltaY = clientY - dragStartCursor.current.y
+
+    // New position = start position + delta
+    const newX = dragStartChipPos.current.x + deltaX
+    const newY = dragStartChipPos.current.y + deltaY
+
+    setChipPos({ x: newX, y: newY })
+
+    // Check which zone cursor is over
+    const zone = getZoneAtPoint(clientX, clientY)
+    setHoveredZone(zone)
+  }, [isDragging, getZoneAtPoint])
+
+  // ═══ DRAG END ═══
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging) return
+    setIsDragging(false)
+
+    if (hoveredZone) {
+      // Dropped on a zone - set pending, keep position
+      setPendingZone(hoveredZone)
+      // Don't snap - just stay where dropped
+    } else {
+      // Missed - spring back home
+      setChipPos({ x: 0, y: 0 })
+      setPendingZone(null)
+    }
+
+    setHoveredZone(null)
+  }, [isDragging, hoveredZone])
+
+  // ═══ GLOBAL LISTENERS ═══
+  useEffect(() => {
+    if (!isDragging) return
+
+    const onMove = (e) => handleDragMove(e)
+    const onEnd = () => handleDragEnd()
+
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onEnd)
+    window.addEventListener('touchmove', onMove, { passive: false })
+    window.addEventListener('touchend', onEnd)
+    window.addEventListener('touchcancel', onEnd)
+
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onEnd)
+      window.removeEventListener('touchmove', onMove)
+      window.removeEventListener('touchend', onEnd)
+      window.removeEventListener('touchcancel', onEnd)
+    }
+  }, [isDragging, handleDragMove, handleDragEnd])
 
   return (
-    <div className="betting-section">
-      <h4 className="betting-title">PLACE YOUR BET</h4>
-
-      <div className="betting-options">
+    <div className="betting-section casino-style" ref={containerRef}>
+      {/* ═══ DROP ZONES — Roulette table! ═══ */}
+      <div className="bet-zones" title={!pendingZone && !selectedOption ? 'Drag chip here' : undefined}>
         {market.options?.map(opt => (
-          <button
+          <div
             key={opt.id}
-            className={`betting-option ${selectedOption === opt.id ? 'selected' : ''}`}
-            style={{
-              '--option-color': opt.color,
-              borderColor: selectedOption === opt.id ? opt.color : 'transparent'
-            }}
-            onClick={() => handleOptionClick(opt.id)}
+            className={`bet-zone ${selectedOption === opt.id ? 'selected' : ''} ${hoveredZone === opt.id ? 'hovered' : ''} ${pendingZone === opt.id ? 'pending' : ''}`}
+            data-option-id={opt.id}
+            style={{ '--zone-color': opt.color }}
           >
-            <span className="betting-option-label">{opt.label?.split(' ')[0]}</span>
-            <span className="betting-option-pct">{opt.pct}%</span>
-          </button>
+            <span className="zone-label">{opt.label?.split(' ')[0]?.slice(0, 5).toUpperCase()}</span>
+            <span className="zone-price">{opt.pct}¢</span>
+            <span className="zone-chance">{opt.pct}% chance</span>
+            {/* Show placed chip if selected (after lock-in) */}
+            {selectedOption === opt.id && (
+              <div className="zone-chip-placed">
+                <img src={userAvatar} alt="You" className="placed-avatar" />
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
-      <div className="betting-amount">
-        <label>Amount</label>
-        <div className="betting-amount-controls">
-          <button onClick={() => setAmount(Math.max(1, amount - 5))}>-</button>
-          <span className="betting-amount-value">${amount}</span>
-          <button onClick={() => setAmount(Math.min(balance, amount + 5))}>+</button>
-        </div>
-      </div>
+      {/* ═══ DRAGGABLE CHIP — Your avatar! ═══ */}
+      {!selectedOption && (
+        <div className="chip-dock">
+          <div className="chip-wrapper">
+            <div
+              ref={chipRef}
+              className={`betting-chip ${isDragging ? 'dragging' : ''} ${pendingZone ? 'on-zone' : ''}`}
+              style={{
+                transform: `translate(${chipPos.x}px, ${chipPos.y}px) scale(${isDragging ? 1.15 : 1})`,
+                transition: isDragging ? 'none' : 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                '--pending-color': pendingOption?.color || '#ffd700',
+              }}
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+            >
+              <img src={userAvatar} alt="You" className="chip-avatar" />
+            </div>
+            {/* Drag me bubble tooltip */}
+            {!pendingZone && !isDragging && (
+              <div className="drag-me-bubble">drag me!</div>
+            )}
+          </div>
+          <span className="chip-label">YOU</span>
 
-      <button
-        className="betting-confirm"
-        disabled={!selectedOption}
-        onClick={handleBet}
-      >
-        {selectedOption ? `BET $${amount} ON ${market.options?.find(o => o.id === selectedOption)?.label?.split(' ')[0]?.toUpperCase()}` : 'SELECT AN OPTION'}
-      </button>
+          {/* ═══ AMOUNT CONTROLS — Under chip dock ═══ */}
+          <div className="bet-amount-bar">
+            <button className="amount-btn" onClick={() => setAmount(Math.max(1, amount - 5))}>−</button>
+            <span className="amount-value">${amount}</span>
+            <button className="amount-btn" onClick={() => setAmount(Math.min(balance, amount + 5))}>+</button>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ PAYOUT + LOCK IN BUTTON ═══ */}
+      {!selectedOption && (
+        <div className="lock-in-section">
+          {pendingOption && (
+            <div className="payout-preview">
+              Win <span className="payout-value">${Math.round(amount * (100 / pendingOption.pct))}</span>
+            </div>
+          )}
+          <button
+            className={`lock-in-btn ${pendingZone ? 'ready' : ''}`}
+            style={{ '--zone-color': pendingOption?.color || '#666' }}
+            disabled={!pendingZone}
+            onClick={handleLockIn}
+          >
+            {pendingOption ? `🔒 LOCK IN ${pendingOption.label?.split(' ')[0]?.toUpperCase()}` : 'DRAG CHIP TO BET'}
+          </button>
+        </div>
+      )}
+
+      {/* ═══ LOCKED STATE ═══ */}
+      {selectedOption && (
+        <div className="bet-locked-indicator">
+          <span className="locked-text">🔒 LOCKED IN</span>
+          <span className="locked-option" style={{ color: market.options?.find(o => o.id === selectedOption)?.color }}>
+            {market.options?.find(o => o.id === selectedOption)?.label}
+          </span>
+          <button
+            className="unlock-bet-btn"
+            onClick={() => onOptionSelect?.(null)}
+          >
+            🔓 UNLOCK
+          </button>
+        </div>
+      )}
     </div>
   )
 }

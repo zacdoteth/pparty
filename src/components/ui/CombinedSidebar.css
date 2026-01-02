@@ -134,106 +134,393 @@
 
 .market-card-options {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .market-card-option {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .market-card-more {
-  font-size: 11px;
+  font-size: 10px;
   color: #666;
+  white-space: nowrap;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   BETTING SECTION
+   BETTING SECTION — CASINO ROULETTE STYLE!
+   "Where fortunes are made" — Vegas Architecture
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.betting-section {
-  padding: 16px;
+.betting-section.casino-style {
+  padding: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.betting-title {
-  margin: 0 0 12px 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #888;
-}
-
-.betting-options {
+/* ═══ BET ZONES — Roulette table layout ═══ */
+.bet-zones {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 12px;
 }
 
-.betting-option {
-  background: rgba(255, 255, 255, 0.04);
-  border: 2px solid transparent;
-  border-radius: 10px;
-  padding: 10px;
+/* 3 options = 1 + 2 layout */
+.bet-zones:has(.bet-zone:nth-child(3):last-child) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* 5+ options = tighter grid */
+.bet-zones:has(.bet-zone:nth-child(5)) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.bet-zone {
+  position: relative;
+  background: linear-gradient(180deg, rgba(20, 18, 30, 0.9) 0%, rgba(10, 8, 20, 0.95) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 80px;
+  overflow: hidden;
+}
+
+/* Glow effect on border */
+.bet-zone::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--zone-color), transparent 60%);
+  opacity: 0.15;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.bet-zone:hover {
+  border-color: var(--zone-color);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--zone-color) 30%, transparent);
+}
+
+.bet-zone:hover::before {
+  opacity: 0.3;
+}
+
+.bet-zone.hovered {
+  border-color: var(--zone-color);
+  transform: scale(1.05);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--zone-color) 50%, transparent),
+    inset 0 0 30px color-mix(in srgb, var(--zone-color) 15%, transparent);
+}
+
+.bet-zone.selected {
+  border-color: var(--zone-color);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--zone-color) 15%, rgba(20, 18, 30, 0.9)) 0%,
+    color-mix(in srgb, var(--zone-color) 8%, rgba(10, 8, 20, 0.95)) 100%
+  );
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--zone-color) 40%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--zone-color) 10%, transparent);
+}
+
+.zone-label {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--zone-color);
+  text-shadow: 0 0 20px var(--zone-color);
+  opacity: 0.9;
+}
+
+.zone-price {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--zone-color);
+  text-shadow: 0 0 15px var(--zone-color);
+}
+
+.zone-chance {
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+}
+
+/* Chip placed in zone */
+.zone-chip-placed {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.placed-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--zone-color);
+  box-shadow: 0 0 10px var(--zone-color);
+}
+
+/* ═══ CHIP DOCK — Your betting chip ═══ */
+.chip-dock {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  padding: 12px 0;
+  margin-bottom: 8px;
 }
 
-.betting-option:hover {
-  background: rgba(255, 255, 255, 0.08);
+.betting-chip {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a1a2e 0%, #0a0a15 100%);
+  border: 3px solid #ffd700;
+  box-shadow:
+    0 4px 20px rgba(255, 215, 0, 0.4),
+    0 0 0 2px rgba(255, 215, 0, 0.2),
+    inset 0 2px 10px rgba(255, 255, 255, 0.1);
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+  z-index: 100;
+  /* No transition here - controlled by inline style */
+  will-change: transform;
 }
 
-.betting-option.selected {
-  background: color-mix(in srgb, var(--option-color) 20%, transparent);
-  border-color: var(--option-color);
+.betting-chip:hover {
+  box-shadow:
+    0 6px 30px rgba(255, 215, 0, 0.6),
+    0 0 0 3px rgba(255, 215, 0, 0.3),
+    inset 0 2px 10px rgba(255, 255, 255, 0.15);
 }
 
-.betting-option-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
+.betting-chip:active,
+.betting-chip.dragging {
+  cursor: grabbing;
+  box-shadow:
+    0 12px 40px rgba(255, 215, 0, 0.7),
+    0 0 0 4px rgba(255, 215, 0, 0.4),
+    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+  z-index: 9999;
 }
 
-.betting-option-pct {
-  font-size: 11px;
-  color: #888;
+.chip-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.chip-wrapper {
+  position: relative;
+}
+
+.chip-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffd700;
+}
+
+/* ═══ DRAG ME BUBBLE — Playful tooltip! ═══ */
+.drag-me-bubble {
+  position: absolute;
+  top: -8px;
+  right: -50px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #1a1a2e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  animation: bubble-bounce 2s ease-in-out infinite;
+  z-index: 10;
+}
+
+/* Little tail pointing to chip */
+.drag-me-bubble::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: #ffd700;
+}
+
+@keyframes bubble-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .betting-amount {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .betting-amount label {
   display: block;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 1px;
-  color: #666;
-  margin-bottom: 8px;
+  letter-spacing: 1.5px;
+  color: #555;
+  margin-bottom: 6px;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .betting-amount-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
-  padding: 8px;
+  padding: 6px 12px;
 }
 
 .betting-amount-controls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #888;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.betting-amount-controls button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.betting-amount-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffd700;
+  min-width: 50px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.betting-confirm {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, rgba(80, 60, 120, 0.8) 0%, rgba(50, 35, 80, 0.9) 100%);
+  border: 1px solid rgba(136, 68, 255, 0.2);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: not-allowed;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.betting-confirm.ready {
+  background: linear-gradient(135deg, #8844ff 0%, #6622cc 100%);
+  border-color: rgba(136, 68, 255, 0.5);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(136, 68, 255, 0.3);
+}
+
+.betting-confirm.ready:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(136, 68, 255, 0.5);
+}
+
+.betting-confirm:disabled {
+  opacity: 0.6;
+}
+
+/* Pending zone (chip dropped, awaiting lock-in) */
+.bet-zone.pending {
+  border-color: var(--zone-color);
+  animation: pulse-pending 1s ease-in-out infinite;
+}
+
+@keyframes pulse-pending {
+  0%, 100% {
+    box-shadow: 0 0 15px color-mix(in srgb, var(--zone-color) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 25px color-mix(in srgb, var(--zone-color) 60%, transparent);
+  }
+}
+
+/* Chip on a zone but not locked — still draggable! */
+.betting-chip.on-zone {
+  border-color: var(--pending-color);
+  box-shadow:
+    0 6px 30px color-mix(in srgb, var(--pending-color) 60%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--pending-color) 40%, transparent);
+  animation: chip-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes chip-pulse {
+  0%, 100% {
+    box-shadow:
+      0 6px 30px color-mix(in srgb, var(--pending-color) 50%, transparent),
+      0 0 0 3px color-mix(in srgb, var(--pending-color) 30%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 8px 40px color-mix(in srgb, var(--pending-color) 70%, transparent),
+      0 0 0 5px color-mix(in srgb, var(--pending-color) 50%, transparent);
+  }
+}
+
+/* ═══ AMOUNT BAR — Under chip dock ═══ */
+.bet-amount-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 8px 16px;
+  margin-top: 8px;
+}
+
+.amount-btn {
   width: 32px;
   height: 32px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #fff;
   font-size: 18px;
   font-weight: 600;
@@ -241,40 +528,224 @@
   transition: all 0.15s ease;
 }
 
-.betting-amount-controls button:hover {
+.amount-btn:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
 }
 
-.betting-amount-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  min-width: 60px;
+.amount-btn:active {
+  transform: scale(0.95);
+}
+
+.amount-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffd700;
+  min-width: 70px;
   text-align: center;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 }
 
-.betting-confirm {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(135deg, #8844ff 0%, #6622cc 100%);
-  color: #fff;
+/* ═══ LOCK IN SECTION — Bottom ═══ */
+.lock-in-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.payout-preview {
   font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.payout-preview .payout-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.lock-in-btn {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  cursor: not-allowed;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lock-in-btn.ready {
+  background: linear-gradient(135deg, var(--zone-color), color-mix(in srgb, var(--zone-color) 60%, #000));
+  border-color: var(--zone-color);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--zone-color) 40%, transparent);
+}
+
+.lock-in-btn.ready:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--zone-color) 50%, transparent);
+}
+
+.lock-in-btn.ready:active {
+  transform: scale(0.98);
+}
+
+/* ═══ BET LOCKED INDICATOR ═══ */
+.bet-locked-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(0, 255, 136, 0.08) 0%, rgba(0, 200, 100, 0.04) 100%);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.locked-text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.locked-option {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 0 15px currentColor;
+}
+
+.unlock-bet-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.2s ease;
+  margin-top: 4px;
 }
 
-.betting-confirm:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(136, 68, 255, 0.4);
+.unlock-bet-btn:hover {
+  background: rgba(255, 180, 0, 0.15);
+  border-color: rgba(255, 180, 0, 0.3);
+  color: #ffb400;
+  transform: scale(1.02);
 }
 
-.betting-confirm:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE BETTING — Thumb-friendly layout!
+   "Design for the thumb zone" — Mobile UX Master
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .betting-section.casino-style {
+    padding: 12px;
+  }
+
+  /* Amount bar */
+  .bet-amount-bar {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+  }
+
+  .amount-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+
+  .amount-value {
+    font-size: 26px;
+    min-width: 80px;
+  }
+
+  /* Zones more compact */
+  .bet-zones {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .bet-zone {
+    min-height: 65px;
+    padding: 10px 6px;
+  }
+
+  .zone-label {
+    font-size: 11px;
+  }
+
+  .zone-price {
+    font-size: 15px;
+  }
+
+  .zone-chance {
+    font-size: 8px;
+  }
+
+  /* Chip dock */
+  .chip-dock {
+    padding: 10px 0;
+    margin-bottom: 6px;
+  }
+
+  .betting-chip {
+    width: 60px;
+    height: 60px;
+    border-width: 4px;
+  }
+
+  .chip-avatar {
+    width: 46px;
+    height: 46px;
+  }
+
+  .chip-label {
+    font-size: 10px;
+  }
+
+  .chip-hint {
+    font-size: 9px;
+  }
+
+  /* Lock in section */
+  .lock-in-section {
+    margin-top: 6px;
+  }
+
+  .lock-in-btn {
+    padding: 16px 20px;
+    font-size: 13px;
+  }
+
+  /* Locked indicator */
+  .bet-locked-indicator {
+    padding: 16px;
+    margin-top: 10px;
+  }
+
+  .locked-option {
+    font-size: 18px;
+  }
+
+  .unlock-bet-btn {
+    padding: 10px 20px;
+    font-size: 11px;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
