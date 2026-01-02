@@ -202,6 +202,9 @@ function BettingSection({ market, onBet, balance = 250, selectedOption, onOption
 
   return (
     <div className={`betting-section casino-style ${pendingZone && !isDragging ? 'has-pending' : ''}`} ref={containerRef}>
+      {/* ═══ MARKET QUESTION — What are we betting on? ═══ */}
+      <div className="betting-question">{market.name}</div>
+
       {/* ═══ DROP ZONES — Roulette table! ═══ */}
       <div className="bet-zones" title={!pendingZone && !selectedOption ? 'Drag chip here' : undefined}>
         {market.options?.map(opt => (
