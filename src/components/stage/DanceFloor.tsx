@@ -83,8 +83,10 @@ const DESKTOP_GRID = {
   cols: 24,
   rows: 12,
   camera: {
-    position: [0, 14, 16] as [number, number, number],
-    fov: 48,
+    // STADIUM VIEW — High angle that fits the ENTIRE stage on Frame 1!
+    // No jump, no auto-zoom. User can zoom in if they want.
+    position: [0, 30, 45] as [number, number, number],
+    fov: 50,
   },
 } as const
 
@@ -2133,26 +2135,8 @@ interface CameraControllerProps {
 }
 
 function CameraController({ isMobile = false }: CameraControllerProps) {
-  const { camera, size } = useThree()
-
-  React.useEffect(() => {
-    // Dynamic zoom based on viewport aspect ratio
-    // Narrow screens = pull camera back to fit the whole stage
-    const aspect = size.width / size.height
-
-    // ZOOMED OUT to see the FULL dance floor on load!
-    const baseY = 18       // Higher up
-    const baseZ = 22       // Further back
-
-    // Scale factor: narrower aspect = zoom out more
-    // Desktop (aspect ~1.8) = scale 1.0
-    // Mobile portrait (aspect ~0.5) = scale ~1.6 (zoomed out)
-    const scaleFactor = Math.max(1, 1.6 / Math.max(aspect, 0.5))
-
-    camera.position.set(0, baseY * scaleFactor, baseZ * scaleFactor)
-    camera.lookAt(0, 0, 0)
-    camera.updateProjectionMatrix()
-  }, [camera, size.width, size.height])
+  // NO AUTO-ZOOM! Camera starts at perfect Stadium View position
+  // User can manually zoom/rotate if they want
 
   return (
     <OrbitControls
@@ -2163,12 +2147,12 @@ function CameraController({ isMobile = false }: CameraControllerProps) {
       enableRotate={true}
       enablePan={false}
       minDistance={6}
-      maxDistance={50}
+      maxDistance={60}
       minPolarAngle={Math.PI / 6}
       maxPolarAngle={Math.PI / 2 - 0.08}
       rotateSpeed={isMobile ? 0.5 : 0.8}
       zoomSpeed={1.0}
-      target={[0, 0.5, 0]}
+      target={[0, 0, 0]}  // DEAD CENTER of the floor!
       touches={{
         ONE: THREE.TOUCH.ROTATE,
         TWO: THREE.TOUCH.DOLLY_PAN,
