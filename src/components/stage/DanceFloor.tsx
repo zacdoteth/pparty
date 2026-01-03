@@ -12,7 +12,7 @@
 
 import React, { useRef, useState, useMemo, useEffect, Suspense, useCallback } from 'react'
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
-import { Text, RoundedBox, useTexture, Environment, OrbitControls } from '@react-three/drei'
+import { Text, Text3D, Center, RoundedBox, useTexture, Environment, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { DancerGroup, AVATARS, type Dancer } from './StickFigures'
 
@@ -88,9 +88,9 @@ const DESKTOP_GRID = {
   cols: 24,
   rows: 12,
   camera: {
-    // TIGHTER FRAME — More intimate view, still see both edges!
-    // Y=12 (lower angle), Z=18 (closer) — immersive but shows full width
-    position: [0, 12, 18] as [number, number, number],
+    // PERFECT FRAME — 10% zoomed out for breathing room!
+    // Y=13 (slightly higher for better overview), Z=20 (10% further back)
+    position: [0, 13, 20] as [number, number, number],
     fov: 55,  // Slightly wider lens to capture edges
   },
 } as const
@@ -1642,132 +1642,144 @@ interface PodiumProps {
   rank: number
 }
 
-const MEDALS = ['🥇', '🥈', '🥉']
-const RANK_LABELS = ['1ST', '2ND', '3RD']
+// ═══════════════════════════════════════════════════════════════════════════
+// PROGRESS BAR PODIUM — Floor-attached, classy loading bar style!
+// "Attached to the floor, legible from all angles" — Art Director
+// ═══════════════════════════════════════════════════════════════════════════
 
-function SkyPodium({ position, label, pct, color, rank }: PodiumProps) {
+// Bar dimensions constant — CHUNKY 3D!
+const BAR_WIDTH = 3.8
+const BAR_HEIGHT = 0.5
+const BAR_DEPTH = 0.25
+
+function ProgressBarPodium({ position, label, pct, color, rank }: PodiumProps) {
   const groupRef = useRef<THREE.Group>(null!)
-  const glowRef = useRef<THREE.Mesh>(null!)
+  const fillRef = useRef<THREE.Mesh>(null!)
+  const shineRef = useRef<THREE.Mesh>(null!)
   const { camera } = useThree()
 
-  // Billboard: always face camera
-  useFrame(({ clock }) => {
+  // Animated fill - starts at 0 and grows to target
+  const animatedFill = useRef(0)
+  const targetFill = pct
+
+  // Billboard + animated fill growth
+  useFrame((_, delta) => {
     if (groupRef.current) {
+      // ═══ BILLBOARD — Always face camera like the title! ═══
       groupRef.current.lookAt(camera.position)
     }
-    // Subtle pulse on edge glow
-    if (glowRef.current) {
-      const mat = glowRef.current.material as THREE.MeshBasicMaterial
-      mat.opacity = 0.7 + Math.sin(clock.elapsedTime * 2) * 0.2
+
+    // ═══ ANIMATE FILL GROWTH — Smooth grow effect! ═══
+    if (animatedFill.current < targetFill) {
+      // Grow with easing - faster at start, slower near end
+      const speed = 2 + (targetFill - animatedFill.current) * 0.05
+      animatedFill.current = Math.min(targetFill, animatedFill.current + delta * speed * 30)
+
+      // Update fill mesh scale and position
+      if (fillRef.current && shineRef.current) {
+        const currentWidth = Math.max(0.1, (animatedFill.current / 100) * BAR_WIDTH)
+        fillRef.current.scale.x = currentWidth / BAR_WIDTH
+        fillRef.current.position.x = (-BAR_WIDTH + currentWidth) / 2
+        shineRef.current.scale.x = currentWidth / BAR_WIDTH
+        shineRef.current.position.x = (-BAR_WIDTH + currentWidth) / 2
+      }
     }
   })
 
   const displayLabel = label.split(' ')[0].toUpperCase()
   const isWinner = rank === 0
 
-  // Sleek horizontal dimensions — like reference image
-  const panelWidth = 3.8
-  const panelHeight = 0.75
-  const cornerRadius = 0.15
-  const edgeThickness = 0.08
+  // Combined label: "J.D. 38%"
+  const combinedLabel = `${displayLabel} ${Math.round(pct)}%`
+
+  // 3D Text settings — like title but smaller!
+  const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json'
+  const labelSize = 0.4
+  const labelDepth = 0.08
 
   return (
     <group ref={groupRef} position={position}>
-      {/* ═══ MAIN PANEL — Dark translucent background ═══ */}
-      <RoundedBox
-        args={[panelWidth, panelHeight, 0.06]}
-        radius={cornerRadius}
-        smoothness={4}
-        position={[0, 0, -0.03]}
-      >
+      {/* ═══ TRANSPARENT COLORED BACKDROP — Like title glow! ═══ */}
+      <mesh position={[0, 0.5, -0.15]}>
+        <planeGeometry args={[BAR_WIDTH + 1.5, 1.8]} />
+        <meshBasicMaterial color={color} transparent opacity={0.15} />
+      </mesh>
+
+      {/* ═══ 3D LABEL + PERCENTAGE — ULTRABOLD like title! ═══ */}
+      <group position={[0, 0.9, 0]}>
+        <Center>
+          <Text3D
+            font={fontUrl}
+            size={labelSize}
+            height={labelDepth * 1.2}  // Deeper for ULTRABOLD
+            curveSegments={8}
+            bevelEnabled={true}
+            bevelThickness={0.025}  // Thicker bevel = CHUNKIER
+            bevelSize={0.018}       // Larger bevel = BOLDER
+            bevelSegments={4}
+            letterSpacing={0.015}   // Tighter for bold look
+          >
+            {combinedLabel}
+            {/* Zone color with metallic shine! */}
+            <meshStandardMaterial
+              color={color}
+              metalness={0.8}
+              roughness={0.15}
+              emissive={color}
+              emissiveIntensity={0.5}  // More glow!
+            />
+          </Text3D>
+        </Center>
+      </group>
+
+      {/* ═══ BAR TRACK — Deep 3D groove ═══ */}
+      <mesh position={[0, 0.25, 0]}>
+        <boxGeometry args={[BAR_WIDTH + 0.1, BAR_HEIGHT + 0.1, BAR_DEPTH]} />
         <meshStandardMaterial
-          color="#080810"
-          transparent
-          opacity={0.92}
-          roughness={0.8}
+          color="#0a0a12"
+          metalness={0.4}
+          roughness={0.6}
         />
-      </RoundedBox>
-
-      {/* ═══ NEON EDGE GLOW — Left side accent bar ═══ */}
-      <mesh ref={glowRef} position={[-panelWidth / 2 + edgeThickness / 2 + 0.02, 0, 0.01]}>
-        <boxGeometry args={[edgeThickness, panelHeight - 0.12, 0.02]} />
-        <meshBasicMaterial color={color} transparent opacity={0.9} />
       </mesh>
 
-      {/* ═══ BOTTOM EDGE GLOW — Subtle neon underline ═══ */}
-      <mesh position={[0, -panelHeight / 2 + 0.03, 0.01]}>
-        <boxGeometry args={[panelWidth - 0.2, 0.04, 0.02]} />
-        <meshBasicMaterial color={color} transparent opacity={0.5} />
-      </mesh>
-
-      {/* ═══ OUTER GLOW HALO — Soft zone color aura ═══ */}
-      <mesh position={[0, 0, -0.08]}>
-        <planeGeometry args={[panelWidth + 0.3, panelHeight + 0.25]} />
-        <meshBasicMaterial color={color} transparent opacity={0.12} />
-      </mesh>
-
-      {/* ═══ PERCENTAGE BAR — Color fill based on % (min 8% width so small values visible) ═══ */}
-      {(() => {
-        const barWidth = panelWidth - 0.16
-        const fillPct = Math.max(8, pct) / 100  // Min 8% so tiny values still show
-        const fillWidth = barWidth * fillPct
-        return (
-          <mesh position={[-barWidth / 2 + fillWidth / 2 + 0.08, 0, -0.02]}>
-            <boxGeometry args={[fillWidth, panelHeight - 0.08, 0.02]} />
-            <meshBasicMaterial color={color} transparent opacity={0.3} />
-          </mesh>
-        )
-      })()}
-
-      {/* ═══ MEDAL EMOJI ONLY — Left side ═══ */}
-      {rank < 3 && (
-        <Text
-          position={[-panelWidth / 2 + 0.22, 0, 0.04]}
-          fontSize={0.28}
-          anchorX="left"
-          anchorY="middle"
-        >
-          {MEDALS[rank]}
-        </Text>
-      )}
-
-      {/* ═══ CANDIDATE NAME — After medal with padding ═══ */}
-      <Text
-        position={[-panelWidth / 2 + (rank < 3 ? 0.72 : 0.22), 0, 0.04]}
-        fontSize={0.34}
-        color="#ffffff"
-        anchorX="left"
-        anchorY="middle"
-        fontWeight="bold"
-        letterSpacing={0.06}
+      {/* ═══ BAR FILL — Animated growth! ═══ */}
+      <mesh
+        ref={fillRef}
+        position={[(-BAR_WIDTH + 0.1) / 2, 0.25, 0.06]}
+        scale={[0.1 / BAR_WIDTH, 1, 1]}
       >
-        {displayLabel}
-      </Text>
+        <boxGeometry args={[BAR_WIDTH, BAR_HEIGHT - 0.08, BAR_DEPTH - 0.05]} />
+        <meshStandardMaterial
+          color={color}
+          metalness={0.6}
+          roughness={0.25}
+          emissive={color}
+          emissiveIntensity={isWinner ? 0.5 : 0.3}
+        />
+      </mesh>
 
-      {/* ═══ PERCENTAGE — Right side ═══ */}
-      <Text
-        position={[panelWidth / 2 - 0.18, 0, 0.04]}
-        fontSize={0.38}
-        color="#ffffff"
-        anchorX="right"
-        anchorY="middle"
-        fontWeight="bold"
+      {/* ═══ TOP SHINE — Glass highlight on fill ═══ */}
+      <mesh
+        ref={shineRef}
+        position={[(-BAR_WIDTH + 0.1) / 2, 0.25 + BAR_HEIGHT / 2 - 0.06, 0.12]}
+        scale={[0.1 / BAR_WIDTH, 1, 1]}
       >
-        {Math.round(pct)}%
-      </Text>
+        <boxGeometry args={[BAR_WIDTH - 0.05, 0.08, BAR_DEPTH - 0.1]} />
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.2}
+        />
+      </mesh>
 
-      {/* ═══ CORNER ACCENT DOTS — Winner bling ═══ */}
+      {/* ═══ WINNER GLOW — Extra light for #1 ═══ */}
       {isWinner && (
-        <>
-          <mesh position={[panelWidth / 2 - 0.12, panelHeight / 2 - 0.12, 0.03]}>
-            <circleGeometry args={[0.05, 12]} />
-            <meshBasicMaterial color={color} />
-          </mesh>
-          <mesh position={[panelWidth / 2 - 0.12, -panelHeight / 2 + 0.12, 0.03]}>
-            <circleGeometry args={[0.05, 12]} />
-            <meshBasicMaterial color={color} />
-          </mesh>
-        </>
+        <pointLight
+          position={[0, 0.8, 0.5]}
+          intensity={2}
+          distance={4}
+          color={color}
+        />
       )}
     </group>
   )
@@ -1825,84 +1837,51 @@ function SkyText3D({ question, icon, isMobile = false }: SkyText3DProps) {
     if (groupRef.current) {
       // ═══ BILLBOARD — Always face camera during rotation! ═══
       groupRef.current.lookAt(camera.position)
-      // Floating animation on Y axis (base = 9)
-      groupRef.current.position.y = 9 + Math.sin(clock.elapsedTime * 0.4) * 0.2
+      // Floating animation on Y axis (base = 7) — raised a bit!
+      groupRef.current.position.y = 7 + Math.sin(clock.elapsedTime * 0.4) * 0.15
     }
   })
 
-  // Inter Bold — TTF format for troika-three-text compatibility!
-  const fontUrl = '/fonts/Inter-Bold.ttf'
+  // TYPOGRAPHY SPEC — BIG CHUNKY TITLE! Zone labels are 50% this size
+  const titleSize = isMobile ? 0.6 : 0.9
+  const depth = isMobile ? 0.1 : 0.15  // Real 3D extrusion depth!
 
-  // TYPOGRAPHY SPEC — Polymarket style
-  const titleSize = isMobile ? 1.0 : 1.6
-  const iconSize = isMobile ? 1.8 : 2.8
-  const letterSpacing = 0.15  // ULTRA-WIDE like Polymarket!
-  const maxWidth = isMobile ? 14 : 26
+  // Typeface JSON font (helvetiker from three.js)
+  const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json'
 
   return (
-    <group ref={groupRef} position={[0, 9, -4]}>
-      {/* ═══ GOLD OUTER GLOW — Polymarket signature aesthetic! ═══ */}
-      <Text
-        font={fontUrl}
-        fontSize={titleSize * 1.04}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={maxWidth}
-        textAlign="center"
-        fontWeight={700}
-        position={[0, 0, -0.15]}
-      >
-        {question.toUpperCase()}
-        <meshBasicMaterial color="#ffd700" transparent opacity={0.4} toneMapped={false} />
-      </Text>
+    <group ref={groupRef} position={[0, 7, -3]}>
+      <Center>
+        {/* ═══ REAL 3D TEXT — ULTRABOLD extruded geometry! ═══ */}
+        <Text3D
+          font={fontUrl}
+          size={titleSize}
+          height={depth * 1.3}  // Deeper extrusion for ULTRABOLD feel
+          curveSegments={12}
+          bevelEnabled={true}
+          bevelThickness={0.04}  // Thicker bevel = CHUNKIER
+          bevelSize={0.025}      // Larger bevel = BOLDER
+          bevelOffset={0}
+          bevelSegments={5}
+          letterSpacing={0.015}  // Tighter spacing for bold look
+        >
+          {question.toUpperCase()}
+          {/* ═══ METALLIC GOLD MATERIAL — Like a trophy! ═══ */}
+          <meshStandardMaterial
+            color="#ffd700"
+            metalness={0.85}
+            roughness={0.15}
+            emissive="#ffa500"
+            emissiveIntensity={0.4}  // More glow!
+          />
+        </Text3D>
+      </Center>
 
-      {/* ═══ DARK STROKE — Crisp edge definition! ═══ */}
-      <Text
-        font={fontUrl}
-        fontSize={titleSize * 1.02}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={maxWidth}
-        textAlign="center"
-        fontWeight={700}
-        position={[0, 0, -0.08]}
-      >
-        {question.toUpperCase()}
-        <meshBasicMaterial color="#1a1a2e" toneMapped={false} />
-      </Text>
-
-      {/* ═══ MAIN TITLE — Bright white with gold tint! ═══ */}
-      <Text
-        font={fontUrl}
-        fontSize={titleSize}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={maxWidth}
-        textAlign="center"
-        fontWeight={700}
-      >
-        {question.toUpperCase()}
-        <meshBasicMaterial color="#fffef0" toneMapped={false} />
-      </Text>
-
-      {/* ═══ INNER HIGHLIGHT — Top edge shine! ═══ */}
-      <Text
-        font={fontUrl}
-        fontSize={titleSize * 0.98}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        maxWidth={maxWidth}
-        textAlign="center"
-        fontWeight={700}
-        position={[0, 0.03, 0.02]}
-      >
-        {question.toUpperCase()}
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6} toneMapped={false} />
-      </Text>
+      {/* ═══ GLOW PLANE BEHIND — Soft gold aura! ═══ */}
+      <mesh position={[0, 0, -0.3]}>
+        <planeGeometry args={[isMobile ? 10 : 16, 1.5]} />
+        <meshBasicMaterial color="#ffd700" transparent opacity={0.15} />
+      </mesh>
     </group>
   )
 }
@@ -1932,47 +1911,27 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
     return zone?.color
   }, [selectedZone, ranges])
 
-  // ═══ MARKET TRANSITION — Sweet intro/outro animation! ═══
+  // ═══ MARKET TRANSITION — Dancers drop from sky! ═══
   const transitionGroupRef = useRef<THREE.Group>(null)
   const prevOptionsRef = useRef<string>('')
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [dropInProgress, setDropInProgress] = useState(false)
 
   // Create a stable key from options
   const optionsKey = useMemo(() => options.map(o => o.id).join(','), [options])
 
-  // Detect market change and trigger transition
+  // Detect market change and trigger drop-in effect
   useEffect(() => {
     if (prevOptionsRef.current && prevOptionsRef.current !== optionsKey) {
-      setIsTransitioning(true)
+      setDropInProgress(true)
+      // Reset after dancers have dropped
+      const timer = setTimeout(() => setDropInProgress(false), 800)
+      return () => clearTimeout(timer)
     }
     prevOptionsRef.current = optionsKey
   }, [optionsKey])
 
-  // Animate the transition
-  useFrame((_, delta) => {
-    if (!transitionGroupRef.current) return
-
-    const group = transitionGroupRef.current
-
-    if (isTransitioning) {
-      // Quick scale down + fade
-      group.scale.x = THREE.MathUtils.lerp(group.scale.x, 0.85, delta * 8)
-      group.scale.y = THREE.MathUtils.lerp(group.scale.y, 0.85, delta * 8)
-      group.scale.z = THREE.MathUtils.lerp(group.scale.z, 0.85, delta * 8)
-      group.position.y = THREE.MathUtils.lerp(group.position.y, -0.5, delta * 8)
-
-      // End transition after brief moment
-      if (group.scale.x < 0.86) {
-        setIsTransitioning(false)
-      }
-    } else {
-      // Smooth scale back up + rise
-      group.scale.x = THREE.MathUtils.lerp(group.scale.x, 1, delta * 6)
-      group.scale.y = THREE.MathUtils.lerp(group.scale.y, 1, delta * 6)
-      group.scale.z = THREE.MathUtils.lerp(group.scale.z, 1, delta * 6)
-      group.position.y = THREE.MathUtils.lerp(group.position.y, 0, delta * 6)
-    }
-  })
+  // No jarring zoom - just keep everything stable!
+  // Dancers will animate their own drop-in via DancerGroup
 
   // ═══ GRID MATH — 1.0 unit step creates 0.08 gutter between 0.92 tiles ═══
   const unit = FLOOR.gridUnit  // 1.0 — the secret sauce for visible gutters!
@@ -2013,8 +1972,8 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
 
       return {
         optionId: range.optionId,
-        // Position at front of floor, slightly below (like CSS version)
-        position: [x, 1.5, halfD + 2.2] as [number, number, number],
+        // ═══ FLOOR-ATTACHED — At front edge, legible from all angles! ═══
+        position: [x, 0.5, halfD + 1.2] as [number, number, number],
         label: range.label,
         pct: range.pct,
         color: range.color,
@@ -2150,9 +2109,9 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
         {/* ═══ PLATFORM BASE ═══ */}
         <Platform width={floorWidth} depth={floorDepth} />
 
-        {/* ═══ SKY PODIUMS — Dope floating signs! ═══ */}
+        {/* ═══ PROGRESS BAR PODIUMS — Floor-attached with shimmer! ═══ */}
         {podiums.map(({ optionId, position, label, pct, color, rank }) => (
-          <SkyPodium key={optionId} position={position} label={label} pct={pct} color={color} rank={rank} />
+          <ProgressBarPodium key={optionId} position={position} label={label} pct={pct} color={color} rank={rank} />
         ))}
 
         {/* ═══ DANCING STICK FIGURES! ═══ */}
@@ -2166,6 +2125,7 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
               tileSize={FLOOR.tileSize}
               tileGap={FLOOR.gridUnit - FLOOR.tileSize}  // 1.0 - 0.92 = 0.08 gap
               isMobile={isMobile}
+              dropIn={dropInProgress}
             />
           </Suspense>
         )}

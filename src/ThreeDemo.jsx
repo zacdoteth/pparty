@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react'
 import DanceFloor, { createBinaryOptions, createMultiOptions } from './components/stage/DanceFloor.tsx'
 import CombinedSidebar from './components/ui/CombinedSidebar'
-import LoadingSplash from './components/ui/LoadingSplash'
+import LoadingSplash, { PartyLogo } from './components/ui/LoadingSplash'
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MARKET DATA — Different market configurations
@@ -157,6 +157,22 @@ export default function ThreeDemo() {
         height: '100%',
         minWidth: 0, // Critical for flex shrinking!
       }}>
+        {/* ═══ TOP LEFT: PARTY LOGO — Brand presence! ═══ */}
+        <div style={{
+          position: 'absolute',
+          top: 'min(16px, 2vw)',
+          left: 'min(16px, 2vw)',
+          zIndex: 100,
+          opacity: introComplete ? 1 : 0,
+          transform: introComplete ? 'translateY(0)' : 'translateY(-20px)',
+          transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+          pointerEvents: 'none',
+          width: 'min(40px, 8vw)',  // Responsive: max 40px
+          height: 'min(40px, 8vw)',
+        }}>
+          <PartyLogo size="small" className="responsive-logo" />
+        </div>
+
         <DanceFloor
           // NO KEY! Keep Canvas alive for instant market switching
           options={selectedMarket.options}

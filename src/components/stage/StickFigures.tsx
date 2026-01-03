@@ -663,7 +663,8 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
   const { camera } = useThree()
   const [angles, setAngles] = useState<LimbAngles>(() => getDanceFrame(danceMove, 0))
   const [showSpeech, setShowSpeech] = useState(!!speech)
-  const [headLookUp, setHeadLookUp] = useState(0)  // How much head tilts up toward camera
+  const [headLookUp, setHeadLookUp] = useState(0)
+  const [introProgress, setIntroProgress] = useState(0)
 
   // Pick from appropriate slang pool based on zone color (green = yes vibes, red = no vibes)
   const getRandomSlang = () => {
@@ -680,8 +681,8 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
   }, [avatar])
 
   // ═══ INTRO ANIMATION STATE ═══
-  const [introProgress, setIntroProgress] = useState(0)
-  const spawnDelay = useMemo(() => Math.random() * 1.2, []) // Staggered spawn (wider range for more dancers)
+  // SMOOTH INTRO — Minimal stagger for cohesive appearance!
+  const spawnDelay = useMemo(() => Math.random() * 0.4, []) // Tight stagger for smooth wave effect
 
   // ═══ NINTENDO GROUND FIX — Calculate exact height so feet KISS the floor! ═══
   // "The soles must touch the tiles perfectly" — Nintendo Physics Lead
@@ -706,7 +707,7 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
   }, [texture])
 
   // Animate the dance + BILLBOARD FACING + INTRO + BOUNCY IDLE!
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock }) => {
     if (!groupRef.current) return
 
     const time = clock.elapsedTime
@@ -725,17 +726,16 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
     const easedProgress = easeOutBounce(newIntroProgress)
 
     // ═══ HABBO HOTEL BOUNCY IDLE — Squash & Stretch! ═══
-    // Since DopeSneaker pivot is at sole bottom, this stretches UPWARD correctly!
-    const bounceFreq = 8 + (danceMove % 4)  // Vary by dance move
-    const bounceAmp = 0.06  // Subtle but visible
+    const bounceFreq = 8 + (danceMove % 4)
+    const bounceAmp = 0.06
     const squashStretch = 1 + Math.sin(time * bounceFreq) * bounceAmp
 
     // Apply scales — intro + bouncy idle
     const baseScale = easedProgress * scale
     groupRef.current.scale.set(
-      baseScale * (1 + (1 - squashStretch) * 0.3),  // X: inverse squash (wider when short)
-      baseScale * squashStretch,                      // Y: main bounce
-      baseScale                                       // Z: constant
+      baseScale * (1 + (1 - squashStretch) * 0.3),
+      baseScale * squashStretch,
+      baseScale
     )
 
     // Drop from above (start 3 units high)
@@ -745,7 +745,7 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
     const newAngles = getDanceFrame(danceMove, time)
     setAngles(newAngles)
 
-    // Apply body bob + intro drop + GROUND OFFSET (soles kiss the floor!)
+    // Apply body bob + intro drop + GROUND OFFSET
     groupRef.current.position.y = position[1] + groundOffset + newAngles.torso.bob * scale + dropHeight
 
     // BILLBOARD — Always face camera (Paper Mario style!)
@@ -754,17 +754,14 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
     groupRef.current.lookAt(cameraPos)
 
     // ═══ HEAD TILT — Look up at camera when overhead! ═══
-    // Calculate how much camera is above the character
     const charWorldPos = new THREE.Vector3(position[0], groupRef.current.position.y, position[2])
     const toCam = camera.position.clone().sub(charWorldPos)
     const horizontalDist = Math.sqrt(toCam.x * toCam.x + toCam.z * toCam.z)
     const verticalDist = toCam.y
 
-    // Angle from horizontal (0 = eye level, positive = looking up)
     const lookUpAngle = Math.atan2(verticalDist, horizontalDist)
-    // Clamp and smooth the head tilt (max ~35 degrees up)
     const targetTilt = Math.min(0.6, Math.max(0, lookUpAngle * 0.7))
-    setHeadLookUp(prev => prev + (targetTilt - prev) * 0.1)  // Smooth interpolation
+    setHeadLookUp(prev => prev + (targetTilt - prev) * 0.1)
 
     // Slight rotation wobble during intro
     if (newIntroProgress < 1) {
@@ -998,7 +995,7 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
         </Limb>
       </group>
 
-      {/* ═══ SHADOW — Flat oval ON the floor (negative groundOffset to stay at tile level!) ═══ */}
+      {/* ═══ SHADOW — Flat oval ON the floor ═══ */}
       <mesh position={[0, -groundOffset + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.55, 1]}>
         <circleGeometry args={[0.22 * flatScale, 16]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.4 * introProgress} />
@@ -1020,25 +1017,6 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
           <meshBasicMaterial color={color} transparent opacity={(1 - introProgress) * 3} depthWrite={false} />
         </mesh>
       )}
-      
-      {/* ═══ LANDING SPARKLES ═══ */}
-      {introProgress > 0.85 && introProgress < 0.98 && (
-        <>
-          {[0, 1, 2, 3].map((i) => (
-            <mesh
-              key={i}
-              position={[
-                Math.cos(i * Math.PI / 2) * 0.35 * flatScale,
-                -groundOffset + 0.15 + (introProgress - 0.85) * 2,
-                Math.sin(i * Math.PI / 2) * 0.35 * flatScale
-              ]}
-            >
-              <sphereGeometry args={[0.04 * (1 - (introProgress - 0.85) * 8), 8, 8]} />
-              <meshBasicMaterial color="#ffffff" />
-            </mesh>
-          ))}
-        </>
-      )}
     </group>
   )
 }
@@ -1054,12 +1032,49 @@ interface DancerGroupProps {
   tileSize: number
   tileGap: number
   isMobile?: boolean  // Mobile-first: smaller avatars!
+  dropIn?: boolean    // Trigger drop-from-sky animation on market change
 }
 
-export function DancerGroup({ dancers, zoneRanges, gridCols, gridRows, tileSize, tileGap, isMobile = false }: DancerGroupProps) {
+export function DancerGroup({ dancers, zoneRanges, gridCols, gridRows, tileSize, tileGap, isMobile = false, dropIn = false }: DancerGroupProps) {
   const unit = tileSize + tileGap
   const halfW = (gridCols * unit) / 2
   const halfD = (gridRows * unit) / 2
+  const groupRef = useRef<THREE.Group>(null)
+  const animProgress = useRef(1)
+  const wasDropIn = useRef(false)
+  const targetScale = useRef(1)
+
+  // Smash Bros style "pop in" — SMOOTH scale up with elastic bounce!
+  // Using refs throughout to prevent re-renders during animation
+  useFrame((_, delta) => {
+    if (!groupRef.current) return
+
+    // Detect new dropIn trigger
+    if (dropIn && !wasDropIn.current) {
+      animProgress.current = 0
+      wasDropIn.current = true
+    } else if (!dropIn) {
+      wasDropIn.current = false
+    }
+
+    // Animate scale pop-in with smooth elastic overshoot
+    if (animProgress.current < 1) {
+      // Slower, smoother animation (2.5 instead of 3.5)
+      animProgress.current = Math.min(1, animProgress.current + delta * 2.5)
+      const t = animProgress.current
+
+      // Smoother elastic ease-out with less overshoot
+      const elasticOut = 1 - Math.pow(1 - t, 2.5) * Math.cos(t * Math.PI * 1.2)
+      targetScale.current = Math.min(1.08, elasticOut)  // Less overshoot (1.08 vs 1.12)
+    } else {
+      targetScale.current = 1
+    }
+
+    // Smooth interpolation to target scale (prevents jitter)
+    const currentScale = groupRef.current.scale.x
+    const newScale = currentScale + (targetScale.current - currentScale) * 0.15
+    groupRef.current.scale.setScalar(newScale)
+  })
 
   // Calculate dancer positions with stable seeded random
   const dancerPositions = useMemo(() => {
@@ -1090,9 +1105,14 @@ export function DancerGroup({ dancers, zoneRanges, gridCols, gridRows, tileSize,
   }, [dancers, zoneRanges, gridCols, gridRows, unit, halfW, halfD])
 
   return (
-    <group>
-      {dancerPositions.map((dancer) => (
-        dancer && (
+    <group ref={groupRef}>
+      {dancerPositions.map((dancer) => {
+        // ═══ USER SCALE BOOST — 2x larger when previewing bet! ═══
+        // "The star of the show needs to STAND OUT" — Nintendo UX
+        const baseScale = isMobile ? 0.85 : 1.3
+        const userScale = dancer.isUser ? baseScale * 2 : baseScale
+
+        return dancer && (
           <StickFigure
             key={dancer.id}
             position={dancer.position}
@@ -1100,12 +1120,12 @@ export function DancerGroup({ dancers, zoneRanges, gridCols, gridRows, tileSize,
             danceMove={dancer.danceMove}
             speech={dancer.speech}
             color={dancer.color}
-            scale={isMobile ? 0.85 : 1.3}  // Smaller on mobile for better fit!
+            scale={userScale}  // 2x for user, normal for others!
             showUsername={!isMobile}  // Hide usernames on mobile - less clutter
             isUser={dancer.isUser}  // Show glow for current user!
           />
         )
-      ))}
+      })}
     </group>
   )
 }

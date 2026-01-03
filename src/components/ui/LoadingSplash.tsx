@@ -32,9 +32,20 @@ const DANCE_FLOOR_COLORS = [
   '#00F0FF',  // CYAN
 ]
 
-function PartyLogo() {
+interface PartyLogoProps {
+  size?: 'small' | 'medium' | 'large'
+  className?: string
+}
+
+export function PartyLogo({ size = 'medium', className = '' }: PartyLogoProps) {
+  const sizeClasses = {
+    small: 'party-logo party-logo-small',
+    medium: 'party-logo',
+    large: 'party-logo party-logo-large',
+  }
+
   return (
-    <div className="party-logo">
+    <div className={`${sizeClasses[size]} ${className}`}>
       {/* 3x3 jelly tile grid — matches dance floor! */}
       <div className="tile-grid">
         {DANCE_FLOOR_COLORS.map((color, i) => (

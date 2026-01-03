@@ -57,6 +57,21 @@
   box-shadow:
     inset 2px 0 20px rgba(100, 100, 255, 0.1),
     -5px 0 30px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ═══ ACTIVE BETS STATE — Green glow when you have bets! ═══ */
+.sidebar-desktop.has-bets {
+  border-left-color: var(--smash-green);
+  box-shadow:
+    inset 2px 0 20px rgba(51, 255, 136, 0.15),
+    -5px 0 30px rgba(51, 255, 136, 0.2),
+    -5px 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar-mobile.has-bets {
+  border-top-color: var(--smash-green);
+  box-shadow: 0 -4px 30px rgba(51, 255, 136, 0.3);
 }
 
 /* ═══ GHOST MODE — Everything fades except chip & locked indicator! ═══ */
@@ -1505,56 +1520,92 @@
 
 @media (max-width: 767px) {
   .sidebar-desktop {
-    display: none;
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    opacity: 0 !important;
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE BOTTOM DRAWER — 50% height so you can see the dance floor!
+   "Thumb-friendly betting on the go" — Mobile UX Master
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .sidebar-mobile {
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 0 !important;
+  right: 0 !important;
   bottom: 0;
-  height: 85vh;
-  max-height: 700px;
-  background: rgba(10, 8, 20, 0.98);
+  width: 100vw !important;  /* Force full viewport width */
+  max-width: 100% !important;
+  height: 50vh;  /* 50% height — see dance floor above! */
+  background: linear-gradient(180deg,
+    rgba(15, 12, 30, 0.98) 0%,
+    rgba(10, 8, 20, 0.99) 100%
+  );
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px 24px 0 0;
-  z-index: 1000;
+  border-radius: 20px 20px 0 0;
+  border-top: 2px solid var(--smash-purple);
+  box-shadow:
+    0 -4px 30px rgba(153, 68, 255, 0.3),
+    0 -1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 1001;  /* Higher than desktop sidebar */
   display: flex;
   flex-direction: column;
   touch-action: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
+/* Closed state — just show handle peek */
 .sidebar-mobile:not(.open) {
-  transform: translateY(calc(100% - 100px)) !important;
+  transform: translateY(calc(100% - 70px)) !important;
 }
 
+/* ═══ DRAG HANDLE — Nintendo style! ═══ */
 .sidebar-handle {
-  padding: 12px;
+  padding: 10px 16px;
   display: flex;
   justify-content: center;
+  align-items: center;
   cursor: grab;
+  background: linear-gradient(180deg,
+    rgba(60, 50, 100, 0.4) 0%,
+    transparent 100%
+  );
+}
+
+.sidebar-handle:active {
+  cursor: grabbing;
 }
 
 .sidebar-handle-bar {
-  width: 40px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
+  width: 48px;
+  height: 5px;
+  background: linear-gradient(90deg, var(--smash-purple), var(--smash-blue));
+  border-radius: 3px;
+  box-shadow:
+    0 0 10px rgba(153, 68, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+/* ═══ PEEK HEADER — Balance + market count ═══ */
 .sidebar-peek {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 16px 12px;
+  border-bottom: 2px solid var(--smash-panel-border);
 }
 
 .sidebar-market-count {
-  font-size: 12px;
-  color: #666;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
 }
 
 .sidebar-content {
@@ -1609,4 +1660,678 @@
 .sidebar-market-list::-webkit-scrollbar-thumb:hover,
 .sidebar-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCORDION SYSTEM — Expandable Market Cards!
+   "Click to reveal your destiny!" — Smash Bros Narrator
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.market-accordion {
+  background: linear-gradient(180deg,
+    rgba(40, 40, 70, 0.6) 0%,
+    rgba(25, 25, 45, 0.8) 100%
+  );
+  border: 2px solid var(--smash-panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.market-accordion:hover {
+  border-color: rgba(150, 150, 200, 0.5);
+}
+
+.market-accordion.expanded {
+  border-color: var(--smash-purple);
+  box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(153, 68, 255, 0.2);
+}
+
+/* ═══ ACCORDION HEADER — Always visible! ═══ */
+.accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.accordion-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.accordion-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.accordion-arrow {
+  font-size: 10px;
+  color: var(--smash-purple);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  text-shadow: 0 0 10px var(--smash-purple);
+}
+
+.market-accordion.expanded .accordion-arrow {
+  color: var(--smash-yellow);
+  text-shadow: 0 0 10px var(--smash-yellow);
+}
+
+.accordion-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.accordion-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.accordion-bet-badge {
+  font-size: 9px;
+  font-weight: 800;
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.accordion-volume {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--smash-yellow);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+}
+
+/* ═══ ACCORDION CONTENT — Smooth expand/collapse! ═══ */
+.accordion-content {
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accordion-inner {
+  padding: 0 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCORDION BETTING — Compact betting inside accordion!
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.accordion-betting {
+  background: linear-gradient(180deg,
+    rgba(20, 20, 40, 0.6) 0%,
+    rgba(15, 15, 30, 0.8) 100%
+  );
+  border: 2px solid rgba(100, 100, 150, 0.3);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+/* Compact bet zones */
+.accordion-zones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+/* 3 options layout */
+.accordion-zones:has(.bet-zone:nth-child(3):last-child) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Compact zone style */
+.bet-zone.compact {
+  min-height: 50px;
+  padding: 6px 4px;
+  border-width: 2px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.bet-zone.compact .zone-label {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.bet-zone.compact .zone-price {
+  font-size: 16px;
+}
+
+.bet-zone.compact .zone-chance {
+  display: none;
+}
+
+.bet-zone.compact .zone-chip-placed {
+  top: 2px;
+  right: 2px;
+}
+
+.bet-zone.compact .placed-avatar {
+  width: 18px;
+  height: 18px;
+}
+
+/* ═══ COMPACT CHIP AREA ═══ */
+.accordion-chip-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.betting-chip.compact {
+  width: 48px;
+  height: 48px;
+  border-width: 3px;
+  box-shadow:
+    3px 3px 0 rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.betting-chip.compact .chip-avatar {
+  width: 36px;
+  height: 36px;
+}
+
+.chip-popup.compact {
+  padding: 5px 6px;
+  gap: 4px;
+  border-radius: 8px;
+}
+
+.chip-popup.compact .popup-row {
+  gap: 4px;
+}
+
+.chip-popup.compact .popup-amount-btn {
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.chip-popup.compact .popup-amount {
+  font-size: 12px;
+  min-width: 32px;
+}
+
+.chip-popup.compact .popup-divider {
+  font-size: 10px;
+}
+
+.chip-popup.compact .popup-win {
+  font-size: 12px;
+}
+
+.chip-popup.compact .popup-lock-btn {
+  padding: 6px 10px;
+  font-size: 10px;
+  border-radius: 6px;
+}
+
+/* ═══ HOLD TO LOCK — Epic progress bar button! ═══ */
+.popup-lock-btn.hold-to-lock {
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid var(--zone-color);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.popup-lock-btn.hold-to-lock .lock-btn-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--hold-progress, 0%);
+  background: var(--zone-color);
+  transition: width 0.05s linear;
+  z-index: 0;
+}
+
+.popup-lock-btn.hold-to-lock .lock-btn-text {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.popup-lock-btn.hold-to-lock.holding {
+  transform: scale(1.02);
+  box-shadow:
+    0 0 15px var(--zone-color),
+    2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.popup-lock-btn.hold-to-lock.holding .lock-btn-text {
+  color: #000;
+  text-shadow: none;
+}
+
+/* Pulse animation when holding */
+@keyframes hold-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.popup-lock-btn.hold-to-lock.holding .lock-btn-fill {
+  animation: hold-pulse 0.3s ease-in-out infinite;
+}
+
+/* ═══ LOCKED STATE IN ACCORDION ═══ */
+.accordion-locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: linear-gradient(180deg,
+    rgba(0, 200, 100, 0.15) 0%,
+    rgba(0, 150, 75, 0.2) 100%
+  );
+  border: 2px solid var(--smash-green);
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.locked-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.locked-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.accordion-locked .locked-amount {
+  font-size: 16px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-shadow: 0 0 8px currentColor;
+}
+
+.unlock-btn {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(180deg,
+    rgba(80, 80, 100, 0.8) 0%,
+    rgba(50, 50, 70, 0.9) 100%
+  );
+  border: 2px solid var(--smash-panel-border);
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.unlock-btn:hover {
+  background: linear-gradient(180deg,
+    rgba(180, 100, 50, 0.9) 0%,
+    rgba(140, 70, 30, 0.95) 100%
+  );
+  border-color: var(--smash-yellow);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MINI LEADERBOARD — Compact version inside accordion!
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mini-leaderboard {
+  background: linear-gradient(180deg,
+    rgba(20, 20, 40, 0.6) 0%,
+    rgba(15, 15, 30, 0.8) 100%
+  );
+  border: 2px solid rgba(100, 100, 150, 0.3);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.mini-leaderboard-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mini-leaderboard-title {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.mini-leaderboard-count {
+  font-size: 9px;
+  font-weight: 800;
+  color: #1a1a2e;
+  background: var(--smash-yellow);
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-left: auto;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.mini-leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* ═══ MINI BETTOR ROW ═══ */
+.mini-bettor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: linear-gradient(180deg,
+    rgba(40, 40, 60, 0.4) 0%,
+    rgba(25, 25, 40, 0.5) 100%
+  );
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.mini-bettor:hover {
+  background: linear-gradient(180deg,
+    rgba(50, 50, 80, 0.5) 0%,
+    rgba(35, 35, 55, 0.6) 100%
+  );
+}
+
+.mini-bettor.you {
+  background: linear-gradient(180deg,
+    rgba(100, 60, 180, 0.3) 0%,
+    rgba(70, 40, 140, 0.4) 100%
+  );
+  border: 1px solid var(--smash-purple);
+  box-shadow: 0 0 8px rgba(153, 68, 255, 0.2);
+}
+
+.mini-rank {
+  font-size: 9px;
+  font-weight: 700;
+  color: #666;
+  min-width: 18px;
+}
+
+.mini-bettor:first-child:not(.you) .mini-rank,
+.mini-bettor.you + .mini-bettor .mini-rank {
+  color: transparent;
+}
+.mini-bettor:first-child:not(.you) .mini-rank::before,
+.mini-bettor.you + .mini-bettor .mini-rank::before {
+  content: '🥇';
+  font-size: 10px;
+}
+
+.mini-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.mini-bettor.you .mini-avatar {
+  border-color: var(--smash-purple);
+  box-shadow: 0 0 6px rgba(153, 68, 255, 0.4);
+}
+
+.mini-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.mini-bettor.you .mini-name {
+  font-weight: 800;
+  color: var(--smash-purple);
+  text-shadow: 0 0 8px var(--smash-purple);
+}
+
+.mini-pick {
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  text-shadow:
+    1px 1px 0 rgba(0, 0, 0, 0.5),
+    0 0 6px currentColor;
+}
+
+.mini-amount {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--smash-yellow);
+  text-shadow: 0 0 6px rgba(255, 204, 0, 0.4);
+}
+
+.mini-pnl {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-pnl.profit {
+  color: #000;
+  background: linear-gradient(180deg, #33ff88 0%, #00cc55 100%);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.mini-pnl.loss {
+  color: #fff;
+  background: linear-gradient(180deg, #ff4466 0%, #cc2244 100%);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ═══ MOBILE ACCORDION ADJUSTMENTS ═══ */
+@media (max-width: 767px) {
+  .accordion-zones {
+    gap: 8px;
+  }
+
+  .bet-zone.compact {
+    min-height: 55px;
+    padding: 8px 6px;
+  }
+
+  .betting-chip.compact {
+    width: 52px;
+    height: 52px;
+  }
+
+  .betting-chip.compact .chip-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mini-bettor {
+    padding: 5px 8px;
+  }
+
+  .mini-avatar {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MY BETS SUMMARY — See all your bets at a glance!
+   ═══════════════════════════════════════════════════════════════════════════ */
+.my-bets-summary {
+  margin: 12px 8px;
+  padding: 12px;
+  background: linear-gradient(180deg,
+    rgba(0, 200, 100, 0.08) 0%,
+    rgba(0, 150, 75, 0.12) 100%
+  );
+  border: 2px solid var(--smash-green);
+  border-radius: 8px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.my-bets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(51, 255, 136, 0.3);
+}
+
+.my-bets-title {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--smash-green);
+  text-shadow: 0 0 8px rgba(51, 255, 136, 0.5);
+}
+
+.my-bets-count {
+  font-size: 10px;
+  font-weight: 800;
+  color: #000;
+  background: var(--smash-green);
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.my-bets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.my-bet-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.my-bet-pick {
+  font-size: 9px;
+  font-weight: 800;
+  color: #000;
+  padding: 3px 6px;
+  border-radius: 3px;
+  min-width: 45px;
+  text-align: center;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.my-bet-market {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-bet-amount {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.my-bet-potential {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--smash-green);
+}
+
+.my-bets-totals {
+  padding-top: 8px;
+  border-top: 1px solid rgba(51, 255, 136, 0.3);
+}
+
+.my-bets-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.my-bets-total-row.potential {
+  color: var(--smash-green);
+}
+
+.total-amount {
+  font-weight: 900;
+  color: #fff;
+}
+
+.total-potential {
+  font-weight: 900;
+  font-size: 13px;
+  text-shadow: 0 0 8px rgba(51, 255, 136, 0.5);
 }
