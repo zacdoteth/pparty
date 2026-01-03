@@ -14,6 +14,7 @@ import HangingSign from './components/ui/HangingSign'
 import BetConfirmationModal from './components/board/BetConfirmationModal'
 import BettingSidebar from './components/ui/BettingSidebar'
 import BettingModal from './components/ui/BettingModal'
+import PokerChipFooter from './components/ui/PokerChipFooter'
 import { playHoverTick, playSuccessChime } from './utils/sounds'
 import './App.css'
 
@@ -367,6 +368,17 @@ function App() {
     // Keep modal open to show confirmation, user will close it
   }, [selectedMarket.id])
 
+  // Handle bet from poker chip footer
+  const handleFooterBet = useCallback((optionId, amount) => {
+    playSuccessChime(0.1)
+    setUserBet({
+      side: optionId,
+      amount,
+      marketId: selectedMarket.id,
+    })
+    setUserBalance(prev => prev - amount)
+  }, [selectedMarket.id])
+
   // Reset user bet when market changes — with dancing loader!
   const handleMarketChange = useCallback((market) => {
     // Show loading state with dancing character
@@ -400,6 +412,22 @@ function App() {
       pct: opt.pct,
       color: opt.color,
       price: `${opt.pct}¢`,
+    }))
+  }
+
+  // Get options formatted for the poker chip footer
+  const getFooterOptions = () => {
+    if (selectedMarket.type === 'binary') {
+      return [
+        { id: 'yes', label: 'YES', pct: selectedMarket.yesPct, color: '#00F0FF' },
+        { id: 'no', label: 'NO', pct: selectedMarket.noPct, color: '#FF0055' },
+      ]
+    }
+    return selectedMarket.options.map(opt => ({
+      id: opt.id,
+      label: opt.label,
+      pct: opt.pct,
+      color: opt.color,
     }))
   }
 
@@ -502,12 +530,14 @@ function App() {
         </div>
       </div>
 
-      {/* ═══ HANGING SIGN — Suspended from ceiling ═══ */}
+      {/* ═══ HANGING SIGN — HIDDEN (Question now in footer!) ═══ */}
+      {/*
       <HangingSign
         question={selectedMarket.question}
         isLive={true}
         countdown="2h 15m"
       />
+      */}
 
       {/* ═══ SIDEBAR — Market List (Desktop) ═══ */}
       <div className="home-screen">
@@ -747,7 +777,8 @@ function App() {
         balance={userBalance}
       />
 
-      {/* ═══ BETTING SIDEBAR — Quick bet placement! ═══ */}
+      {/* ═══ BETTING SIDEBAR — Replaced by PokerChipFooter! ═══ */}
+      {/* Hiding old sidebar in favor of poker chip footer
       <BettingSidebar
         market={selectedMarket}
         userBet={hasUserBet ? userBet : null}
@@ -755,8 +786,10 @@ function App() {
         onPlaceBet={handleSidebarBet}
         onCancelBet={handleCancelBet}
       />
+      */}
 
-      {/* ═══ FLOATING BET BUTTON — Opens drag-to-vote modal! ═══ */}
+      {/* ═══ FLOATING BET BUTTON — Replaced by PokerChipFooter! ═══ */}
+      {/* Hiding this since we now have the poker chip footer
       {!hasUserBet && (
         <button
           className="floating-bet-button"
@@ -766,6 +799,7 @@ function App() {
           <span>Make Prediction</span>
         </button>
       )}
+      */}
 
       {/* ═══ DRAG-TO-VOTE MODAL — New immersive betting UX! ═══ */}
       <BettingModal
@@ -775,6 +809,18 @@ function App() {
         onBet={handleDragModalBet}
         userAvatar={CURRENT_USER.avatar}
         userName={CURRENT_USER.username}
+      />
+
+      {/* ═══ POKER CHIP FOOTER — Drag chip to bet! ═══ */}
+      <PokerChipFooter
+        question={selectedMarket.question}
+        options={getFooterOptions()}
+        onBet={handleFooterBet}
+        userBalance={userBalance}
+        userAvatar={CURRENT_USER.avatar}
+        userName={CURRENT_USER.username}
+        lockedOption={hasUserBet ? userBet.side : null}
+        lockedAmount={hasUserBet ? userBet.amount : 0}
       />
     </div>
   )

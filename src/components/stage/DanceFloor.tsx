@@ -59,6 +59,7 @@ export interface DanceFloorProps {
   marketQuestion?: string // 3D floating title in sky (Smash Bros style!)
   marketIcon?: string     // PREMOJI icon above title (🏈, 🗳️, etc.)
   selectedZone?: string   // Zone to illuminate (from sidebar bet selection!)
+  lockedInZone?: string   // Zone that was just locked in — triggers CELEBRATION MODE!
   // ═══ LOADING & INTRO ═══
   showIntro?: boolean           // Show intro camera animation
   onLoadProgress?: (progress: number) => void
@@ -1140,9 +1141,10 @@ interface LaserBeamProps {
   color: [number, number, number]  // HDR color values!
   rotationOffset: number
   speed: number
+  celebrationMode?: boolean  // GOES CRAZY when true!
 }
 
-function LaserBeam({ position, color, rotationOffset, speed }: LaserBeamProps) {
+function LaserBeam({ position, color, rotationOffset, speed, celebrationMode = false }: LaserBeamProps) {
   const meshRef = useRef<THREE.Mesh>(null!)
   const beamLength = 80  // LONG beams into the sky
 
@@ -1150,15 +1152,27 @@ function LaserBeam({ position, color, rotationOffset, speed }: LaserBeamProps) {
     if (!meshRef.current) return
     const time = clock.elapsedTime
 
-    // Slow, calming sweeps — no dubstep drops!
-    const searchX = Math.sin(time * speed * 0.2 + rotationOffset) * 0.3
-    const searchZ = Math.cos(time * speed * 0.15 + rotationOffset * 1.3) * 0.25
+    if (celebrationMode) {
+      // ═══ CELEBRATION MODE — WILD SPINNING! ═══
+      const spinSpeed = 8  // Much faster!
+      const wildX = Math.sin(time * spinSpeed + rotationOffset) * 0.6
+      const wildZ = Math.cos(time * spinSpeed * 1.3 + rotationOffset) * 0.5
+      const wildY = Math.sin(time * spinSpeed * 0.7 + rotationOffset * 2) * 0.4
 
-    meshRef.current.rotation.x = -0.3 + searchX
-    meshRef.current.rotation.z = searchZ
+      meshRef.current.rotation.x = -0.2 + wildX
+      meshRef.current.rotation.z = wildZ
+      meshRef.current.rotation.y = wildY
+    } else {
+      // Slow, calming sweeps — no dubstep drops!
+      const searchX = Math.sin(time * speed * 0.2 + rotationOffset) * 0.3
+      const searchZ = Math.cos(time * speed * 0.15 + rotationOffset * 1.3) * 0.25
 
-    // Gentle Y rotation for fan-out effect
-    meshRef.current.rotation.y = Math.sin(time * speed * 0.08 + rotationOffset) * 0.08
+      meshRef.current.rotation.x = -0.3 + searchX
+      meshRef.current.rotation.z = searchZ
+
+      // Gentle Y rotation for fan-out effect
+      meshRef.current.rotation.y = Math.sin(time * speed * 0.08 + rotationOffset) * 0.08
+    }
   })
 
   return (
@@ -1198,9 +1212,10 @@ interface SkynetLaserArrayProps {
   colors: string[]
   isMobile?: boolean
   accentColor?: string  // When set, ALL lasers become this color — epic zone focus!
+  celebrationMode?: boolean  // LASERS GO WILD!
 }
 
-function SkynetLaserArray({ width, depth, colors, isMobile = false, accentColor }: SkynetLaserArrayProps) {
+function SkynetLaserArray({ width, depth, colors, isMobile = false, accentColor, celebrationMode = false }: SkynetLaserArrayProps) {
   // Fewer lasers on mobile for performance + less visual clutter
   const numLasers = isMobile ? 6 : 14
   const radius = Math.max(width, depth) * 0.8 + 3  // Ring outside the floor
@@ -1261,8 +1276,72 @@ function SkynetLaserArray({ width, depth, colors, isMobile = false, accentColor 
           color={laser.color}
           rotationOffset={laser.rotationOffset}
           speed={laser.speed}
+          celebrationMode={celebrationMode}
         />
       ))}
+    </group>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CELEBRATION FLASH — "WHO WANTS TO BE A MILLIONAIRE" FINAL ANSWER MOMENT!
+// Epic flash + pulse when bet is locked in
+// ═══════════════════════════════════════════════════════════════════════════
+interface CelebrationFlashProps {
+  active: boolean
+  color?: string
+}
+
+function CelebrationFlash({ active, color = '#FFD700' }: CelebrationFlashProps) {
+  const sphereRef = useRef<THREE.Mesh>(null!)
+  const lightRef = useRef<THREE.PointLight>(null!)
+  const flashIntensity = useRef(0)
+
+  useFrame((_, delta) => {
+    if (!sphereRef.current || !lightRef.current) return
+
+    if (active) {
+      // Flash ON — rapid bright then decay
+      flashIntensity.current = Math.min(1, flashIntensity.current + delta * 15)
+    } else {
+      // Fade out
+      flashIntensity.current = Math.max(0, flashIntensity.current - delta * 3)
+    }
+
+    const intensity = flashIntensity.current
+    const pulseScale = 1 + Math.sin(Date.now() * 0.02) * 0.3 * intensity
+
+    // Update sphere
+    sphereRef.current.scale.setScalar(30 * pulseScale * intensity)
+    const mat = sphereRef.current.material as THREE.MeshBasicMaterial
+    mat.opacity = intensity * 0.4
+
+    // Update light
+    lightRef.current.intensity = intensity * 50
+  })
+
+  const flashColor = new THREE.Color(color)
+
+  return (
+    <group position={[0, 5, 0]}>
+      {/* Central flash sphere */}
+      <mesh ref={sphereRef}>
+        <sphereGeometry args={[1, 16, 16]} />
+        <meshBasicMaterial
+          color={flashColor}
+          transparent
+          opacity={0}
+          toneMapped={false}
+        />
+      </mesh>
+      {/* Intense point light */}
+      <pointLight
+        ref={lightRef}
+        color={flashColor}
+        intensity={0}
+        distance={100}
+        decay={2}
+      />
     </group>
   )
 }
@@ -1647,10 +1726,10 @@ interface PodiumProps {
 // "Attached to the floor, legible from all angles" — Art Director
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Bar dimensions constant — CHUNKY 3D!
+// Bar dimensions constant — THIN & SLEEK like footer bars!
 const BAR_WIDTH = 3.8
-const BAR_HEIGHT = 0.5
-const BAR_DEPTH = 0.25
+const BAR_HEIGHT = 0.12  // Thin like the 2D footer bars
+const BAR_DEPTH = 0.08
 
 function ProgressBarPodium({ position, label, pct, color, rank }: PodiumProps) {
   const groupRef = useRef<THREE.Group>(null!)
@@ -1700,13 +1779,13 @@ function ProgressBarPodium({ position, label, pct, color, rank }: PodiumProps) {
   return (
     <group ref={groupRef} position={position}>
       {/* ═══ TRANSPARENT COLORED BACKDROP — Like title glow! ═══ */}
-      <mesh position={[0, 0.5, -0.15]}>
-        <planeGeometry args={[BAR_WIDTH + 1.5, 1.8]} />
-        <meshBasicMaterial color={color} transparent opacity={0.15} />
+      <mesh position={[0, 0.4, -0.1]}>
+        <planeGeometry args={[BAR_WIDTH + 1.5, 1.4]} />
+        <meshBasicMaterial color={color} transparent opacity={0.12} />
       </mesh>
 
       {/* ═══ 3D LABEL + PERCENTAGE — ULTRABOLD like title! ═══ */}
-      <group position={[0, 0.9, 0]}>
+      <group position={[0, 0.55, 0]}>
         <Center>
           <Text3D
             font={fontUrl}
@@ -1732,43 +1811,45 @@ function ProgressBarPodium({ position, label, pct, color, rank }: PodiumProps) {
         </Center>
       </group>
 
-      {/* ═══ BAR TRACK — Deep 3D groove ═══ */}
-      <mesh position={[0, 0.25, 0]}>
-        <boxGeometry args={[BAR_WIDTH + 0.1, BAR_HEIGHT + 0.1, BAR_DEPTH]} />
+      {/* ═══ BAR TRACK — Thin dark groove with rounded look ═══ */}
+      <mesh position={[0, 0.15, 0]}>
+        <boxGeometry args={[BAR_WIDTH + 0.08, BAR_HEIGHT + 0.04, BAR_DEPTH]} />
         <meshStandardMaterial
-          color="#0a0a12"
-          metalness={0.4}
-          roughness={0.6}
+          color="#1a1a24"
+          metalness={0.3}
+          roughness={0.7}
+          transparent
+          opacity={0.9}
         />
       </mesh>
 
-      {/* ═══ BAR FILL — Animated growth! ═══ */}
+      {/* ═══ BAR FILL — Animated growth with glow! ═══ */}
       <mesh
         ref={fillRef}
-        position={[(-BAR_WIDTH + 0.1) / 2, 0.25, 0.06]}
+        position={[(-BAR_WIDTH + 0.1) / 2, 0.15, 0.03]}
         scale={[0.1 / BAR_WIDTH, 1, 1]}
       >
-        <boxGeometry args={[BAR_WIDTH, BAR_HEIGHT - 0.08, BAR_DEPTH - 0.05]} />
+        <boxGeometry args={[BAR_WIDTH, BAR_HEIGHT, BAR_DEPTH]} />
         <meshStandardMaterial
           color={color}
-          metalness={0.6}
-          roughness={0.25}
+          metalness={0.7}
+          roughness={0.2}
           emissive={color}
-          emissiveIntensity={isWinner ? 0.5 : 0.3}
+          emissiveIntensity={isWinner ? 0.8 : 0.5}
         />
       </mesh>
 
-      {/* ═══ TOP SHINE — Glass highlight on fill ═══ */}
+      {/* ═══ GLOW AURA — Soft bloom behind fill ═══ */}
       <mesh
         ref={shineRef}
-        position={[(-BAR_WIDTH + 0.1) / 2, 0.25 + BAR_HEIGHT / 2 - 0.06, 0.12]}
+        position={[(-BAR_WIDTH + 0.1) / 2, 0.15, -0.02]}
         scale={[0.1 / BAR_WIDTH, 1, 1]}
       >
-        <boxGeometry args={[BAR_WIDTH - 0.05, 0.08, BAR_DEPTH - 0.1]} />
+        <boxGeometry args={[BAR_WIDTH + 0.3, BAR_HEIGHT + 0.15, 0.01]} />
         <meshBasicMaterial
-          color="#ffffff"
+          color={color}
           transparent
-          opacity={0.2}
+          opacity={0.25}
         />
       </mesh>
 
@@ -1849,39 +1930,62 @@ function SkyText3D({ question, icon, isMobile = false }: SkyText3DProps) {
   // Typeface JSON font (helvetiker from three.js)
   const fontUrl = 'https://threejs.org/examples/fonts/helvetiker_bold.typeface.json'
 
+  // ═══ HEXAGONAL BANNER SHAPE — Matching footer style! ═══
+  // Dynamic width based on text length! ~0.7 units per character at titleSize=0.9
+  // Helvetiker bold + bevel makes characters chunky!
+  const charWidth = isMobile ? 0.5 : 0.7
+  const textWidth = question.length * charWidth * titleSize  // Scale with font size
+  const minWidth = isMobile ? 12 : 16
+  const bannerWidth = Math.max(minWidth, textWidth + 4)  // +4 for generous padding
+  const bannerHeight = 2.2
+  const pointyAmount = 0.8  // How pointy the ends are
+
+  // Create hexagonal shape points (same as footer clip-path)
+  const hexShape = useMemo(() => {
+    const shape = new THREE.Shape()
+    const w = bannerWidth / 2
+    const h = bannerHeight / 2
+    const p = pointyAmount
+    // polygon(3% 0%, 97% 0%, 100% 50%, 97% 100%, 3% 100%, 0% 50%)
+    shape.moveTo(-w + p, h)      // top-left (after point)
+    shape.lineTo(w - p, h)       // top-right (before point)
+    shape.lineTo(w, 0)           // right point (middle)
+    shape.lineTo(w - p, -h)      // bottom-right (after point)
+    shape.lineTo(-w + p, -h)     // bottom-left (before point)
+    shape.lineTo(-w, 0)          // left point (middle)
+    shape.closePath()
+    return shape
+  }, [bannerWidth, bannerHeight, pointyAmount])
+
   return (
-    <group ref={groupRef} position={[0, 7, -3]}>
+    // ═══ JUMBOTRON POSITION — UP and BACK like a concert banner! ═══
+    // High enough to never block Paper Mario dancers, even when jumping
+    <group ref={groupRef} position={[0, 10, -8]}>
+      {/* ═══ PURE GOLD 3D TEXT — No background, just glowing text! ═══ */}
       <Center>
-        {/* ═══ REAL 3D TEXT — ULTRABOLD extruded geometry! ═══ */}
         <Text3D
           font={fontUrl}
           size={titleSize}
-          height={depth * 1.3}  // Deeper extrusion for ULTRABOLD feel
+          height={depth * 1.3}
           curveSegments={12}
           bevelEnabled={true}
-          bevelThickness={0.04}  // Thicker bevel = CHUNKIER
-          bevelSize={0.025}      // Larger bevel = BOLDER
+          bevelThickness={0.04}
+          bevelSize={0.025}
           bevelOffset={0}
           bevelSegments={5}
-          letterSpacing={0.015}  // Tighter spacing for bold look
+          letterSpacing={0.015}
         >
           {question.toUpperCase()}
-          {/* ═══ METALLIC GOLD MATERIAL — Like a trophy! ═══ */}
+          {/* ═══ METALLIC GOLD — Hot Market trophy vibes! ═══ */}
           <meshStandardMaterial
             color="#ffd700"
-            metalness={0.85}
-            roughness={0.15}
-            emissive="#ffa500"
-            emissiveIntensity={0.4}  // More glow!
+            metalness={0.9}
+            roughness={0.1}
+            emissive="#ffaa00"
+            emissiveIntensity={0.6}  // Extra glow since no background!
           />
         </Text3D>
       </Center>
-
-      {/* ═══ GLOW PLANE BEHIND — Soft gold aura! ═══ */}
-      <mesh position={[0, 0, -0.3]}>
-        <planeGeometry args={[isMobile ? 10 : 16, 1.5]} />
-        <meshBasicMaterial color="#ffd700" transparent opacity={0.15} />
-      </mesh>
     </group>
   )
 }
@@ -1899,10 +2003,30 @@ interface SceneProps {
   marketQuestion?: string
   marketIcon?: string
   selectedZone?: string  // Zone to illuminate!
+  lockedInZone?: string  // Zone just locked in — CELEBRATION MODE!
 }
 
-function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion, marketIcon, selectedZone }: SceneProps) {
+function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, isMobile = false, marketQuestion, marketIcon, selectedZone, lockedInZone }: SceneProps) {
   const ranges = useMemo(() => calculateColumnRanges(options, gridCols), [options, gridCols])
+
+  // ═══ CELEBRATION MODE — Epic light show when bet is locked! ═══
+  const [celebrationActive, setCelebrationActive] = useState(false)
+  const celebrationTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (lockedInZone) {
+      setCelebrationActive(true)
+      // Clear any existing timer
+      if (celebrationTimerRef.current) clearTimeout(celebrationTimerRef.current)
+      // Celebration lasts 2 seconds
+      celebrationTimerRef.current = setTimeout(() => {
+        setCelebrationActive(false)
+      }, 2000)
+    }
+    return () => {
+      if (celebrationTimerRef.current) clearTimeout(celebrationTimerRef.current)
+    }
+  }, [lockedInZone])
 
   // ═══ SELECTED ZONE COLOR — For epic light takeover! ═══
   const selectedZoneColor = useMemo(() => {
@@ -1910,6 +2034,13 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
     const zone = ranges.find(r => r.optionId === selectedZone)
     return zone?.color
   }, [selectedZone, ranges])
+
+  // ═══ LOCKED IN ZONE COLOR — For celebration mode! ═══
+  const lockedInColor = useMemo(() => {
+    if (!lockedInZone) return undefined
+    const zone = ranges.find(r => r.optionId === lockedInZone)
+    return zone?.color
+  }, [lockedInZone, ranges])
 
   // ═══ MARKET TRANSITION — Dancers drop from sky! ═══
   const transitionGroupRef = useRef<THREE.Group>(null)
@@ -2132,10 +2263,20 @@ function DanceFloorScene({ options, gridCols, gridRows, onTileClick, dancers, is
       </group>
 
       {/* ═══ CLUB LIGHT RIG — Sweeping volumetric god rays! (Desktop only) ═══ */}
-      {!isMobile && <ClubLightRig width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} accentColor={selectedZoneColor} />}
+      {!isMobile && <ClubLightRig width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} accentColor={celebrationActive ? lockedInColor : selectedZoneColor} />}
 
       {/* ═══ SKYNET LASER ARRAY — Electric Forest 2AM vibes! ═══ */}
-      <SkynetLaserArray width={floorWidth} depth={floorDepth} colors={ranges.map(r => r.color)} isMobile={isMobile} accentColor={selectedZoneColor} />
+      <SkynetLaserArray
+        width={floorWidth}
+        depth={floorDepth}
+        colors={ranges.map(r => r.color)}
+        isMobile={isMobile}
+        accentColor={celebrationActive ? lockedInColor : selectedZoneColor}
+        celebrationMode={celebrationActive}
+      />
+
+      {/* ═══ CELEBRATION FLASH — Millionaire "Final Answer" moment! ═══ */}
+      <CelebrationFlash active={celebrationActive} color={lockedInColor} />
 
       {/* ═══ ALIEN FOREST ATMOSPHERE — Fog for laser visibility! ═══ */}
       <fogExp2 attach="fog" args={['#030208', isMobile ? 0.025 : 0.018]} />
@@ -2294,6 +2435,7 @@ export default function DanceFloor({
   marketQuestion,
   marketIcon,
   selectedZone,
+  lockedInZone,
   showIntro,
   onLoadProgress,
   onLoadComplete,
@@ -2407,6 +2549,7 @@ export default function DanceFloor({
           marketQuestion={marketQuestion}
           marketIcon={marketIcon}
           selectedZone={selectedZone}
+          lockedInZone={lockedInZone}
         />
       </Canvas>
 
