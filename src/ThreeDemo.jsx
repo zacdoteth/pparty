@@ -739,24 +739,24 @@ export default function ThreeDemo() {
         {!isMobile && (
           <div style={{
             position: 'absolute',
-            bottom: 24,
+            bottom: 'clamp(20px, 2vw, 40px)',
             left: '50%',
             transform: 'translateX(-50%)',
             pointerEvents: 'auto',
-            maxWidth: 800,
+            maxWidth: 'clamp(700px, 70vw, 1200px)',
             width: '92vw',
           }}>
             {/* ═══ MILLIONAIRE-STYLE TITLE BAR ═══ */}
             <div style={{
               background: 'linear-gradient(90deg, transparent 0%, rgba(100,50,255,0.4) 20%, rgba(100,50,255,0.5) 50%, rgba(100,50,255,0.4) 80%, transparent 100%)',
-              borderBottom: '2px solid rgba(255,215,0,0.6)',
-              padding: '14px 32px',
-              marginBottom: 12,
+              borderBottom: '3px solid rgba(255,215,0,0.6)',
+              padding: 'clamp(14px, 1.5vw, 24px) clamp(32px, 4vw, 64px)',
+              marginBottom: 'clamp(12px, 1.2vw, 20px)',
               clipPath: 'polygon(3% 0%, 97% 0%, 100% 100%, 0% 100%)',
             }}>
               <div style={{
                 textAlign: 'center',
-                fontSize: 22,
+                fontSize: 'clamp(22px, 2.2vw, 40px)',
                 fontWeight: 900,
                 color: '#fff',
                 textShadow: '0 0 30px rgba(255,215,0,0.6), 0 2px 8px rgba(0,0,0,0.9)',
@@ -775,12 +775,12 @@ export default function ThreeDemo() {
                 // Smart grid: 2 for binary, 3 for 3 options, 3 for 4-6, etc.
                 gridTemplateColumns: (() => {
                   const len = selectedMarket.options.length
-                  if (len <= 2) return 'repeat(2, minmax(120px, 200px))'  // Binary: compact
+                  if (len <= 2) return 'repeat(2, minmax(140px, 280px))'  // Binary: scales up on 4K
                   if (len === 3) return 'repeat(3, 1fr)'
                   if (len === 4) return 'repeat(2, 1fr)'
                   return 'repeat(3, 1fr)'  // 5+ options: 3 columns for density
                 })(),
-                gap: 8,
+                gap: 'clamp(8px, 0.8vw, 14px)',
                 justifyContent: selectedMarket.options.length <= 2 ? 'center' : 'stretch',
               }}
             >
@@ -818,7 +818,9 @@ export default function ThreeDemo() {
                     }}
                     style={{
                       position: 'relative',
-                      padding: selectedMarket.options.length >= 5 ? '12px 14px' : '14px 18px',
+                      padding: selectedMarket.options.length >= 5
+                        ? 'clamp(10px, 1vw, 16px) clamp(12px, 1.2vw, 20px)'
+                        : 'clamp(14px, 1.4vw, 24px) clamp(18px, 1.8vw, 32px)',
                       background: isBet
                         ? `linear-gradient(180deg, ${option.color}DD 0%, ${option.color}99 100%)`
                         : 'linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.9) 100%)',
@@ -827,14 +829,18 @@ export default function ThreeDemo() {
                       color: '#fff',
                       fontFamily: "'Space Grotesk', sans-serif",
                       fontWeight: 700,
-                      fontSize: selectedMarket.options.length >= 5 ? 13 : 15,
+                      fontSize: selectedMarket.options.length >= 5
+                        ? 'clamp(13px, 1.3vw, 22px)'
+                        : 'clamp(15px, 1.5vw, 26px)',
                       cursor: 'pointer',
                       transition: 'all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1)',
                       transform: isHolding || (isBet && isCanceling) ? 'scale(0.97)' : isSelected ? 'scale(1.02)' : 'scale(1)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: selectedMarket.options.length >= 5 ? 8 : 12,
-                      minHeight: selectedMarket.options.length >= 5 ? 44 : 50,
+                      gap: selectedMarket.options.length >= 5 ? 'clamp(8px, 0.8vw, 14px)' : 'clamp(12px, 1.2vw, 20px)',
+                      minHeight: selectedMarket.options.length >= 5
+                        ? 'clamp(44px, 4.5vw, 70px)'
+                        : 'clamp(50px, 5vw, 80px)',
                       textAlign: 'left',
                       overflow: 'hidden',
                       userSelect: 'none',
