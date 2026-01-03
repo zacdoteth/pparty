@@ -22,8 +22,24 @@
 .iso-world {
   position: relative;
   transform-style: preserve-3d;
-  /* PICTO-PARTY FIX: rotateX only — faces VIEWER directly like PictoChat/Habbo */
-  /* No rotateZ means NO/YES zones face you straight on! */
+  /* EPIC TURNTABLE — Slow mesmerizing rotation! */
+  /* "Leave it on your second monitor all day" — Miyamoto */
   transform: rotateX(55deg);
   transform-origin: center center;
+  /* THE EPIC ROTATION — 60s for one full rotation */
+  animation: turntable-rotate 60s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TURNTABLE ROTATION — The soul of the visualizer!
+   "Like a DJ spinning the world" — Toshiro
+   Slow enough to be hypnotic, fast enough to notice
+═══════════════════════════════════════════════════════════════ */
+@keyframes turntable-rotate {
+  0% {
+    transform: rotateX(55deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(55deg) rotateZ(360deg);
+  }
 }

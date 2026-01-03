@@ -297,7 +297,7 @@ function App() {
   // User bet state
   const [userBet, setUserBet] = useState(null) // { side: 'yes'|'no'|'zone1', amount: 20, marketId: 1 }
   const [showBetModal, setShowBetModal] = useState(false)
-  const [showDragModal, setShowDragModal] = useState(false) // NEW drag-to-vote modal
+  const [showDragModal, setShowDragModal] = useState(false)
   const [pendingZone, setPendingZone] = useState(null)
   const [userBalance, setUserBalance] = useState(250)
 
