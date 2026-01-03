@@ -662,7 +662,8 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
   const headRef = useRef<THREE.Group>(null!)
   const { camera } = useThree()
   const [angles, setAngles] = useState<LimbAngles>(() => getDanceFrame(danceMove, 0))
-  const [showSpeech, setShowSpeech] = useState(!!speech)
+  // User's speech bubble always shows, others cycle randomly
+  const [showSpeech, setShowSpeech] = useState(!!speech || isUser)
   const [headLookUp, setHeadLookUp] = useState(0)
   const [introProgress, setIntroProgress] = useState(0)
 
@@ -769,9 +770,9 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
     }
   })
 
-  // Cycle speech bubbles with OG crypto slang
+  // Cycle speech bubbles with OG crypto slang (not for user!)
   useEffect(() => {
-    if (!speech) {
+    if (!speech && !isUser) {
       const interval = setInterval(() => {
         // Randomly show/hide speech
         const show = Math.random() > 0.6
@@ -782,7 +783,7 @@ function StickFigure({ position, avatar, danceMove, speech, color, scale = 1.4, 
       }, 3000 + Math.random() * 4000)
       return () => clearInterval(interval)
     }
-  }, [speech])
+  }, [speech, isUser])
 
   // ═══ ZONE COLOR for body! ═══
   const bodyColor = color  // Now matches the tile color!
@@ -1107,10 +1108,10 @@ export function DancerGroup({ dancers, zoneRanges, gridCols, gridRows, tileSize,
   return (
     <group ref={groupRef}>
       {dancerPositions.map((dancer) => {
-        // ═══ USER SCALE BOOST — 2x larger when previewing bet! ═══
-        // "The star of the show needs to STAND OUT" — Nintendo UX
+        // ═══ USER SCALE BOOST — Slightly larger when previewing bet! ═══
+        // "Stand out, but don't overwhelm" — Nintendo UX
         const baseScale = isMobile ? 0.85 : 1.3
-        const userScale = dancer.isUser ? baseScale * 2 : baseScale
+        const userScale = dancer.isUser ? baseScale * 1.3 : baseScale
 
         return dancer && (
           <StickFigure
